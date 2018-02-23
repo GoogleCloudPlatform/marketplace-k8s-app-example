@@ -1,51 +1,38 @@
 # Overview
 
-This repository contains third party Kubernetes Applications that can
-be listed in (and deployed via) Google Cloud Marketplace.
+This repository contains example Kubernetes applications ("apps") that meet the
+requirements for integration with Google Cloud Marketplace. For a complete
+description of those requirements, see the technical onboarding guide.
+*TODO: add link*
 
-The marketplace-k8s-app-tools repository contains utilities that interact
-with Applications in this repository in an analogous manner to Google
-Cloud Marketplace, and can be used for rapid iteration.
+The related [marketplace-k8s-app-tools](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools)
+repository contains utilities for testing the integration of an app with
+Marketplace, including a test harness for simulating UI-based deployment.
+See instructions in that repository.
 
-## Implementation Overview
+# Marketplace Integration Requirements
 
-### Launcher Integrations
+Briefly, apps must support two modes of installation:
+- **CLI**: via a Kubernetes client tool like kubectl or helm
+- **Marketplace UI**: via the deployment container ("deployer") mechanism.
+  
+A few additional Marketplace requirements are described below.
 
-The root level Makefile in this repository is only intended to be invoked
-from a marketplace-k8s-app-tools repository, and it only serves to
-dispatch build targets to Application specific subdirectories. An
-illustrative wordpress example Application is provided by default.
+## Application resource and controller
 
-The following integration points are necesseary to facilitate integration
-with Google Cloud Marketplace.
+Apps must supply an Application resource conforming to the
+[Kubernetes community proposal](https://github.com/kubernetes/community/pull/1629).
+The proposal describes the Application resource, as well as a corresponding
+controller that would be responsible for application-generic functionality such
+as assigning owner references to application components.
 
-#### Deployer
+**Temporary Note**: the public source repository associated with the proposal is
+not yet available. In the interim, we have an equivalent CRD and controller in
+the marketplace-k8s-app-tools repository. Expect changes once the public repo is
+available.
 
-Applications must create a deployer container is based on the
-deployer_kubectl_base image in marketplace-k8s-app-tools and include
-relevant manifest templates.
+## Deployer
 
-This deployer container will be created by Cloud Marketplace, and will
-be passed the following environment variables:
-
-* APPLICATION_NAME
-  * the name that uniquely identifies the Application
-* NAMESPACE
-  * the namespace in which the Application's resources will be created
-* REGISTRY
-  * the registry in which Application image resources will reside
-
-The Application's manfiest templates should include $APPLICATION_NAME
-in all resource names in order prevent naming collisions.
-
-#### Controller
-
-Manifest templates must include a Deployment based on the controller
-image in marketplace-k8s-app-tools.
-
-This controller Deployment will monitor the health status of all manifest
-resources and assign owner references.
-
-### Command Line Installation
-
-TODO(trironkk): Fill me in.
+Apps must supply a deployment container image ("deployer") which is used in
+UI-based deployment. This image should extend from one of the base images
+provided in the marketplace-k8s-app-tools repository.
