@@ -1,0 +1,30 @@
+apiVersion: marketplace.cloud.google.com/v1
+kind: Application
+metadata:
+  annotations:
+    marketplace.cloud.google.com: |
+      {"name":"Wordpress","version":"v0.1","description":"The most popular blogging platform","url":"wordpress.org","tagline":"wordpress blog","support_info":"Community support","documentations":[{"url":"https://codex.wordpress.org/Getting_Started_with_WordPress","title":"Getting Started","description":"A quick walkthrough"}]}
+  ApplicationStatus:
+    ready: true
+  generation: 0
+  initializers: null
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  components:
+  - {{ .Release.Name }}-controller:
+      kind: Deployment
+  - {{ .Release.Name }}-deployer:
+      kind: Job
+  - {{ .Release.Name }}-wordpress:
+      kind: Deployment
+  - {{ .Release.Name }}-mariadb:
+      kind: Deployment
+  - {{ .Release.Name }}-wordpress:
+      kind: Service
+  - {{ .Release.Name }}-mariadb:
+      kind: Service
+  - {{ .Release.Name }}-wordpress:
+      kind: PersistentVolumeClaim
+  - {{ .Release.Name }}-mariadb:
+      kind: PersistentVolumeClaim

@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-controller"
+  labels:
+    app: {{ .Release.Name }}
+    component: wordpress-controller
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: {{ .Values.registry }}/marketplace/controller:latest
+        name: mysql
+        env:
+        - name: APPLICATION_NAME
+          value: {{ .Release.Name }}
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+
