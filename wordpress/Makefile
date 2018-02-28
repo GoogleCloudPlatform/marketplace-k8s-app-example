@@ -1,8 +1,15 @@
 $(shell mkdir -p .build/)
 
+.PHONY: build
 build: .build/app
 
+.PHONY: clean
+clean:
+	rm -rf .build/
+
 .build/app: Makefile deployer/*
+	ifndef REGISTRY
+		$(error REGISTRY var must be set to a Docker registry)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/wordpress/deployer" \
@@ -10,6 +17,3 @@ build: .build/app
 	    .
 	gcloud docker -- push "$(REGISTRY)/wordpress/deployer"
 	touch "$@"
-
-clean:
-	rm -rf .build/
