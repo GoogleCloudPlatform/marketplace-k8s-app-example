@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: launcher.gcr.io/google/nginx1 
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:

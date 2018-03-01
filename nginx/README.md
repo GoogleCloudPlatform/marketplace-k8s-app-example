@@ -48,7 +48,7 @@ Expand manifest template:
 helm template . --set APPLICATION_NAME=$APPLICATION_NAME,NAMESPACE=$NAMESPACE > expanded.yaml
 ```
 
-Run helm install:
+Run kubectl:
 ```
 kubectl apply -f expanded.yaml
 ```
