@@ -7,10 +7,7 @@ build: .build/app
 clean:
 	rm -rf .build/
 
-.build/app: Makefile deployer/*
-	ifndef REGISTRY
-		$(error REGISTRY var must be set to a Docker registry)
-	endif
+.build/app: check-env Makefile deployer/*
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/wordpress/deployer" \
@@ -18,3 +15,9 @@ clean:
 	    .
 	gcloud docker -- push "$(REGISTRY)/wordpress/deployer"
 	touch "$@"
+
+.PHONY: check-env
+check-env:
+ifndef REGISTRY
+  $(error REGISTRY var must be set to a Docker registry)
+endif
