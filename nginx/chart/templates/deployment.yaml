@@ -1,7 +1,7 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "nginx.fullname" . }}
+  name: {{ .Values.APPLICATION_NAME }}
   labels:
     app: {{ template "nginx.name" . }}
     chart: {{ template "nginx.chart" . }}
