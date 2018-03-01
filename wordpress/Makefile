@@ -13,7 +13,12 @@ clean:
 	    --tag "$(REGISTRY)/wordpress/deployer" \
 	    -f deployer/Dockerfile \
 	    .
+	cd init; \
+	docker build \
+	    --tag "$(REGISTRY)/wordpress/init" \
+	    .
 	gcloud docker -- push "$(REGISTRY)/wordpress/deployer"
+	gcloud docker -- push "$(REGISTRY)/wordpress/init"
 	touch "$@"
 
 .PHONY: check-env

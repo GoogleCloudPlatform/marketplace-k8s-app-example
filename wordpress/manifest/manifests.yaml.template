@@ -1,3 +1,4 @@
+---
 apiVersion: marketplace.cloud.google.com/v1
 kind: Application
 metadata:
@@ -129,6 +130,18 @@ spec:
     metadata:
       labels: *WordpressDeploymentLabels
     spec:
+      initContainers:
+      - image: $REGISTRY/wordpress/init
+        name: wordpress-init
+        env:
+        - name: AGENT_LOCAL_PORT
+          value: "6080"
+        volumeMounts:
+        - name: data
+          mountPath: /var/www/html
+          subPath: wp
+        - name: ubbagent-config
+          mountPath: /etc/ubbagent
       containers:
       - image: launcher.gcr.io/google/wordpress4-php5-apache
         name: wordpress
@@ -146,10 +159,30 @@ spec:
         - name: data
           mountPath: /var/www/html
           subPath: wp
+      - image: $REGISTRY/marketplace/ubbagent
+        name: ubbagent
+        env:
+        - name: AGENT_CONFIG_FILE
+          value: /etc/ubbagent/config.yaml
+        - name: AGENT_LOCAL_PORT
+          value: "6080"
+        - name: AGENT_STATE_DIR
+          value: /var/lib/ubbagent
+        - name: AGENT_REPORT_DIR
+          value: /var/lib/ubbagent/reports
+        volumeMounts:
+        - name: ubbagent-config
+          mountPath: /etc/ubbagent
+        - name: ubbagent-state
+          mountPath: /var/lib/ubbagent
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: $APPLICATION_NAME-wordpress-pvc
+      - name: ubbagent-config
+        emptyDir: {}
+      - name: ubbagent-state
+        emptyDir: {}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
