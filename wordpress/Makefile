@@ -10,6 +10,7 @@ clean:
 .build/app: Makefile deployer/*
 	ifndef REGISTRY
 		$(error REGISTRY var must be set to a Docker registry)
+	endif
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/wordpress/deployer" \
