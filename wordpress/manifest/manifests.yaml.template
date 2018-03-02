@@ -181,6 +181,7 @@ spec:
           claimName: $APPLICATION_NAME-wordpress-pvc
       - name: ubbagent-config
         emptyDir: {}
+      # TODO(volkman): state directory should maybe be on a PV.
       - name: ubbagent-state
         emptyDir: {}
 ---
