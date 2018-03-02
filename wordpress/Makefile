@@ -7,7 +7,7 @@ build: .build/app
 clean:
 	rm -rf .build/
 
-.build/app: Makefile deployer/* | check-env
+.build/app: Makefile deployer/* manifest/* | check-env
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/wordpress/deployer" \
