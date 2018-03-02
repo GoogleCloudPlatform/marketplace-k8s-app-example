@@ -1,0 +1,22 @@
+apiVersion: marketplace.cloud.google.com/v1
+kind: Application
+metadata:
+  annotations:
+    marketplace.cloud.google.com: |
+      {"name":"NGINX","version":"v0.1","description":"An HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.","url":"nginx.com","tagline":"nginx","support_info":"Community support","documentations":[{"url":"https://www.nginx.com/resources/wiki/start/","title":"Getting Started","description":"A quick walkthrough"}]}
+  ApplicationStatus:
+    ready: true
+  generation: 0
+  initializers: null
+  name: "{{ .Values.APPLICATION_NAME }}"
+  namespace: "{{ .Values.NAMESPACE }}"
+spec:
+  components:
+  - {{ .Values.APPLICATION_NAME }}:
+      kind: Deployment
+  - {{ .Values.APPLICATION_NAME }}:
+      kind: Service
+  - {{ .Values.APPLICATION_NAME }}-controller:
+      kind: Deployment
+  - {{ .Values.APPLICATION_NAME }}-deployer:
+      kind: Job

@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Values.APPLICATION_NAME }}-controller
+  labels:
+    app: {{ template "nginx.name" . }}
+    chart: {{ template "nginx.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "nginx.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "nginx.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - image: {{ .Values.REGISTRY }}/marketplace/controller
+        name: controller
+        env:
+        - name: APPLICATION_NAME
+          value: "{{ .Values.APPLICATION_NAME }}"
+        - name: NAMESPACE
+          value: "{{ .Values.NAMESPACE }}"
+
