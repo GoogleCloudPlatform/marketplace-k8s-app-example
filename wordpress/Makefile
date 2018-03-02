@@ -9,7 +9,7 @@ build: .build/deployer .build/init .build/marketplace-ubbagent
 clean:
 	rm -rf .build/
 
-.build/deployer: Makefile $(wildcard deployer/* manifest/*) | check-env
+.build/deployer: Makefile deployer/* manifest/* | check-env
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/wordpress/deployer" \
@@ -18,7 +18,7 @@ clean:
 	gcloud docker -- push "$(REGISTRY)/wordpress/deployer"
 	touch "$@"
 
-.build/init: Makefile $(wildcard init/*) | check-env
+.build/init: Makefile init/* | check-env
 	cd init; \
 	docker build \
 	    --tag "$(REGISTRY)/wordpress/init" \
@@ -26,7 +26,7 @@ clean:
 	gcloud docker -- push "$(REGISTRY)/wordpress/init"
 	touch "$@"
 
-.build/marketplace-ubbagent: Makefile $(wildcard $(AGENT_REPO)/* $(AGENT_REPO)/**/*) | check-env
+.build/marketplace-ubbagent: Makefile $(AGENT_REPO)/* $(AGENT_REPO)/**/* | check-env
 	@if [ ! -d "$(AGENT_REPO)" ]; then \
 	    echo "Expected metering agent repo (github.com/GoogleCloudPlatform/ubbagent) at $(AGENT_REPO)"; \
 	    exit 1; \
