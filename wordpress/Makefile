@@ -29,7 +29,7 @@ clean:
 	    exit 1; \
 	fi
 	cd "$(AGENT_REPO)"; \
-        docker build \
+	docker build \
 	    --tag "$(REGISTRY)/marketplace/ubbagent" \
 	    .
 	gcloud docker -- push "$(REGISTRY)/marketplace/ubbagent"
