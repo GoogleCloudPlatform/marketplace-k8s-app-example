@@ -39,13 +39,13 @@ Follow these instructions to install WordPress from the command line.
 
 Set environment variables (modify if necessary):
 ```
-export APPLICATION_NAME=nginx-1
+export APP_INSTANCE_NAME=nginx-1
 export NAMESPACE=default
 ```
 
 Expand manifest template:
 ```
-helm template . --set APPLICATION_NAME=$APPLICATION_NAME,NAMESPACE=$NAMESPACE > expanded.yaml
+helm template . --set APP_INSTANCE_NAME=$APP_INSTANCE_NAME,NAMESPACE=$NAMESPACE > expanded.yaml
 ```
 
 Run kubectl:
