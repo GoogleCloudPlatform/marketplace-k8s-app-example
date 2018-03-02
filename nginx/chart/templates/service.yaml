@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.APPLICATION_NAME }}
+  name: {{ .Values.APP_INSTANCE_NAME }}
   labels:
     app: {{ template "nginx.name" . }}
     chart: {{ template "nginx.chart" . }}

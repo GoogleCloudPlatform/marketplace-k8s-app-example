@@ -8,15 +8,15 @@ metadata:
     ready: true
   generation: 0
   initializers: null
-  name: "{{ .Values.APPLICATION_NAME }}"
+  name: "{{ .Values.APP_INSTANCE_NAME }}"
   namespace: "{{ .Values.NAMESPACE }}"
 spec:
   components:
-  - {{ .Values.APPLICATION_NAME }}:
+  - {{ .Values.APP_INSTANCE_NAME }}:
       kind: Deployment
-  - {{ .Values.APPLICATION_NAME }}:
+  - {{ .Values.APP_INSTANCE_NAME }}:
       kind: Service
-  - {{ .Values.APPLICATION_NAME }}-controller:
+  - {{ .Values.APP_INSTANCE_NAME }}-controller:
       kind: Deployment
-  - {{ .Values.APPLICATION_NAME }}-deployer:
+  - {{ .Values.APP_INSTANCE_NAME }}-deployer:
       kind: Job
