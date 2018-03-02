@@ -1,3 +1,4 @@
+---
 apiVersion: marketplace.cloud.google.com/v1
 kind: Application
 metadata:
@@ -8,33 +9,33 @@ metadata:
     ready: true
   generation: 0
   initializers: null
-  name: "$APPLICATION_NAME"
+  name: "$APP_INSTANCE_NAME"
   namespace: "$NAMESPACE"
 spec:
   components:
-  - $APPLICATION_NAME-controller:
+  - $APP_INSTANCE_NAME-controller:
       kind: Deployment
-  - $APPLICATION_NAME-mysql:
+  - $APP_INSTANCE_NAME-mysql:
       kind: Deployment
-  - $APPLICATION_NAME-mysql-pvc:
+  - $APP_INSTANCE_NAME-mysql-pvc:
       kind: PersistentVolumeClaim
-  - $APPLICATION_NAME-mysql-svc:
+  - $APP_INSTANCE_NAME-mysql-svc:
       kind: Service
-  - $APPLICATION_NAME-wordpress:
+  - $APP_INSTANCE_NAME-wordpress:
       kind: Deployment
-  - $APPLICATION_NAME-wordpress-pvc:
+  - $APP_INSTANCE_NAME-wordpress-pvc:
       kind: PersistentVolumeClaim
-  - $APPLICATION_NAME-wordpress-svc:
+  - $APP_INSTANCE_NAME-wordpress-svc:
       kind: Service
-  - $APPLICATION_NAME-deployer:
+  - $APP_INSTANCE_NAME-deployer:
       kind: Job
 ---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: $APPLICATION_NAME-controller
+  name: $APP_INSTANCE_NAME-controller
   labels: &MysqlDeploymentLabels
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-controller
 spec:
   replicas: 1
@@ -48,8 +49,8 @@ spec:
       - image: $REGISTRY/marketplace/controller
         name: mysql
         env:
-        - name: APPLICATION_NAME
-          value: "$APPLICATION_NAME"
+        - name: APP_INSTANCE_NAME
+          value: "$APP_INSTANCE_NAME"
         - name: NAMESPACE
           value: "$NAMESPACE"
 ---
@@ -57,9 +58,9 @@ spec:
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: $APPLICATION_NAME-mysql
+  name: $APP_INSTANCE_NAME-mysql
   labels: &MysqlDeploymentLabels
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-mysql
 spec:
   replicas: 1
@@ -82,14 +83,14 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: $APPLICATION_NAME-mysql-pvc
+          claimName: $APP_INSTANCE_NAME-mysql-pvc
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: $APPLICATION_NAME-mysql-pvc
+  name: $APP_INSTANCE_NAME-mysql-pvc
   labels:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-mysql
 spec:
   accessModes: [ReadWriteOnce]
@@ -101,15 +102,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: $APPLICATION_NAME-mysql-svc
+  name: $APP_INSTANCE_NAME-mysql-svc
   labels:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-mysql
 spec:
   ports:
   - port: 3306
   selector:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-mysql
   clusterIP: None
 ---
@@ -117,9 +118,9 @@ spec:
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: $APPLICATION_NAME-wordpress
+  name: $APP_INSTANCE_NAME-wordpress
   labels: &WordpressDeploymentLabels
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-webserver
 spec:
   replicas: 1
@@ -129,12 +130,24 @@ spec:
     metadata:
       labels: *WordpressDeploymentLabels
     spec:
+      initContainers:
+      - image: $REGISTRY/wordpress/init
+        name: wordpress-init
+        env:
+        - name: AGENT_LOCAL_PORT
+          value: "6080"
+        volumeMounts:
+        - name: data
+          mountPath: /var/www/html
+          subPath: wp
+        - name: ubbagent-config
+          mountPath: /etc/ubbagent
       containers:
       - image: launcher.gcr.io/google/wordpress4-php5-apache
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST
-          value: $APPLICATION_NAME-mysql-svc
+          value: $APP_INSTANCE_NAME-mysql-svc
         - name: WORDPRESS_DB_PASSWORD
           value: example-password
         - name: WORDPRESS_DB_USER
@@ -146,17 +159,38 @@ spec:
         - name: data
           mountPath: /var/www/html
           subPath: wp
+      - image: $REGISTRY/marketplace/ubbagent
+        name: ubbagent
+        env:
+        - name: AGENT_CONFIG_FILE
+          value: /etc/ubbagent/config.yaml
+        - name: AGENT_LOCAL_PORT
+          value: "6080"
+        - name: AGENT_STATE_DIR
+          value: /var/lib/ubbagent
+        - name: AGENT_REPORT_DIR
+          value: /var/lib/ubbagent/reports
+        volumeMounts:
+        - name: ubbagent-config
+          mountPath: /etc/ubbagent
+        - name: ubbagent-state
+          mountPath: /var/lib/ubbagent
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: $APPLICATION_NAME-wordpress-pvc
+          claimName: $APP_INSTANCE_NAME-wordpress-pvc
+      - name: ubbagent-config
+        emptyDir: {}
+      # TODO(volkman): state directory should maybe be on a PV.
+      - name: ubbagent-state
+        emptyDir: {}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: $APPLICATION_NAME-wordpress-pvc
+  name: $APP_INSTANCE_NAME-wordpress-pvc
   labels:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-webserver
 spec:
   accessModes: [ReadWriteOnce]
@@ -168,9 +202,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: $APPLICATION_NAME-wordpress-svc
+  name: $APP_INSTANCE_NAME-wordpress-svc
   labels:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-webserver
 spec:
   ports:
@@ -178,6 +212,6 @@ spec:
     port: 80
     targetPort: http
   selector:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: wordpress-webserver
   type: LoadBalancer

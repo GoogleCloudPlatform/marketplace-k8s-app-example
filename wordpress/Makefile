@@ -1,8 +1,15 @@
+AGENT_REPO ?= ../../ubbagent
+
 $(shell mkdir -p .build/)
 
-build: .build/app
+.PHONY: build
+build: .build/deployer .build/init .build/marketplace-ubbagent
 
-.build/app: Makefile deployer/*
+.PHONY: clean
+clean:
+	rm -rf .build/
+
+.build/deployer: Makefile deployer/* manifest/* | check-env
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/wordpress/deployer" \
@@ -11,5 +18,28 @@ build: .build/app
 	gcloud docker -- push "$(REGISTRY)/wordpress/deployer"
 	touch "$@"
 
-clean:
-	rm -rf .build/
+.build/init: Makefile init/* | check-env
+	cd init; \
+	docker build \
+	    --tag "$(REGISTRY)/wordpress/init" \
+	    .
+	gcloud docker -- push "$(REGISTRY)/wordpress/init"
+	touch "$@"
+
+.build/marketplace-ubbagent: Makefile $(AGENT_REPO)/* $(AGENT_REPO)/**/* | check-env
+	@if [ ! -d "$(AGENT_REPO)" ]; then \
+	    echo "Expected metering agent repo (github.com/GoogleCloudPlatform/ubbagent) at $(AGENT_REPO)"; \
+	    exit 1; \
+	fi
+	cd "$(AGENT_REPO)"; \
+	docker build \
+	    --tag "$(REGISTRY)/marketplace/ubbagent" \
+	    .
+	gcloud docker -- push "$(REGISTRY)/marketplace/ubbagent"
+	touch "$@"
+
+.PHONY: check-env
+check-env:
+ifndef REGISTRY
+  $(error REGISTRY var must be set to a Docker registry)
+endif
