@@ -20,25 +20,25 @@ metadata:
     ready: true
   generation: 0
   initializers: null
-  name: "$APPLICATION_NAME"
+  name: "$APP_INSTANCE_NAME"
   namespace: "$NAMESPACE"
 spec:
   components:
-  - $APPLICATION_NAME-controller:
+  - $APP_INSTANCE_NAME-controller:
       kind: Deployment
-  - $APPLICATION_NAME-elasticsearch:
+  - $APP_INSTANCE_NAME-elasticsearch:
       kind: StatefulSet
-  - $APPLICATION_NAME-elasticsearch-svc:
+  - $APP_INSTANCE_NAME-elasticsearch-svc:
       kind: Service
-  - $APPLICATION_NAME-deployer:
+  - $APP_INSTANCE_NAME-deployer:
       kind: Job
 ---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: $APPLICATION_NAME-controller
-  labels: &ElasticsearchDeploymentLabels
-    app: $APPLICATION_NAME
+  name: $APP_INSTANCE_NAME-controller
+  labels: &ElasticsearchControllerDeploymentLabels
+    app: $APP_INSTANCE_NAME
     component: elasticsearch-controller
 spec:
   replicas: 1
@@ -52,22 +52,22 @@ spec:
       - image: $REGISTRY/marketplace/controller
         name: elasticsearch
         env:
-        - name: APPLICATION_NAME
-          value: "$APPLICATION_NAME"
+        - name: APP_INSTANCE_NAME
+          value: "$APP_INSTANCE_NAME"
         - name: NAMESPACE
           value: "$NAMESPACE"
 ---
 apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
-  name: $APPLICATION_NAME-elasticsearch
+  name: $APP_INSTANCE_NAME-elasticsearch
   labels: &ElasticsearchDeploymentLabels
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: elasticsearch-server
 spec:
   selector:
     matchLabels: *ElasticsearchDeploymentLabels
-  serviceName: $APPLICATION_NAME-elasticsearch-svc
+  serviceName: $APP_INSTANCE_NAME-elasticsearch-svc
   replicas: 1
   template:
     metadata:
@@ -84,13 +84,13 @@ spec:
         - name: tcp-transport
           containerPort: 9300
         volumeMounts:
-        - name: $APPLICATION_NAME-elasticsearch-pvc
+        - name: $APP_INSTANCE_NAME-elasticsearch-pvc
           mountPath: /usr/share/elasticsearch/data
   volumeClaimTemplates:
   - metadata:
-      name: $APPLICATION_NAME-elasticsearch-pvc
+      name: $APP_INSTANCE_NAME-elasticsearch-pvc
       labels:
-        app: $APPLICATION_NAME
+        app: $APP_INSTANCE_NAME
         component: elasticsearch-server
     spec:
       accessModes: [ "ReadWriteOnce" ]
@@ -102,9 +102,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: $APPLICATION_NAME-elasticsearch-svc
+  name: $APP_INSTANCE_NAME-elasticsearch-svc
   labels:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: elasticsearch-server
 spec:
   ports:
@@ -113,6 +113,6 @@ spec:
   - name: tcp-transport
     port: 9300
   selector:
-    app: $APPLICATION_NAME
+    app: $APP_INSTANCE_NAME
     component: elasticsearch-server
   type: LoadBalancer

@@ -8,7 +8,7 @@ Follow these instructions to install Elasticsearch from the command line.
 
 Set environment variables (modify if necessary):
 ```
-export APPLICATION_NAME=elasticsearch-1
+export APP_INSTANCE_NAME=elasticsearch-1
 export NAMESPACE=default
 ```
 
