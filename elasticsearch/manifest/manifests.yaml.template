@@ -1,0 +1,118 @@
+apiVersion: marketplace.cloud.google.com/v1
+kind: Application
+metadata:
+  annotations:
+    marketplace.cloud.google.com: |
+      {
+        "name":"Elasticsearch",
+        "version":"v5.6",
+        "description":"Elasticsearch is an open-source search engine that provides a distributed, multitenant-capable full-text search engine with an HTTP web interface and schema-free JSON documents.",
+        "url":"www.elastic.co",
+        "tagline":"Distributed real time search and analytics",
+        "support_info":"Community support",
+        "documentations":[{
+          "url":"https://github.com/GoogleCloudPlatform/elasticsearch-docker/blob/master/5/README.md",
+          "title":"Getting Started",
+          "description":"Get started with Google Cloud Platform's Elasticsearch container image"
+        }]
+      }
+  ApplicationStatus:
+    ready: true
+  generation: 0
+  initializers: null
+  name: "$APP_INSTANCE_NAME"
+  namespace: "$NAMESPACE"
+spec:
+  components:
+  - $APP_INSTANCE_NAME-controller:
+      kind: Deployment
+  - $APP_INSTANCE_NAME-elasticsearch:
+      kind: StatefulSet
+  - $APP_INSTANCE_NAME-elasticsearch-svc:
+      kind: Service
+  - $APP_INSTANCE_NAME-deployer:
+      kind: Job
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: $APP_INSTANCE_NAME-controller
+  labels: &ElasticsearchControllerDeploymentLabels
+    app: $APP_INSTANCE_NAME
+    component: elasticsearch-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels: *ElasticsearchControllerDeploymentLabels
+  template:
+    metadata:
+      labels: *ElasticsearchControllerDeploymentLabels
+    spec:
+      containers:
+      - image: $REGISTRY/marketplace/controller
+        name: elasticsearch
+        env:
+        - name: APP_INSTANCE_NAME
+          value: "$APP_INSTANCE_NAME"
+        - name: NAMESPACE
+          value: "$NAMESPACE"
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: $APP_INSTANCE_NAME-elasticsearch
+  labels: &ElasticsearchDeploymentLabels
+    app: $APP_INSTANCE_NAME
+    component: elasticsearch-server
+spec:
+  selector:
+    matchLabels: *ElasticsearchDeploymentLabels
+  serviceName: $APP_INSTANCE_NAME-elasticsearch-svc
+  replicas: 1
+  template:
+    metadata:
+      labels: *ElasticsearchDeploymentLabels
+    spec:
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: elasticsearch
+        image: launcher.gcr.io/google/elasticsearch5:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: tcp-transport
+          containerPort: 9300
+        volumeMounts:
+        - name: $APP_INSTANCE_NAME-elasticsearch-pvc
+          mountPath: /usr/share/elasticsearch/data
+  volumeClaimTemplates:
+  - metadata:
+      name: $APP_INSTANCE_NAME-elasticsearch-pvc
+      labels:
+        app: $APP_INSTANCE_NAME
+        component: elasticsearch-server
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $APP_INSTANCE_NAME-elasticsearch-svc
+  labels:
+    app: $APP_INSTANCE_NAME
+    component: elasticsearch-server
+spec:
+  ports:
+  - name: http
+    port: 9200
+  - name: tcp-transport
+    port: 9300
+  selector:
+    app: $APP_INSTANCE_NAME
+    component: elasticsearch-server
+  type: LoadBalancer
