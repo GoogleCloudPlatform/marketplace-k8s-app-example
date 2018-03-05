@@ -70,7 +70,7 @@ spec:
       - image: $REGISTRY/marketplace/controller
         name: controller
         env:
-        - name: APPLICATION_NAME
+        - name: APP_INSTANCE_NAME
           value: "$APP_INSTANCE_NAME"
         - name: NAMESPACE
           value: "$NAMESPACE"
