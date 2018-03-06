@@ -12,9 +12,27 @@ metadata:
   name: "$APP_INSTANCE_NAME"
   namespace: "$NAMESPACE"
 spec:
+  # TODO(huyhuynh): This list "replaces" the original list created
+  # by the up script. As a result, the deployer service account, for example,
+  # is no longer owned by this application. We have to hackily list such
+  # non-application resources here.
+  # To correctly fix this, we need to use a proper merge stategy. The idea is
+  # that kubectl wouldn't touch the components that it doesn't manage.
+  #
+  # TODO(huyhuynh): Need a good way to do this. Listing the components
+  # manually like this is error-prone and especially hard when there are
+  # many manifest files or when they are modified.
   components:
   - $APP_INSTANCE_NAME-controller:
       kind: Deployment
+  - $APP_INSTANCE_NAME-controller-sa:
+      kind: ServiceAccount
+  - $APP_INSTANCE_NAME-controller-role:
+      kind: Role
+  - $APP_INSTANCE_NAME-controller-apprb:
+      kind: RoleBinding
+  - $APP_INSTANCE_NAME-controller-editrb:
+      kind: RoleBinding
   - $APP_INSTANCE_NAME-mysql:
       kind: Deployment
   - $APP_INSTANCE_NAME-mysql-pvc:
@@ -27,32 +45,19 @@ spec:
       kind: PersistentVolumeClaim
   - $APP_INSTANCE_NAME-wordpress-svc:
       kind: Service
+  # The following shouldn't be listed here. They are not part of the
+  # application itself, and the solution crafter shouldn't have to worry
+  # about them. See TODOs above.
   - $APP_INSTANCE_NAME-deployer:
       kind: Job
----
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  name: $APP_INSTANCE_NAME-controller
-  labels: &MysqlDeploymentLabels
-    app: $APP_INSTANCE_NAME
-    component: wordpress-controller
-spec:
-  replicas: 1
-  selector:
-    matchLabels: *MysqlDeploymentLabels
-  template:
-    metadata:
-      labels: *MysqlDeploymentLabels
-    spec:
-      containers:
-      - image: $REGISTRY/marketplace/controller
-        name: mysql
-        env:
-        - name: APP_INSTANCE_NAME
-          value: "$APP_INSTANCE_NAME"
-        - name: NAMESPACE
-          value: "$NAMESPACE"
+  - $APP_INSTANCE_NAME-deployer-sa:
+      kind: ServiceAccount
+  - $APP_INSTANCE_NAME-deployer-role:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+  - $APP_INSTANCE_NAME-deployer-rb:
+      apiGroup: rbac.authorization.k8s.io
+      kind: RoleBinding
 ---
 # TODO(huyhuynh): Change this to using StatefulSet
 apiVersion: apps/v1beta2
@@ -148,6 +153,7 @@ spec:
         env:
         - name: WORDPRESS_DB_HOST
           value: $APP_INSTANCE_NAME-mysql-svc
+        # TODO(huyhuynh): Use secrets.
         - name: WORDPRESS_DB_PASSWORD
           value: example-password
         - name: WORDPRESS_DB_USER
