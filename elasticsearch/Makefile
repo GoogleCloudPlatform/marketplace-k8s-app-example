@@ -2,7 +2,7 @@ $(shell mkdir -p .build/)
 
 build: .build/app
 
-.build/app: Makefile deployer/*
+.build/app: Makefile deployer/* manifest/*
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(REGISTRY)/elasticsearch/deployer" \

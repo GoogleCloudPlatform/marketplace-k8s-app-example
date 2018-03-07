@@ -27,7 +27,7 @@ spec:
       kind: Deployment
   - $APP_INSTANCE_NAME-controller-sa:
       kind: ServiceAccount
-  - $APP_INSTANCE_NAME-controller-role:
+  - $APP_INSTANCE_NAME-controller-approle:
       kind: Role
   - $APP_INSTANCE_NAME-controller-apprb:
       kind: RoleBinding
