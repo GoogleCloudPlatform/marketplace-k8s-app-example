@@ -26,36 +26,31 @@ spec:
   components:
   - $APP_INSTANCE_NAME-controller:
       kind: Deployment
+  - $APP_INSTANCE_NAME-controller-sa:
+      kind: ServiceAccount
+  - $APP_INSTANCE_NAME-controller-approle:
+      kind: Role
+  - $APP_INSTANCE_NAME-controller-apprb:
+      kind: RoleBinding
+  - $APP_INSTANCE_NAME-controller-editrb:
+      kind: RoleBinding
   - $APP_INSTANCE_NAME-elasticsearch:
       kind: StatefulSet
   - $APP_INSTANCE_NAME-elasticsearch-svc:
       kind: Service
+  # The following shouldn't be listed here. They are not part of the
+  # application itself, and the solution crafter shouldn't have to worry
+  # about them. See TODOs above.
   - $APP_INSTANCE_NAME-deployer:
       kind: Job
----
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  name: $APP_INSTANCE_NAME-controller
-  labels: &ElasticsearchControllerDeploymentLabels
-    app: $APP_INSTANCE_NAME
-    component: elasticsearch-controller
-spec:
-  replicas: 1
-  selector:
-    matchLabels: *ElasticsearchControllerDeploymentLabels
-  template:
-    metadata:
-      labels: *ElasticsearchControllerDeploymentLabels
-    spec:
-      containers:
-      - image: $REGISTRY/marketplace/controller
-        name: elasticsearch
-        env:
-        - name: APP_INSTANCE_NAME
-          value: "$APP_INSTANCE_NAME"
-        - name: NAMESPACE
-          value: "$NAMESPACE"
+  - $APP_INSTANCE_NAME-deployer-sa:
+      kind: ServiceAccount
+  - $APP_INSTANCE_NAME-deployer-role:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+  - $APP_INSTANCE_NAME-deployer-rb:
+      apiGroup: rbac.authorization.k8s.io
+      kind: RoleBinding
 ---
 apiVersion: apps/v1beta2
 kind: StatefulSet
