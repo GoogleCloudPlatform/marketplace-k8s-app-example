@@ -1,0 +1,4 @@
+[submodule "vendor/marketplace-tools"]
+	path = vendor/marketplace-tools
+	url = git@github.com:GoogleCloudPlatform/marketplace-k8s-app-tools.git
+	branch = huyhg-submodule
