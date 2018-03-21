@@ -1,12 +1,14 @@
 APP_NAME = wordpress
 AGENT_REPO ?= ../../ubbagent
 
+include ../vendor/marketplace-tools/gcloud.Makefile
+
 include ../vendor/marketplace-tools/crd.Makefile
 include ../vendor/marketplace-tools/app.Makefile
 
 app/build:: .build/deployer .build/init .build/marketplace-ubbagent
 
-.build/deployer: deployer/* manifest/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(MARKETPLACE_BASE_BUILD)/controller | app/setup
+.build/deployer: deployer/* manifest/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(MARKETPLACE_BASE_BUILD)/controller $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -15,7 +17,7 @@ app/build:: .build/deployer .build/init .build/marketplace-ubbagent
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/init: init/* | app/setup
+.build/init: init/* $(APP_BUILD)/registry_prefix | app/setup
 	cd init \
 	&& docker build \
 	      --tag "$(APP_REGISTRY)/init" \
@@ -23,7 +25,7 @@ app/build:: .build/deployer .build/init .build/marketplace-ubbagent
 	gcloud docker -- push "$(APP_REGISTRY)/init"
 	@touch "$@"
 
-.build/marketplace-ubbagent: $(AGENT_REPO)/* $(AGENT_REPO)/**/* | app/setup
+.build/marketplace-ubbagent: $(AGENT_REPO)/* $(AGENT_REPO)/**/* $(MARKETPLACE_BASE_BUILD)/registry_prefix  | app/setup
 	@if [ ! -d "$(AGENT_REPO)" ]; then \
 	    echo "Expected metering agent repo (github.com/GoogleCloudPlatform/ubbagent) at $(AGENT_REPO)"; \
 	    exit 1; \
