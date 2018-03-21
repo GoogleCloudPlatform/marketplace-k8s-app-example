@@ -67,7 +67,7 @@ spec:
     spec:
       serviceAccountName: $APP_INSTANCE_NAME-controller-sa
       containers:
-      - image: $REGISTRY/marketplace/controller
+      - image: $MARKETPLACE_REGISTRY/controller
         name: controller
         env:
         - name: APP_INSTANCE_NAME
