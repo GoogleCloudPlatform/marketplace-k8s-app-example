@@ -71,7 +71,6 @@ spec:
     metadata:
       labels: *MemcachedDeploymentLabels
     spec:
-      terminationGracePeriodSeconds: 180
       containers:
       - name: memcached
         image: launcher.gcr.io/google/memcached1:latest
@@ -85,25 +84,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: $APP_INSTANCE_NAME-memcached-svc
-  labels: &MemcachedDeploymentLabels
-    app: $APP_INSTANCE_NAME
-    component: memcached-server
 spec:
   type: LoadBalancer
+  ports:
+  - name: memcached-port
+    port: 11211
+    protocol: TCP
   selector:
-    matchLabels: *MemcachedDeploymentLabels
-  serviceName: $APP_INSTANCE_NAME-memcached
-  replicas: 1
-  template:
-    metadata:
-      labels: *MemcachedDeploymentLabels
-    spec:
-      terminationGracePeriodSeconds: 180
-      containers:
-      - name: memcached
-        image: launcher.gcr.io/google/memcached1:latest
-        imagePullPolicy: Always
-        ports:
-        - name: memcached-port
-          containerPort: 11211
-          protocol: TCP
+    app: $APP_INSTANCE_NAME
+    component: memcached-server
+
