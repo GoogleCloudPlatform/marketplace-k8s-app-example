@@ -19,7 +19,7 @@ are populated with proper code.
 
 ```shell
 git submodule sync --recursive
-git submodule update --recursive --remote
+git submodule update --recursive --init --remote
 ```
 
 ## Setting up your cluster and environment
