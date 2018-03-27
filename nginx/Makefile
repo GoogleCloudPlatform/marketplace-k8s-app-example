@@ -10,7 +10,7 @@ include $(tools_path)/ubbagent.Makefile
 
 app/build:: .build/deployer
 
-.build/deployer: deployer/* .build/nginx.tar.gz $(MARKETPLACE_BASE_BUILD)/deployer-helm $(MARKETPLACE_BASE_BUILD)/controller $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(MARKETPLACE_BASE_BUILD)/controller $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -18,6 +18,3 @@ app/build:: .build/deployer
 	    .
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
-
-.build/nginx.tar.gz: chart/* | app/setup
-	tar -czvf .build/nginx.tar.gz chart/
