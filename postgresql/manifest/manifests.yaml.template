@@ -1,0 +1,116 @@
+apiVersion: marketplace.cloud.google.com/v1
+kind: Application
+metadata:
+  annotations:
+    marketplace.cloud.google.com: |
+      {
+        "name":"PostgreSQL",
+        "version":"v10",
+        "description":"PostgreSQL is an open source object-relational database with an emphasis on extensibility and standards-compliance.",
+        "url":"https://www.postgresql.org/"
+        "tagline":"Object-relational database",
+        "support_info":"Community support",
+        "documentations":[{
+          "url":"https://github.com/GoogleCloudPlatform/postgresql-docker/blob/master/10/README.md"
+          "title":"Getting Started",
+          "description":"Get started with Google Cloud Platform's PostgreSQL container image"
+        }]
+      }
+  ApplicationStatus:
+    ready: true
+  generation: 0
+  initializers: null
+  name: $APP_INSTANCE_NAME
+  namespace: $NAMESPACE
+spec:
+  components:
+  - $APP_INSTANCE_NAME-postgresql-pod:
+      kind: Pod
+  - $APP_INSTANCE_NAME-postgresql-svc:
+      kind: Service
+  - $APP_INSTANCE_NAME-deployer:
+      kind: Job
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: $APP_INSTANCE_NAME-postgresql-set
+  labels:
+    app: $APP_INSTANCE_NAME
+    component: postgresql-server
+  ownerReferences:
+  - apiVersion: extensions/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Application
+    name: $APP_INSTANCE_NAME
+    uid: $APP_INSTANCE_UID
+spec:
+  selector:
+    matchLabels:
+      app: $APP_INSTANCE_NAME
+  serviceName: $APP_INSTANCE_NAME-postgresql-set
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: $APP_INSTANCE_NAME
+        component: postgresql-server
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: postgresql
+        image: launcher.gcr.io/google/postgresql10
+        env:
+        - name: "PGDATA"
+          value: "/var/lib/postgresql/data/pgdata"
+        - name: "POSTGRES_PASSWORD"
+          value: "Ec7QOwC6984rjqav"
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: $APP_INSTANCE_NAME-pvc
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: $APP_INSTANCE_NAME-pvc
+      labels:
+        app: $APP_INSTANCE_NAME
+        component: postgresql-server
+      ownerReferences:
+      - apiVersion: extensions/v1beta1
+        blockOwnerDeletion: true
+        controller: true
+        kind: Application
+        name: $APP_INSTANCE_NAME
+        uid: $APP_INSTANCE_UID
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $APP_INSTANCE_NAME-postgresql-svc
+  labels:
+    app: $APP_INSTANCE_NAME
+    component: postgresql-server
+  ownerReferences:
+  - apiVersion: extensions/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Application
+    name: $APP_INSTANCE_NAME
+    uid: $APP_INSTANCE_UID
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+  selector:
+    app: $APP_INSTANCE_NAME
+    component: postgresql-server
+  type: LoadBalancer
