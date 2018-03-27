@@ -2,22 +2,19 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: {{ .Values.APP_INSTANCE_NAME }}
-  labels:
+  labels: &Labels
     app: {{ template "nginx.name" . }}
     chart: {{ template "nginx.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    component: nginx
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      app: {{ template "nginx.name" . }}
-      release: {{ .Release.Name }}
+    matchLabels: *Labels
   template:
     metadata:
-      labels:
-        app: {{ template "nginx.name" . }}
-        release: {{ .Release.Name }}
+      labels: *Labels
     spec:
       containers:
         - name: {{ .Chart.Name }}

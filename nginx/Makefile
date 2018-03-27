@@ -1,19 +1,23 @@
-$(shell mkdir -p .build/)
+APP_NAME = nginx
 
-build: .build/app
+tools_path = ../vendor/marketplace-tools
 
-build/nginx.tar.gz: chart/*
-	mkdir -p build/
-	tar -czvf build/nginx.tar.gz chart/
+include $(tools_path)/gcloud.Makefile
 
-.build/app: Makefile deployer/* build/nginx.tar.gz
+include $(tools_path)/crd.Makefile
+include $(tools_path)/app.Makefile
+include $(tools_path)/ubbagent.Makefile
+
+app/build:: .build/deployer
+
+.build/deployer: deployer/* .build/nginx.tar.gz $(MARKETPLACE_BASE_BUILD)/deployer-helm $(MARKETPLACE_BASE_BUILD)/controller $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
-	    --build-arg REGISTRY="$(REGISTRY)" \
-	    --tag "$(REGISTRY)/nginx/deployer" \
+	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
+	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
-	gcloud docker -- push "$(REGISTRY)/nginx/deployer"
-	touch "$@"
+	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
+	@touch "$@"
 
-clean:
-	rm -rf .build/ build/
+.build/nginx.tar.gz: chart/* | app/setup
+	tar -czvf .build/nginx.tar.gz chart/
