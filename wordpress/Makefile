@@ -9,10 +9,6 @@ include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
 app/build:: .build/deployer .build/wordpress .build/init .build/mysql $(UBBAGENT_BUILD)/ubbagent
-ifndef APP_TAG
-  $(error Must define APP_TAG)
-endif
-
 
 .build/deployer: deployer/* manifest/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(MARKETPLACE_BASE_BUILD)/controller $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
