@@ -76,7 +76,7 @@ spec:
       labels: *MysqlDeploymentLabels
     spec:
       containers:
-      - image: launcher.gcr.io/google/mysql5
+      - image: $IMAGE_MYSQL
         name: mysql
         env:
         - name: "MYSQL_ROOT_PASSWORD"
@@ -136,7 +136,7 @@ spec:
       labels: *WordpressDeploymentLabels
     spec:
       initContainers:
-      - image: $REGISTRY/init
+      - image: $IMAGE_INIT
         name: wordpress-init
         env:
         - name: AGENT_LOCAL_PORT
@@ -148,7 +148,7 @@ spec:
         - name: ubbagent-config
           mountPath: /etc/ubbagent
       containers:
-      - image: launcher.gcr.io/google/wordpress4-php5-apache
+      - image: $IMAGE_WORDPRESS
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST
@@ -165,7 +165,7 @@ spec:
         - name: data
           mountPath: /var/www/html
           subPath: wp
-      - image: $MARKETPLACE_REGISTRY/ubbagent
+      - image: $IMAGE_UBBAGENT
         name: ubbagent
         env:
         - name: AGENT_CONFIG_FILE
