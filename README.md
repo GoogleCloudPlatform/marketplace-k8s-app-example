@@ -37,6 +37,7 @@ override these by exporting environment variables:
 export REGISTRY=gcr.io/your-registry
 export NAMESPACE=your-namespace
 export APP_INSTANCE_NAME=your-installation-name
+export APP_TAG=your-tag
 ```
 
 Do a one time setup for application CRD:
