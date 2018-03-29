@@ -37,7 +37,7 @@ metadata:
   name: $APP_INSTANCE_NAME-controller
   labels: &MemcachedControllerDeploymentLabels
     app: $APP_INSTANCE_NAME
-    component: memcached-controller
+    component: $APP_INSTANCE_NAME-controller
 spec:
   replicas: 1
   selector:

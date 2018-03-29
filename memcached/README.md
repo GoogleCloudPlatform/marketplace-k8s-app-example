@@ -8,8 +8,8 @@ Follow these instructions to install Elasticsearch from the command line.
 
 Set environment variables (modify if necessary):
 ```
-export APP_INSTANCE_NAME=memcached
-export NAMESPACE=default
+export APP_INSTANCE_NAME=memcached-1
+export NAMESPACE=database
 ```
 
 Expand manifest template:
