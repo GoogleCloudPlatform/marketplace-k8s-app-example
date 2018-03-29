@@ -1,4 +1,4 @@
-ARG REGISTRY
-FROM ${REGISTRY}/marketplace/deployer_kubectl_base
+ARG MARKETPLACE_REGISTRY
+FROM ${MARKETPLACE_REGISTRY}/deployer_kubectl_base
 
-ADD manifest/* /data/manifest
+ADD manifest/* /data/manifest/

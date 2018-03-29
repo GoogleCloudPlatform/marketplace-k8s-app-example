@@ -1,4 +1,9 @@
-ARG REGISTRY
-FROM ${REGISTRY}/marketplace/deployer_helm_base
+ARG MARKETPLACE_REGISTRY
+FROM launcher.gcr.io/google/debian9 AS build
 
-ADD build/nginx.tar.gz /data/chart
+ADD chart /tmp/chart
+RUN cd /tmp \
+    && tar -czvf /tmp/nginx.tar.gz chart/
+
+FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
+COPY --from=build /tmp/nginx.tar.gz /data/chart/
