@@ -33,9 +33,6 @@ spec:
       kind: Job
   - {{ .Values.APP_INSTANCE_NAME }}-deployer-sa:
       kind: ServiceAccount
-  - {{ .Values.APP_INSTANCE_NAME }}-deployer-role:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
   - {{ .Values.APP_INSTANCE_NAME }}-deployer-rb:
       apiGroup: rbac.authorization.k8s.io
       kind: RoleBinding

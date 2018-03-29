@@ -42,10 +42,8 @@ metadata:
   namespace: $NAMESPACE
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  # This role is intended for the deployer container. See comment
-  # above about this binding.
-  name: $APP_INSTANCE_NAME-deployer-role
+  kind: ClusterRole
+  name: admin
 subjects:
 - kind: ServiceAccount
   name: $APP_INSTANCE_NAME-controller-sa
