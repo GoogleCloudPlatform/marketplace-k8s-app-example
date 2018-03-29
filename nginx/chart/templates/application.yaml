@@ -18,5 +18,24 @@ spec:
       kind: Service
   - {{ .Values.APP_INSTANCE_NAME }}-controller:
       kind: Deployment
+  - {{ .Values.APP_INSTANCE_NAME }}-controller-sa:
+      kind: ServiceAccount
+  - {{ .Values.APP_INSTANCE_NAME }}-controller-approle:
+      kind: Role
+  - {{ .Values.APP_INSTANCE_NAME }}-controller-apprb:
+      kind: RoleBinding
+  - {{ .Values.APP_INSTANCE_NAME }}-controller-editrb:
+      kind: RoleBinding
+  # The following shouldn't be listed here. They are not part of the
+  # application itself, and the solution crafter shouldn't have to worry
+  # about them. See TODOs above.
   - {{ .Values.APP_INSTANCE_NAME }}-deployer:
       kind: Job
+  - {{ .Values.APP_INSTANCE_NAME }}-deployer-sa:
+      kind: ServiceAccount
+  - {{ .Values.APP_INSTANCE_NAME }}-deployer-role:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+  - {{ .Values.APP_INSTANCE_NAME }}-deployer-rb:
+      apiGroup: rbac.authorization.k8s.io
+      kind: RoleBinding
