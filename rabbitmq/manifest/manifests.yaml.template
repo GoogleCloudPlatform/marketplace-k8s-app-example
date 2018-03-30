@@ -35,7 +35,7 @@ spec:
   - $APP_INSTANCE_NAME-controller-editrb:
       kind: RoleBinding
   - $APP_INSTANCE_NAME-rabbitmq:
-      kind: Pod
+      kind: StatefulSet
   - $APP_INSTANCE_NAME-rabbitmq-svc:
       kind: Service
   - $APP_INSTANCE_NAME-deployer:
