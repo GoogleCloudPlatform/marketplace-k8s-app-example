@@ -3,6 +3,9 @@ kind: ServiceAccount
 metadata:
   name: $APP_INSTANCE_NAME-controller-sa
   namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 ---
 # This role is what an application specific controller would
 # typically need.
@@ -11,8 +14,11 @@ kind: Role
 metadata:
   name: $APP_INSTANCE_NAME-controller-approle
   namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 rules:
-- apiGroups: ['marketplace.cloud.google.com']
+- apiGroups: ['application.k8s.io']
   resources: ['applications']
   verbs: ['*']
 - apiGroups: ['']
@@ -24,6 +30,9 @@ kind: RoleBinding
 metadata:
   name: $APP_INSTANCE_NAME-controller-apprb
   namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -40,6 +49,9 @@ kind: RoleBinding
 metadata:
   name: $APP_INSTANCE_NAME-controller-editrb
   namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -53,8 +65,8 @@ kind: Deployment
 metadata:
   name: $APP_INSTANCE_NAME-controller
   labels: &DeploymentLabels
-    app: $APP_INSTANCE_NAME
-    component: elasticsearch-controller
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 spec:
   replicas: 1
   selector:

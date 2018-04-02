@@ -1,60 +1,10 @@
-apiVersion: marketplace.cloud.google.com/v1
-kind: Application
-metadata:
-  annotations:
-    marketplace.cloud.google.com: |
-      {
-        "name":"Elasticsearch",
-        "version":"v5.6",
-        "description":"Elasticsearch is an open-source search engine that provides a distributed, multitenant-capable full-text search engine with an HTTP web interface and schema-free JSON documents.",
-        "url":"www.elastic.co",
-        "tagline":"Distributed real time search and analytics",
-        "support_info":"Community support",
-        "documentations":[{
-          "url":"https://github.com/GoogleCloudPlatform/elasticsearch-docker/blob/master/5/README.md",
-          "title":"Getting Started",
-          "description":"Get started with Google Cloud Platform's Elasticsearch container image"
-        }]
-      }
-  ApplicationStatus:
-    ready: true
-  generation: 0
-  initializers: null
-  name: "$APP_INSTANCE_NAME"
-  namespace: "$NAMESPACE"
-spec:
-  components:
-  - $APP_INSTANCE_NAME-controller:
-      kind: Deployment
-  - $APP_INSTANCE_NAME-controller-sa:
-      kind: ServiceAccount
-  - $APP_INSTANCE_NAME-controller-approle:
-      kind: Role
-  - $APP_INSTANCE_NAME-controller-apprb:
-      kind: RoleBinding
-  - $APP_INSTANCE_NAME-controller-editrb:
-      kind: RoleBinding
-  - $APP_INSTANCE_NAME-elasticsearch:
-      kind: StatefulSet
-  - $APP_INSTANCE_NAME-elasticsearch-svc:
-      kind: Service
-  # The following shouldn't be listed here. They are not part of the
-  # application itself, and the solution crafter shouldn't have to worry
-  # about them. See TODOs above.
-  - $APP_INSTANCE_NAME-deployer:
-      kind: Job
-  - $APP_INSTANCE_NAME-deployer-sa:
-      kind: ServiceAccount
-  - $APP_INSTANCE_NAME-deployer-rb:
-      apiGroup: rbac.authorization.k8s.io
-      kind: RoleBinding
 ---
 apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
   name: $APP_INSTANCE_NAME-elasticsearch
   labels: &ElasticsearchDeploymentLabels
-    app: $APP_INSTANCE_NAME
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
     component: elasticsearch-server
 spec:
   selector:
@@ -96,7 +46,7 @@ kind: Service
 metadata:
   name: $APP_INSTANCE_NAME-elasticsearch-svc
   labels:
-    app: $APP_INSTANCE_NAME
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
     component: elasticsearch-server
 spec:
   ports:
