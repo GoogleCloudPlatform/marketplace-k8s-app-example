@@ -1,8 +1,9 @@
 APP_NAME ?= wordpress
 
 .PHONY: init
-init:
-	git submodules --init --remote --recursive
+submodule/init:
+	git submodule sync --recursive
+	git submodule update --init --recursive
 
 .PHONY: build/$(APP_NAME)
 build/$(APP_NAME): $(APP_NAME)/**/*
