@@ -10,7 +10,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: $APP_INSTANCE_NAME-controller-apprb
+  name: $APP_INSTANCE_NAME-controller-rb
   namespace: $NAMESPACE
   labels:
     application.k8s.io/name: "$APP_INSTANCE_NAME"
