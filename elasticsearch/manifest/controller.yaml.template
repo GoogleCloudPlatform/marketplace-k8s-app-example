@@ -3,43 +3,18 @@ kind: ServiceAccount
 metadata:
   name: $APP_INSTANCE_NAME-controller-sa
   namespace: $NAMESPACE
----
-# This role is what an application specific controller would
-# typically need.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: $APP_INSTANCE_NAME-controller-approle
-  namespace: $NAMESPACE
-rules:
-- apiGroups: ['marketplace.cloud.google.com']
-  resources: ['applications']
-  verbs: ['*']
-- apiGroups: ['']
-  resources: ['events']
-  verbs: ['*']
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: $APP_INSTANCE_NAME-controller-apprb
+  name: $APP_INSTANCE_NAME-controller-rb
   namespace: $NAMESPACE
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: $APP_INSTANCE_NAME-controller-approle
-subjects:
-- kind: ServiceAccount
-  name: $APP_INSTANCE_NAME-controller-sa
----
-# We need this binding because the controller currently
-# needs to assign owner references. This functionality
-# will be replaced by the CRD controller.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: $APP_INSTANCE_NAME-controller-editrb
-  namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -53,8 +28,8 @@ kind: Deployment
 metadata:
   name: $APP_INSTANCE_NAME-controller
   labels: &DeploymentLabels
-    app: $APP_INSTANCE_NAME
-    component: elasticsearch-controller
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 spec:
   replicas: 1
   selector:
