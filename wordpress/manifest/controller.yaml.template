@@ -7,24 +7,6 @@ metadata:
     application.k8s.io/name: "$APP_INSTANCE_NAME"
     component: controller
 ---
-# This role is what an application specific controller would
-# typically need.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: $APP_INSTANCE_NAME-controller-approle
-  namespace: $NAMESPACE
-  labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: controller
-rules:
-- apiGroups: ['application.k8s.io']
-  resources: ['applications']
-  verbs: ['*']
-- apiGroups: ['']
-  resources: ['events']
-  verbs: ['*']
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -35,27 +17,8 @@ metadata:
     component: controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: $APP_INSTANCE_NAME-controller-approle
-subjects:
-- kind: ServiceAccount
-  name: $APP_INSTANCE_NAME-controller-sa
----
-# We need this binding because the controller currently
-# needs to assign owner references. This functionality
-# will be replaced by the CRD controller.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: $APP_INSTANCE_NAME-controller-editrb
-  namespace: $NAMESPACE
-  labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: admin
+  name: cluster-admin
 subjects:
 - kind: ServiceAccount
   name: $APP_INSTANCE_NAME-controller-sa
