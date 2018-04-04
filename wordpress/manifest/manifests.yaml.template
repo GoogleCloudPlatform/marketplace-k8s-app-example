@@ -55,7 +55,7 @@ spec:
   ports:
   - port: 3306
   selector:
-    app: $APP_INSTANCE_NAME
+    application.k8s.io/name: $APP_INSTANCE_NAME
     component: wordpress-mysql
   clusterIP: None
 ---
@@ -158,6 +158,6 @@ spec:
     port: 80
     targetPort: http
   selector:
-    app: $APP_INSTANCE_NAME
+    application.k8s.io/name: wordpress-1
     component: wordpress-webserver
   type: LoadBalancer
