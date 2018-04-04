@@ -3,28 +3,18 @@ kind: ServiceAccount
 metadata:
   name: $APP_INSTANCE_NAME-controller-sa
   namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: $APP_INSTANCE_NAME-controller-apprb
+  name: $APP_INSTANCE_NAME-controller-rb
   namespace: $NAMESPACE
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: ServiceAccount
-  name: $APP_INSTANCE_NAME-controller-sa
----
-# We need this binding because the controller currently
-# needs to assign owner references. This functionality
-# will be replaced by the CRD controller.
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: $APP_INSTANCE_NAME-controller-editrb
-  namespace: $NAMESPACE
+  labels:
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -37,16 +27,16 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: $APP_INSTANCE_NAME-controller
-  labels: &MysqlDeploymentLabels
-    app: $APP_INSTANCE_NAME
-    component: wordpress-controller
+  labels: &DeploymentLabels
+    application.k8s.io/name: "$APP_INSTANCE_NAME"
+    component: controller
 spec:
   replicas: 1
   selector:
-    matchLabels: *MysqlDeploymentLabels
+    matchLabels: *DeploymentLabels
   template:
     metadata:
-      labels: *MysqlDeploymentLabels
+      labels: *DeploymentLabels
     spec:
       serviceAccountName: $APP_INSTANCE_NAME-controller-sa
       containers:
