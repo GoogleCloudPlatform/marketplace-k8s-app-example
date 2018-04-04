@@ -3,7 +3,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.APP_INSTANCE_NAME }}
   labels: &Labels
-    application.k8s.io/name: "{{ .Values.APP_INSTANCE_NAME }}"
+    app.kubernetes.io/name: "{{ .Values.APP_INSTANCE_NAME }}"
+    app.kubernetes.io/component: nginx
     app: {{ template "nginx.name" . }}
     chart: {{ template "nginx.chart" . }}
     release: {{ .Release.Name }}

@@ -4,8 +4,8 @@ metadata:
   name: $APP_INSTANCE_NAME-controller-sa
   namespace: $NAMESPACE
   labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: controller
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: controller
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -13,8 +13,8 @@ metadata:
   name: $APP_INSTANCE_NAME-controller-rb
   namespace: $NAMESPACE
   labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: controller
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -28,8 +28,8 @@ kind: Deployment
 metadata:
   name: $APP_INSTANCE_NAME-controller
   labels: &DeploymentLabels
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: controller
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: controller
 spec:
   replicas: 1
   selector:
