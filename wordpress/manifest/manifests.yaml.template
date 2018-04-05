@@ -5,8 +5,8 @@ kind: Deployment
 metadata:
   name: $APP_INSTANCE_NAME-mysql
   labels: &MysqlDeploymentLabels
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: wordpress-mysql
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: wordpress-mysql
 spec:
   replicas: 1
   selector:
@@ -35,8 +35,8 @@ apiVersion: v1
 metadata:
   name: $APP_INSTANCE_NAME-mysql-pvc
   labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: wordpress-mysql
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: wordpress-mysql
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: standard
@@ -49,14 +49,14 @@ kind: Service
 metadata:
   name: $APP_INSTANCE_NAME-mysql-svc
   labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: wordpress-mysql
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: wordpress-mysql
 spec:
   ports:
   - port: 3306
   selector:
-    application.k8s.io/name: $APP_INSTANCE_NAME
-    component: wordpress-mysql
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: wordpress-mysql
   clusterIP: None
 ---
 # TODO(huyhuynh): Change this to using StatefulSet
@@ -65,8 +65,8 @@ kind: Deployment
 metadata:
   name: $APP_INSTANCE_NAME-wordpress
   labels: &WordpressDeploymentLabels
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: wordpress-webserver
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: wordpress-webserver
 spec:
   replicas: 1
   selector:
@@ -136,8 +136,8 @@ apiVersion: v1
 metadata:
   name: $APP_INSTANCE_NAME-wordpress-pvc
   labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: wordpress-webserver
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: wordpress-webserver
 spec:
   accessModes: [ReadWriteOnce]
   storageClassName: standard
@@ -150,14 +150,14 @@ kind: Service
 metadata:
   name: $APP_INSTANCE_NAME-wordpress-svc
   labels:
-    application.k8s.io/name: "$APP_INSTANCE_NAME"
-    component: wordpress-webserver
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: wordpress-webserver
 spec:
   ports:
   - name: http
     port: 80
     targetPort: http
   selector:
-    application.k8s.io/name: wordpress-1
-    component: wordpress-webserver
+    app.kubernetes.io/name: wordpress-1
+    app.kubernetes.io/component: wordpress-webserver
   type: LoadBalancer
