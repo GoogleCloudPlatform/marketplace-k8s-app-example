@@ -28,17 +28,7 @@ See [Getting Started](https://github.com/GoogleCloudPlatform/marketplace-k8s-app
 
 ## Installing Wordpress
 
-Run the following commands from within `wordpress` folder. Note that
-by defaults `make` derives docker registry and k8s namespace
-from your local configurations of `gcloud` and `kubectl`. You can
-override these by exporting environment variables:
-
-```shell
-export REGISTRY=gcr.io/your-registry
-export NAMESPACE=your-namespace
-export APP_INSTANCE_NAME=your-installation-name
-export APP_TAG=your-tag
-```
+Run the following commands from within `wordpress` folder.
 
 Do a one time setup for application CRD:
 
@@ -64,6 +54,27 @@ To delete the installation, run:
 
 ```shell
 make app/uninstall
+```
+
+## Overriding context values (Optional)
+
+By default `make` derives docker registry and k8s namespace
+from your local configurations of `gcloud` and `kubectl`. 
+
+You can see these values using
+
+```shell
+kubectl config view
+```
+
+If you want to use values that differ from the local context of `gcloud` and `kubectl`,
+you can override them by exporting the appropriate environment variables:
+
+```shell
+export REGISTRY=gcr.io/your-registry
+export NAMESPACE=your-namespace
+export APP_INSTANCE_NAME=your-installation-name
+export APP_TAG=your-tag
 ```
 
 # Marketplace Integration Requirements
