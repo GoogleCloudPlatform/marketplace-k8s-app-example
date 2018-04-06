@@ -45,8 +45,9 @@ spec:
     spec:
       serviceAccountName: {{ .Values.APP_INSTANCE_NAME }}-controller-sa
       containers:
-      - image: {{ .Values.MARKETPLACE_REGISTRY }}/controller
-        name: controller
+      - name: controller
+        image: {{ .Values.imageController.image }}:{{ .Values.imageController.tag }}
+        imagePullPolicy: {{ .Values.imageController.pullPolicy }}
         env:
         - name: APP_INSTANCE_NAME
           value: "{{ .Values.APP_INSTANCE_NAME }}"

@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.imageNginx.image }}:{{ .Values.imageNginx.tag }}"
+          imagePullPolicy: {{ .Values.imageNginx.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
