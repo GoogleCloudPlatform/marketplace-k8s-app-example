@@ -1,9 +1,9 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ .Values.APP_INSTANCE_NAME }}
+  name: {{ .Release.Name }}
   labels: &Labels
-    app.kubernetes.io/name: "{{ .Values.APP_INSTANCE_NAME }}"
+    app.kubernetes.io/name: "{{ .Release.Name }}"
     app.kubernetes.io/component: nginx
     app: {{ template "nginx.name" . }}
     chart: {{ template "nginx.chart" . }}
@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.imageNginx.image }}:{{ .Values.imageNginx.tag }}"
+          imagePullPolicy: {{ .Values.imageNginx.pullPolicy }}
           ports:
             - name: http
               containerPort: 80

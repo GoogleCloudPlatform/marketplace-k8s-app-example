@@ -4,9 +4,14 @@
 
 replicaCount: 1
 
-image:
-  repository: launcher.gcr.io/google/nginx1 
-  tag: latest
+imageNginx:
+  image: $REGISTRY
+  tag: $TAG
+  pullPolicy: IfNotPresent
+
+imageController:
+  image: $REGISTRY/controller
+  tag: $TAG
   pullPolicy: IfNotPresent
 
 service:
