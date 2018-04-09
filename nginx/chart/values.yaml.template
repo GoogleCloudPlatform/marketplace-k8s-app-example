@@ -9,11 +9,6 @@ imageNginx:
   tag: $TAG
   pullPolicy: IfNotPresent
 
-imageController:
-  image: $REGISTRY/controller
-  tag: $TAG
-  pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 80
