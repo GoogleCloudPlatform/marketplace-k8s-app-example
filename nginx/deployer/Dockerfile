@@ -2,13 +2,18 @@ ARG MARKETPLACE_REGISTRY
 FROM launcher.gcr.io/google/debian9 AS build
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gettext
+    && apt-get install -y --no-install-recommends \
+    gettext
 
 ARG REGISTRY
 ARG TAG
-ADD chart /tmp/chart
+ARG MARKETPLACE_REGISTRY
+COPY chart /tmp/chart
 RUN cd /tmp/chart \
-    && REGISTRY="$REGISTRY" TAG="$TAG" cat values.yaml.template | envsubst > values.yaml \
+    && MARKETPLACE_REGISTRY="${MARKETPLACE_REGISTRY}" \
+       REGISTRY="$REGISTRY" \
+       TAG="$TAG" \
+       cat values.yaml.template | envsubst > values.yaml \
     && rm values.yaml.template
 RUN cd /tmp \
     && tar -czvf /tmp/nginx.tar.gz chart/

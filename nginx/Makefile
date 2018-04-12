@@ -10,9 +10,15 @@ include $(tools_path)/ubbagent.Makefile
 
 app/build:: .build/deployer .build/nginx
 
-.build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: \
+  $(APP_BUILD)/registry_prefix \
+  $(MARKETPLACE_BASE_BUILD)/deployer-helm \
+  chart/* \
+  deployer/* \
+  | app/setup
+
 	docker build \
-            --build-arg REGISTRY="$(APP_REGISTRY)" \
+      --build-arg REGISTRY="$(APP_REGISTRY)" \
 	    --build-arg TAG="$(APP_TAG)" \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -20,6 +26,25 @@ app/build:: .build/deployer .build/nginx
 	    .
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
+
+
+app/build/integ:: \
+	.build/deployer/integ \
+	.build/nginx
+
+.build/deployer/integ: \
+	.build/deployer \
+	chart-integ/* \
+	| app/setup
+
+	docker build \
+	    --build-arg APP_DEPLOYER_IMAGE="$(APP_DEPLOYER_IMAGE)" \
+	    --tag "$(APP_DEPLOYER_IMAGE_INTEG)" \
+	    -f deployer/Dockerfile-integ \
+	    .
+	gcloud docker -- push "$(APP_DEPLOYER_IMAGE_INTEG)"
+	@touch "$@"
+
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
