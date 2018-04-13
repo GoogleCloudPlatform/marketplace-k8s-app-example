@@ -10,7 +10,7 @@ include $(tools_path)/ubbagent.Makefile
 
 APP_PARAMETERS = '{ "REGISTRY": "$(APP_REGISTRY)", "TAG": "$(APP_TAG)"}'
 
-app/build:: .build/deployer .build/nginx .build/controller
+app/build:: .build/deployer .build/nginx
 
 .build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
@@ -29,11 +29,4 @@ app/build:: .build/deployer .build/nginx .build/controller
 	gcloud docker -- pull launcher.gcr.io/google/nginx1
 	docker tag launcher.gcr.io/google/nginx1 "$(APP_REGISTRY):$(APP_TAG)"
 	gcloud docker -- push "$(APP_REGISTRY):$(APP_TAG)"
-	@touch "$@"
-
-# Relocate public controller image to $APP_REGISTRY.
-.build/controller: $(APP_BUILD)/registry_prefix $(MARKETPLACE_BASE_BUILD)/controller | app/setup
-	gcloud docker -- pull "$(MARKETPLACE_REGISTRY)/controller"
-	docker tag "$(MARKETPLACE_REGISTRY)/controller" "$(APP_REGISTRY)/controller:$(APP_TAG)"
-	gcloud docker -- push "$(APP_REGISTRY)/controller:$(APP_TAG)"
 	@touch "$@"
