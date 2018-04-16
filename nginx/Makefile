@@ -8,18 +8,17 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
+APP_PARAMETERS = '{ "REGISTRY": "$(APP_REGISTRY)", "TAG": "$(APP_TAG)", "MARKETPLACE_REGISTRY": "$(MARKETPLACE_REGISTRY)"}'
+
 app/build:: .build/deployer .build/nginx
 
+app/build-integ:: .build/deployer-integ .build/nginx
+
 .build/deployer: \
-  $(APP_BUILD)/registry_prefix \
-  $(MARKETPLACE_BASE_BUILD)/deployer-helm \
-  chart/* \
-  deployer/* \
-  | app/setup
+	chart/* \
+	deployer/*
 
 	docker build \
-      --build-arg REGISTRY="$(APP_REGISTRY)" \
-	    --build-arg TAG="$(APP_TAG)" \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
@@ -28,21 +27,17 @@ app/build:: .build/deployer .build/nginx
 	@touch "$@"
 
 
-app/build/integ:: \
-	.build/deployer/integ \
-	.build/nginx
-
-.build/deployer/integ: \
+.build/deployer-integ: \
 	.build/deployer \
 	chart-integ/* \
-	| app/setup
+	deployer-integ/*
 
 	docker build \
 	    --build-arg APP_DEPLOYER_IMAGE="$(APP_DEPLOYER_IMAGE)" \
-	    --tag "$(APP_DEPLOYER_IMAGE_INTEG)" \
-	    -f deployer/Dockerfile-integ \
+	    --tag "$(APP_DEPLOYER_INTEG_IMAGE)" \
+	    -f deployer-integ/Dockerfile \
 	    .
-	gcloud docker -- push "$(APP_DEPLOYER_IMAGE_INTEG)"
+	gcloud docker -- push "$(APP_DEPLOYER_INTEG_IMAGE)"
 	@touch "$@"
 
 

@@ -1,0 +1,5 @@
+tester:
+  image: $MARKETPLACE_REGISTRY/tester_dummy
+  tag: $TAG
+  duration: "10"
+  exitcode: "0"
