@@ -12,8 +12,6 @@ APP_PARAMETERS = '{ "REGISTRY": "$(APP_REGISTRY)", "TAG": "$(APP_TAG)", "MARKETP
 
 app/build:: .build/deployer .build/nginx
 
-app/build-integ:: .build/deployer-integ .build/nginx
-
 .build/deployer: \
 	chart/* \
 	deployer/*
@@ -25,21 +23,6 @@ app/build-integ:: .build/deployer-integ .build/nginx
 	    .
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
-
-
-.build/deployer-integ: \
-	.build/deployer \
-	chart-integ/* \
-	deployer-integ/*
-
-	docker build \
-	    --build-arg APP_DEPLOYER_IMAGE="$(APP_DEPLOYER_IMAGE)" \
-	    --tag "$(APP_DEPLOYER_INTEG_IMAGE)" \
-	    -f deployer-integ/Dockerfile \
-	    .
-	gcloud docker -- push "$(APP_DEPLOYER_INTEG_IMAGE)"
-	@touch "$@"
-
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
