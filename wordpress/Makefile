@@ -8,6 +8,16 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
+define APP_PARAMETERS
+{ \
+  "IMAGE_WORDPRESS": "$(APP_REGISTRY):$(APP_TAG)", \
+  "IMAGE_INIT": "$(APP_REGISTRY)/init:$(APP_TAG)", \
+  "IMAGE_MYSQL": "$(APP_REGISTRY)/mysql:$(APP_TAG)", \
+  "IMAGE_UBBAGENT": "$(APP_REGISTRY)/ubbagent:$(APP_TAG)" \
+}
+endef
+
+export APP_PARAMETERS
 app/build:: .build/deployer .build/wordpress .build/init .build/mysql .build/ubbagent
 
 .build/deployer: deployer/* manifest/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix | app/setup
