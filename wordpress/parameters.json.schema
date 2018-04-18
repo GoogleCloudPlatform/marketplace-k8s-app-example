@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "IMAGE_WORDPRESS": {
+      "type": "string",
+      "default": "gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress:latest"
+    },
+    "IMAGE_INIT": {
+      "type": "string",
+      "default": "gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/init:latest"
+    },
+    "IMAGE_MYSQL": {
+      "type": "string",
+      "default": "gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/mysql:latest"
+    },
+    "IMAGE_UBBAGENT": {
+      "type": "string",
+      "default": "gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/ubbagent:latest"
+    }
+  },
+  "required": [
+    "IMAGE_WORDPRESS",
+    "IMAGE_INIT",
+    "IMAGE_MYSQL",
+    "IMAGE_UBBAGENT"
+  ]
+}
