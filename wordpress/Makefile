@@ -10,6 +10,8 @@ include $(tools_path)/ubbagent.Makefile
 
 define APP_PARAMETERS
 { \
+  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
+  "NAMESPACE": "$(NAMESPACE)", \
   "IMAGE_WORDPRESS": "$(APP_REGISTRY):$(APP_TAG)", \
   "IMAGE_INIT": "$(APP_REGISTRY)/init:$(APP_TAG)", \
   "IMAGE_MYSQL": "$(APP_REGISTRY)/mysql:$(APP_TAG)", \
