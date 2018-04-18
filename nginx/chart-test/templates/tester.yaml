@@ -3,8 +3,7 @@ kind: Job
 metadata:
   name: "tester"
   labels:
-    app.kubernetes.io/name: "tester"
-    tester: "true"
+    app.kubernetes.io/name: "{{ .Release.Name }}"
 spec:
   template:
     spec:
