@@ -8,7 +8,12 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
-APP_PARAMETERS = '{ "REGISTRY": "$(APP_REGISTRY)", "TAG": "$(APP_TAG)", "MARKETPLACE_REGISTRY": "$(MARKETPLACE_REGISTRY)"}'
+APP_PARAMETERS = '{ \
+  "REGISTRY": "$(APP_REGISTRY)", \
+  "TAG": "$(APP_TAG)", \
+  "MARKETPLACE_REGISTRY": "$(MARKETPLACE_REGISTRY)", \
+  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)"\
+  }'
 
 app/build:: .build/deployer .build/nginx
 
