@@ -18,8 +18,11 @@ APP_PARAMETERS = '{ \
 app/build:: .build/deployer .build/nginx
 
 .build/deployer: \
+	$(APP_BUILD)/registry_prefix \
+	$(MARKETPLACE_BASE_BUILD)/deployer-helm \
 	chart/* \
-	deployer/*
+	deployer/* \
+	| app/setup
 
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
