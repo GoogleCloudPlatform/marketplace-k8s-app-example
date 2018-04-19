@@ -1,0 +1,25 @@
+# TODO: Add x-google-properties.
+properties:
+  APP_INSTANCE_NAME:
+    type: string
+  NAMESPACE:
+    type: string
+  IMAGE_WORDPRESS:
+    type: string
+    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress:latest
+  IMAGE_INIT:
+    type: string
+    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/init:latest
+  IMAGE_MYSQL:
+    type: string
+    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/mysql:latest
+  IMAGE_UBBAGENT:
+    type: string
+    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/ubbagent:latest
+required:
+- APP_INSTANCE_NAME
+- NAMESPACE
+- IMAGE_WORDPRESS
+- IMAGE_INIT
+- IMAGE_MYSQL
+- IMAGE_UBBAGENT
