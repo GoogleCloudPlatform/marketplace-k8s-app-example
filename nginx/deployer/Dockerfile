@@ -2,7 +2,8 @@ ARG MARKETPLACE_REGISTRY
 FROM launcher.gcr.io/google/debian9 AS build
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gettext
+    && apt-get install -y --no-install-recommends \
+    gettext
 
 ADD chart /tmp/chart
 RUN cd /tmp \
