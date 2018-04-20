@@ -5,8 +5,7 @@
 replicaCount: 1
 
 imageNginx:
-  image: $REGISTRY
-  tag: $TAG
+  image: $IMAGE_NGINX
   pullPolicy: IfNotPresent
 
 service:
