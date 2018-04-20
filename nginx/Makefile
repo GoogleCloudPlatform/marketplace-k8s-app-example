@@ -20,8 +20,6 @@ app/build:: .build/deployer .build/nginx
 
 .build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
-	    --build-arg REGISTRY="$(APP_REGISTRY)" \
-	    --build-arg TAG="$(APP_TAG)" \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
