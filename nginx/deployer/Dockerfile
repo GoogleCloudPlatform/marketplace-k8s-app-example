@@ -18,3 +18,4 @@ FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
 COPY --from=build /tmp/nginx.tar.gz /data/chart/
 COPY --from=build /tmp/test/nginx.tar.gz /data-test/chart/
 COPY apptest/* /data-test/
+COPY schema.yaml /data/schema.yaml
