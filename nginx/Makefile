@@ -8,16 +8,19 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
-APP_PARAMETERS = '{ "REGISTRY": "$(APP_REGISTRY)", "TAG": "$(APP_TAG)", "MARKETPLACE_REGISTRY": "$(MARKETPLACE_REGISTRY)"}'
+define APP_PARAMETERS
+{ \
+  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
+  "NAMESPACE": "$(NAMESPACE)", \
+  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
+}
+endef
 
 app/build:: .build/deployer .build/nginx
 
 app/build-integ:: .build/deployer-integ .build/nginx
 
-.build/deployer: \
-	chart/* \
-	deployer/*
-
+.build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \

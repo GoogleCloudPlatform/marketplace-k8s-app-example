@@ -19,8 +19,8 @@ spec:
       labels: *Labels
     spec:
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.imageNginx.image }}:{{ .Values.imageNginx.tag }}"
+        - name: "{{ .Chart.Name }}"
+          image: "{{ .Values.imageNginx.image }}"
           imagePullPolicy: {{ .Values.imageNginx.pullPolicy }}
           ports:
             - name: http
