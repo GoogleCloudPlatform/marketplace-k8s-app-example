@@ -19,7 +19,7 @@ define APP_PARAMETERS
   "IMAGE_INIT": "$(APP_REGISTRY)/init:$(APP_TAG)", \
   "IMAGE_MYSQL": "$(APP_REGISTRY)/mysql:$(APP_TAG)", \
   "IMAGE_UBBAGENT": "$(APP_REGISTRY)/ubbagent:$(APP_TAG)", \
-  "APP_TESTER_IMAGE": "$(REGISTRY)/tester:latest" \
+  "APP_TESTER_IMAGE": "$(APP_TESTER_IMAGE)" \
 }
 endef
 

@@ -3,8 +3,7 @@ FROM launcher.gcr.io/google/debian9 AS build
 
 #TODO(ruela) try without this
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    gettext
+    && apt-get install -y --no-install-recommends gettext
 
 #TODO(ruela) try without ADD commands 
 ADD chart /tmp/chart
