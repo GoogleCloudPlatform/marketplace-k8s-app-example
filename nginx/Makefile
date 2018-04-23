@@ -17,6 +17,7 @@ define APP_PARAMETERS
   "NAMESPACE": "$(NAMESPACE)", \
   "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)", \
   "APP_TESTER_IMAGE": "$(REGISTRY)/tester:latest" \
+  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
 }
 endef
 
