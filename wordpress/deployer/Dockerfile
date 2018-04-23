@@ -10,4 +10,6 @@ ENV IMAGE_MYSQL "$REGISTRY/mysql:$TAG"
 ENV IMAGE_UBBAGENT "$REGISTRY/ubbagent:$TAG"
 
 ADD manifest/* /data/manifest/
+ADD manifest-test/* /data-test/manifest/
+COPY apptest/config.yaml /data-test/
 ADD schema.yaml /data/schema.yaml

@@ -8,17 +8,21 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
+# TODO(ruela) Double check the correct registry to use here.
+APP_TESTER_IMAGE = "$(REGISTRY)/tester:latest"
+
 define APP_PARAMETERS
 { \
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
-  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
+  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)", \
+  "APP_TESTER_IMAGE": "$(REGISTRY)/tester:latest" \
 }
 endef
 
 app/build:: .build/deployer .build/nginx
 
-app/build-integ:: .build/deployer-integ .build/nginx
+app/build-test:: .build/deployer .build/tester .build/nginx
 
 .build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
@@ -29,20 +33,13 @@ app/build-integ:: .build/deployer-integ .build/nginx
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-
-.build/deployer-integ: \
-	.build/deployer \
-	chart-integ/* \
-	deployer-integ/*
-
+.build/tester: apptest/* $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
-	    --build-arg APP_DEPLOYER_IMAGE="$(APP_DEPLOYER_IMAGE)" \
-	    --tag "$(APP_DEPLOYER_INTEG_IMAGE)" \
-	    -f deployer-integ/Dockerfile \
+	    --tag "$(APP_TESTER_IMAGE)" \
+	    -f apptest/Dockerfile \
 	    .
-	gcloud docker -- push "$(APP_DEPLOYER_INTEG_IMAGE)"
+	gcloud docker -- push "$(APP_TESTER_IMAGE)"
 	@touch "$@"
-
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
