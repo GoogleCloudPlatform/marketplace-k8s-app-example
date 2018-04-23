@@ -10,3 +10,4 @@ RUN cd /tmp \
 
 FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
 COPY --from=build /tmp/nginx.tar.gz /data/chart/
+COPY schema.yaml /data/schema.yaml

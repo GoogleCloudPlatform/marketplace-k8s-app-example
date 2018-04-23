@@ -1,0 +1,14 @@
+# TODO(#46): Add x-google-properties. 
+properties:
+  APP_INSTANCE_NAME:
+    type: string
+  NAMESPACE:
+    type: string
+  IMAGE_NGINX:
+    type: string
+    # TODO(ruela): use proper nginx path when it is ready
+    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/nginx:latest
+required:
+- APP_INSTANCE_NAME
+- NAMESPACE
+- IMAGE_NGINX
