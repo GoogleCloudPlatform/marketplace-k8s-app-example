@@ -9,7 +9,7 @@ include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
 # TODO(ruela) Double check the correct registry to use here.
-APP_TESTER_IMAGE = "$(REGISTRY)/tester:latest"
+APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
 
 define APP_PARAMETERS
 { \
