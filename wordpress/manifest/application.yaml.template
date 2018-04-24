@@ -36,3 +36,4 @@ spec:
   - kind: PersistentVolumeClaim
   - kind: Service
   - kind: Job
+  - kind: Secret
