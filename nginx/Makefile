@@ -8,21 +8,25 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
-# TODO(ruela) Double check the correct registry to use here.
 APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
 
 define APP_PARAMETERS
 { \
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
-  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)", \
+  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
+}
+endef
+
+define TEST_PARAMETERS
+{ \
   "APP_TESTER_IMAGE": "$(APP_TESTER_IMAGE)" \
 }
 endef
 
 app/build:: .build/deployer .build/nginx
 
-app/build-test:: .build/deployer .build/tester .build/nginx
+app/build-test:: app/build .build/tester
 
 .build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \

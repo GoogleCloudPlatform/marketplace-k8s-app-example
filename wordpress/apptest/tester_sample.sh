@@ -16,7 +16,8 @@
 
 set -eox pipefail
 
-# This is a
+# TODO(#54) Replace with real tester.
+# This is an empty tester for connecting to the driver verification
 
 # Assert existence of required environment variables.
 [[ -v "DURATION" ]] || exit 1
