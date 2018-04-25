@@ -18,7 +18,7 @@ properties:
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/ubbagent:latest
   DB_PASSWORD:
     type: string
-    x-googleMarketplace:
+    x-google-marketplace:
       type: GENERATED_PASSWORD
       generatedPassword:
         length: 16
