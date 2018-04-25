@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: db-secret
 type: Opaque
 data:
-  password: "$dbPassword"
+  password: "$DB_PASSWORD"
 ---
 # TODO(huyhuynh): Change this to using StatefulSet
 apiVersion: apps/v1beta2
