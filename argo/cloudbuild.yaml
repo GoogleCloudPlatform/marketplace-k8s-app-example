@@ -1,0 +1,51 @@
+steps:
+#   # Decrypt the file containing the key
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   args:
+#   - kms
+#   - decrypt
+#   - --ciphertext-file=id_rsa.enc
+#   - --plaintext-file=/root/.ssh/id_rsa
+#   - --location=global
+#   - --keyring=my-keyring
+#   - --key=github-key
+#   volumes:
+#   - name: 'ssh'
+#     path: /root/.ssh
+
+# # Set up git with key and domain.
+# - name: 'gcr.io/cloud-builders/git'
+#   entrypoint: 'bash'
+#   args:
+#   - '-c'
+#   - |
+#     chmod 600 /root/.ssh/id_rsa
+#     cat <<EOF >/root/.ssh/config
+#     Hostname github.com
+#     IdentityFile /root/.ssh/id_rsa
+#     EOF
+#     ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+#   volumes:
+#   - name: 'ssh'
+#     path: /root/.ssh
+
+# # Use git clone.
+# - name: 'gcr.io/cloud-builders/git'
+#   args:
+#   - clone
+#   - --depth 
+#   - '1'
+#   - git@github.com:GoogleCloudPlatform/marketplace-k8s-app-example.git
+#   - /marketplace
+
+#   volumes:
+#   - name: 'ssh'
+#     path: /root/.ssh
+#   - name: 'repo'
+#     path: /marketplace
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/deployer', '-f', 'deployer/Dockerfile', '.' ]
+  
+images:
+- 'gcr.io/$PROJECT_ID/deployer'
