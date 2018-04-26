@@ -16,6 +16,12 @@ properties:
   IMAGE_UBBAGENT:
     type: string
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/ubbagent:latest
+  DB_PASSWORD:
+    type: string
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 16
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
@@ -23,3 +29,4 @@ required:
 - IMAGE_INIT
 - IMAGE_MYSQL
 - IMAGE_UBBAGENT
+- DB_PASSWORD
