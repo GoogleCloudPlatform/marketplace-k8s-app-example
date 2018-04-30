@@ -2,20 +2,38 @@
 properties:
   APP_INSTANCE_NAME:
     type: string
+    x-google-marketplace:
+      type: APP_INSTANCE_NAME
   NAMESPACE:
     type: string
+    x-google-marketplace:
+      type: NAMESPACE
   IMAGE_WORDPRESS:
     type: string
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress:latest
+    x-google-marketplace:
+      type: IMAGE
   IMAGE_INIT:
     type: string
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/init:latest
+    x-google-marketplace:
+      type: IMAGE
   IMAGE_MYSQL:
     type: string
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/mysql:latest
+    x-google-marketplace:
+      type: IMAGE
   IMAGE_UBBAGENT:
     type: string
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/ubbagent:latest
+    x-google-marketplace:
+      type: IMAGE
+  DB_PASSWORD:
+    type: string
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 16
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
@@ -23,3 +41,4 @@ required:
 - IMAGE_INIT
 - IMAGE_MYSQL
 - IMAGE_UBBAGENT
+- DB_PASSWORD
