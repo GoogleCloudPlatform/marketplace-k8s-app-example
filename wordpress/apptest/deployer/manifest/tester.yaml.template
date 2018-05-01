@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tester
+  labels:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+spec:
+  template:
+    spec:
+      containers:
+      - name: tester
+        image: "$APP_TESTER_IMAGE"
+        env:
+        - name: EXITCODE
+          value: "0"
+        - name: DURATION
+          value: "10"
+      restartPolicy: Never
+  backoffLimit: 0

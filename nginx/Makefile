@@ -8,6 +8,8 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
+APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
+
 define APP_PARAMETERS
 { \
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
@@ -16,15 +18,31 @@ define APP_PARAMETERS
 }
 endef
 
+define TEST_PARAMETERS
+{ \
+  "APP_TESTER_IMAGE": "$(APP_TESTER_IMAGE)" \
+}
+endef
+
 app/build:: .build/deployer .build/nginx
 
-.build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
+app/build-test:: app/build .build/tester
+
+.build/deployer: deployer/* chart/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
+	@touch "$@"
+
+.build/tester: apptest/* $(APP_BUILD)/registry_prefix | app/setup
+	docker build \
+	    --tag "$(APP_TESTER_IMAGE)" \
+	    -f apptest/tester/Dockerfile \
+	    .
+	gcloud docker -- push "$(APP_TESTER_IMAGE)"
 	@touch "$@"
 
 # Simulate building of primary app image. Actually just copying public image to
