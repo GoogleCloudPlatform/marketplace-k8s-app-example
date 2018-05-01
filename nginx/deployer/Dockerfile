@@ -7,12 +7,13 @@ RUN apt-get update \
 ADD chart /tmp/chart
 RUN cd /tmp \
     && tar -czvf /tmp/nginx.tar.gz chart
-ADD apptest/deployer-test/chart-test /tmp/test/chart
+ADD apptest/deployer/chart /tmp/test/chart
 RUN cd /tmp/test \
     && tar -czvf /tmp/test/nginx.tar.gz chart/
 
 FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
 COPY --from=build /tmp/nginx.tar.gz /data/chart/
 COPY --from=build /tmp/test/nginx.tar.gz /data-test/chart/
-COPY apptest/deployer-test /data-test/
+COPY apptest/deployer/config.yaml /data-test/
+COPY apptest/deployer/schema.yaml /data-test/
 COPY schema.yaml /data/schema.yaml

@@ -33,7 +33,7 @@ app/build:: .build/deployer .build/wordpress .build/init .build/mysql .build/ubb
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: deployer/* manifest/* apptest/deployer-test/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: deployer/* manifest/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg REGISTRY="$(APP_REGISTRY)" \
 	    --build-arg TAG="$(APP_TAG)" \
