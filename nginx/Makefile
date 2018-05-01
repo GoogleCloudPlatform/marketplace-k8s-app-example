@@ -28,7 +28,7 @@ app/build:: .build/deployer .build/nginx
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: deployer/* chart/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: deployer/* chart/* apptest/deployer-test/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -40,7 +40,7 @@ app/build-test:: app/build .build/tester
 .build/tester: apptest/* $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --tag "$(APP_TESTER_IMAGE)" \
-	    -f apptest/Dockerfile \
+	    -f apptest/tester/Dockerfile \
 	    .
 	gcloud docker -- push "$(APP_TESTER_IMAGE)"
 	@touch "$@"
