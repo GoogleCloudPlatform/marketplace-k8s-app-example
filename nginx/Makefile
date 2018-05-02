@@ -28,7 +28,7 @@ app/build:: .build/deployer .build/nginx
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: deployer/* chart/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: schema.yaml deployer/* chart/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \

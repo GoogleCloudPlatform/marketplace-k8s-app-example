@@ -1,9 +1,8 @@
-# TODO(#46): Add x-google-properties. 
 properties:
   APP_INSTANCE_NAME:
     type: string
     x-google-marketplace:
-      type: APP_INSTANCE_NAME
+      type: NAME
   NAMESPACE:
     type: string
     x-google-marketplace:
