@@ -1,4 +1,4 @@
-APP_NAME = k8s-app
+APP_NAME ?= wordpress
 
 tools_path = ../vendor/marketplace-tools
 
@@ -7,6 +7,8 @@ include $(tools_path)/gcloud.Makefile
 include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
+
+REGISTRY_FOR_DEPLOYER ?= $(APP_REGISTRY)
 
 # TODO(ruela) Double check the correct registry to use here.
 APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
@@ -35,7 +37,7 @@ app/build-test:: app/build .build/tester
 
 .build/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix | app/setup
 	docker build \
-	    --build-arg REGISTRY="$(APP_REGISTRY)" \
+	    --build-arg REGISTRY="$(REGISTRY_FOR_DEPLOYER)" \
 	    --build-arg TAG="$(APP_TAG)" \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
