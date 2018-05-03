@@ -1,4 +1,4 @@
-APP_NAME = wordpress
+APP_NAME = k8s-app
 
 tools_path = ../vendor/marketplace-tools
 
