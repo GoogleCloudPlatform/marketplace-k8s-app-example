@@ -1,0 +1,96 @@
+steps:
+
+# Decrypt deploy key for tools repo
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=argo/googlecloudplatform_marketplace-k8s-app-tools.key.enc
+  - --plaintext-file=/root/.ssh/googlecloudplatform_marketplace-k8s-app-tools.key
+  - --location=global
+  - --keyring=googlecloudplatform_marketplace-k8s-example
+  - --key=github-key
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+# Decrypt deploy key for ubbagent
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=argo/googlecloudplatform_ubbagent.key.enc
+  - --plaintext-file=/root/.ssh/googlecloudplatform_ubbagent.key
+  - --location=global
+  - --keyring=googlecloudplatform_marketplace-k8s-example
+  - --key=github-key
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+# Setup git repo
+- name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'bash'
+  args:
+  - argo/setup_github_key.sh
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+# Setup the verifier image
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    docker pull gcr.io/$PROJECT_ID/verifier || echo "Ignoring pull"
+    docker build --cache-from gcr.io/$PROJECT_ID/verifier -t gcr.io/$PROJECT_ID/verifier -f argo/Dockerfile .
+
+# Set commit as pending
+- name: 'gcr.io/$PROJECT_ID/verifier'
+  entrypoint: 'bash'
+  args: 
+  - -c
+  - |
+    argo/set_commit_status.sh \
+      --secret=argo.pem \
+      --state=pending \
+      --target_url="https://pantheon.corp.google.com/gcr/builds/$BUILD_ID?project=$PROJECT_ID" \
+      --description="Running integration tests" \
+      --context="google-cloud/builder/integration-test" \
+      --repo="vcanaa/marketplace-k8s-app-example" \
+      --commit=$COMMIT_SHA
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+# Run the verification
+- name: 'gcr.io/$PROJECT_ID/verifier'
+  entrypoint: 'bash'
+  dir: 'nginx'
+  args: 
+  - -c
+  - |
+    export REGISTRY=gcr.io/$PROJECT_ID
+    gcloud container clusters get-credentials "cluster-1" --zone "us-west1-a"
+    make app/verify
+
+# Set commit as succeeded
+- name: 'gcr.io/$PROJECT_ID/verifier'
+  entrypoint: 'bash'
+  args: 
+  - -c
+  - |
+    argo/set_commit_status.sh \
+      --state=success \
+      --target_url="https://pantheon.corp.google.com/gcr/builds/$BUILD_ID?project=$PROJECT_ID" \
+      --description="Integration tests passed." \
+      --context="google-cloud/builder/integration-test" \
+      --repo="vcanaa/marketplace-k8s-app-example" \
+      --commit=$COMMIT_SHA
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+images:
+- 'gcr.io/$PROJECT_ID/verifier'
