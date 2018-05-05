@@ -1,29 +1,31 @@
 steps:
 
-# Decrypt deploy key for tools repo
-- name: 'gcr.io/cloud-builders/gcloud'
+# Fetch deploy keys for tools repo
+- name: 'gcr.io/cloud-builders/gsutil'
   args:
-  - kms
-  - decrypt
-  - --ciphertext-file=argo/googlecloudplatform_marketplace-k8s-app-tools.key.enc
-  - --plaintext-file=/root/.ssh/googlecloudplatform_marketplace-k8s-app-tools.key
-  - --location=global
-  - --keyring=googlecloudplatform_marketplace-k8s-example
-  - --key=github-key
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_marketplace-k8s-app-tools
+  - /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
   volumes:
   - name: 'ssh'
     path: /root/.ssh
 
-# Decrypt deploy key for ubbagent
-- name: 'gcr.io/cloud-builders/gcloud'
+# Fetch deploy keys for tools repo
+- name: 'gcr.io/cloud-builders/gsutil'
   args:
-  - kms
-  - decrypt
-  - --ciphertext-file=argo/googlecloudplatform_ubbagent.key.enc
-  - --plaintext-file=/root/.ssh/googlecloudplatform_ubbagent.key
-  - --location=global
-  - --keyring=googlecloudplatform_marketplace-k8s-example
-  - --key=github-key
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_ubbagent
+  - /root/.ssh/googlecloudplatform_ubbagent
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+# Fetch key for the github app
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/appkeys/cloudbuild
+  - cloudbuild.pem
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -32,7 +34,7 @@ steps:
 - name: 'gcr.io/cloud-builders/git'
   entrypoint: 'bash'
   args:
-  - argo/setup_github_key.sh
+  - cloudbuild/fetch_submodules.sh
   volumes:
   - name: 'ssh'
     path: /root/.ssh
@@ -44,7 +46,7 @@ steps:
   - '-c'
   - |
     docker pull gcr.io/$PROJECT_ID/verifier || echo "Ignoring pull"
-    docker build --cache-from gcr.io/$PROJECT_ID/verifier -t gcr.io/$PROJECT_ID/verifier -f argo/Dockerfile .
+    docker build --cache-from gcr.io/$PROJECT_ID/verifier -t gcr.io/$PROJECT_ID/verifier -f cloudbuild/Dockerfile .
 
 # Set commit as pending
 - name: 'gcr.io/$PROJECT_ID/verifier'
@@ -52,13 +54,14 @@ steps:
   args: 
   - -c
   - |
-    argo/set_commit_status.sh \
-      --secret=argo.pem \
+    cloudbuild/set_commit_status.sh \
+      --secret=cloudbuild.pem \
+      --issuer=11572 \
       --state=pending \
       --target_url="https://pantheon.corp.google.com/gcr/builds/$BUILD_ID?project=$PROJECT_ID" \
       --description="Running integration tests" \
       --context="google-cloud/builder/integration-test" \
-      --repo="vcanaa/marketplace-k8s-app-example" \
+      --repo="$_REPO_NAME" \
       --commit=$COMMIT_SHA
   volumes:
   - name: 'ssh'
@@ -72,7 +75,7 @@ steps:
   - -c
   - |
     export REGISTRY=gcr.io/$PROJECT_ID
-    gcloud container clusters get-credentials "cluster-1" --zone "us-west1-a"
+    gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
     make app/verify
 
 # Set commit as succeeded
@@ -81,12 +84,14 @@ steps:
   args: 
   - -c
   - |
-    argo/set_commit_status.sh \
+    cloudbuild/set_commit_status.sh \
+      --secret=cloudbuild.pem \
+      --issuer=11572 \
       --state=success \
       --target_url="https://pantheon.corp.google.com/gcr/builds/$BUILD_ID?project=$PROJECT_ID" \
       --description="Integration tests passed." \
       --context="google-cloud/builder/integration-test" \
-      --repo="vcanaa/marketplace-k8s-app-example" \
+      --repo="$_REPO_NAME" \
       --commit=$COMMIT_SHA
   volumes:
   - name: 'ssh'

@@ -1,0 +1,9 @@
+Host marketplace-k8s-app-tools
+Hostname github.com
+User git
+IdentityFile /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
+
+Host ubbagent
+Hostname github.com
+User git
+IdentityFile /root/.ssh/googlecloudplatform_ubbagent

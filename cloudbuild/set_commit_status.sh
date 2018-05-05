@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -x
-set -e
-set -o pipefail
+set -xeo pipefail
 
 for i in "$@"
 do
@@ -60,7 +58,10 @@ case $i in
 esac
 done
 
-jwt_token="$(./get_jwt.py --secret "$secret" --issuer " $issuer")"
+# Getting the directory of the running script
+DIR="$(realpath $(dirname $0))"
+
+jwt_token="$($DIR/get_jwt.py --secret "$secret" --issuer " $issuer")"
 
 accept_header="Accept: application/vnd.github.machine-man-preview+json"
 auth_header="Authorization: Bearer $jwt_token"

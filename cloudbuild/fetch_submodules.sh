@@ -16,17 +16,23 @@
 
 set -eox pipefail
 
-chmod 600 /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools.key
-chmod 600 /root/.ssh/googlecloudplatform_ubbagent.key
+chmod 600 /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
+chmod 600 /root/.ssh/googlecloudplatform_ubbagent
 
 # Configuring one ssh key for each submodule to be pull.
 # Github does not support role based access over ssh. Therefore we use deploy keys.
 # Github does not allow a deploy key to be shared between repositories.
 # so we have to keep one deploy key per repo and configure ssh to pick
 # the correct one.
-cp ssh_config /root/.ssh/config
+cp cloudbuild/ssh_config /root/.ssh/config
+cat /root/.ssh/config
 
 ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 
-git submodule sync --recursive
-git submodule update --recursive --init --force --remote
+git submodule init
+
+ssh-agent sh -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools; git submodule update vendor/marketplace-tools"
+
+cd vendor/marketplace-tools
+ssh-agent sh -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_ubbagent; git submodule update vendor/ubbagent"
+
