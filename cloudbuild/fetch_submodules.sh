@@ -24,8 +24,6 @@ chmod 600 /root/.ssh/googlecloudplatform_ubbagent
 # Github does not allow a deploy key to be shared between repositories.
 # so we have to keep one deploy key per repo and configure ssh to pick
 # the correct one.
-cp cloudbuild/ssh_config /root/.ssh/config
-cat /root/.ssh/config
 
 ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 

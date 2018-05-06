@@ -51,7 +51,7 @@ steps:
 # Set commit as pending
 - name: 'gcr.io/$PROJECT_ID/verifier'
   entrypoint: 'bash'
-  args: 
+  args:
   - -c
   - |
     cloudbuild/set_commit_status.sh \
@@ -71,10 +71,9 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/verifier'
   entrypoint: 'bash'
   dir: 'nginx'
-  args: 
+  args:
   - -c
   - |
-    export REGISTRY=gcr.io/$PROJECT_ID
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
     make app/verify
 

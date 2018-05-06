@@ -80,10 +80,6 @@ token=$(curl -X POST "https://api.github.com/installations/$install_id/access_to
 
 token_header="Authorization: Bearer $token"
 
-curl -X GET "https://api.github.com/repos/$repo/commits/$commit/statuses" \
--H "$accept_header" \
--H "$token_header"
-
 curl -X POST "https://api.github.com/repos/$repo/statuses/$commit" \
 -H "$accept_header" \
 -H "$token_header" \
@@ -95,3 +91,4 @@ curl -X POST "https://api.github.com/repos/$repo/statuses/$commit" \
   "context": "$context"
 }
 EOF
+
