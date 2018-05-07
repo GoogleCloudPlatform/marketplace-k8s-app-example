@@ -39,15 +39,6 @@ steps:
   - name: 'ssh'
     path: /root/.ssh
 
-# Setup the verifier image
-- name: 'gcr.io/cloud-builders/docker'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    docker pull gcr.io/$PROJECT_ID/verifier || echo "Ignoring pull"
-    docker build --cache-from gcr.io/$PROJECT_ID/verifier -t gcr.io/$PROJECT_ID/verifier -f cloudbuild/Dockerfile .
-
 # Set commit as pending
 - name: 'gcr.io/$PROJECT_ID/verifier'
   entrypoint: 'bash'
@@ -95,6 +86,3 @@ steps:
   volumes:
   - name: 'ssh'
     path: /root/.ssh
-
-images:
-- 'gcr.io/$PROJECT_ID/verifier'

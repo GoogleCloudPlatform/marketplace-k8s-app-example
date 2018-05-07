@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -eox pipefail
+set -eo pipefail
 
 chmod 600 /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
 chmod 600 /root/.ssh/googlecloudplatform_ubbagent
@@ -29,8 +29,8 @@ ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 
 git submodule init
 
-ssh-agent sh -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools; git submodule update vendor/marketplace-tools"
+ssh-agent bash -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools; git submodule update vendor/marketplace-tools"
 
 cd vendor/marketplace-tools
-ssh-agent sh -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_ubbagent; git submodule update vendor/ubbagent"
+ssh-agent bash -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_ubbagent; git submodule update vendor/ubbagent"
 
