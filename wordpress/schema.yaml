@@ -9,22 +9,22 @@ properties:
       type: NAMESPACE
   IMAGE_WORDPRESS:
     type: string
-    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress:latest
+    default: $REGISTRY:$TAG
     x-google-marketplace:
       type: IMAGE
   IMAGE_INIT:
     type: string
-    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/init:latest
+    default: $REGISTRY/init:$TAG
     x-google-marketplace:
       type: IMAGE
   IMAGE_MYSQL:
     type: string
-    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/mysql:latest
+    default: $REGISTRY/mysql:$TAG
     x-google-marketplace:
       type: IMAGE
   IMAGE_UBBAGENT:
     type: string
-    default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/wordpress/ubbagent:latest
+    default: $REGISTRY/ubbagent:$TAG
     x-google-marketplace:
       type: IMAGE
   DB_PASSWORD:
