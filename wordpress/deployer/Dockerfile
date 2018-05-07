@@ -9,6 +9,11 @@ ENV IMAGE_INIT "$REGISTRY/init:$TAG"
 ENV IMAGE_MYSQL "$REGISTRY/mysql:$TAG"
 ENV IMAGE_UBBAGENT "$REGISTRY/ubbagent:$TAG"
 
+ADD schema.yaml /data/
 COPY manifest /data/manifest
 COPY apptest/deployer /data-test/
-ADD schema.yaml /data/schema.yaml
+
+RUN cat /data/schema.yaml \
+    | env -i "REGISTRY=$REGISTRY" "TAG=$TAG" envsubst \
+    > /data/schema.yaml.new \
+    && mv /data/schema.yaml.new /data/schema.yaml
