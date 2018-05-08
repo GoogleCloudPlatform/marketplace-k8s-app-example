@@ -33,6 +33,18 @@ properties:
       type: GENERATED_PASSWORD
       generatedPassword:
         length: 16
+  serverReplicas:
+    title: Server replicas
+    type: int
+    default: 1
+    minimum: 1
+    maximum: 128
+  blogTitle:
+    title: Blog title
+    description: WordPress requires a blog title for setup. This can be changed later.
+    type: string
+    maxLength: 128
+    pattern: '[A-Za-z0-9 -]+'
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
