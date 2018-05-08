@@ -91,4 +91,3 @@ curl -X POST "https://api.github.com/repos/$repo/statuses/$commit" \
   "context": "$context"
 }
 EOF
-
