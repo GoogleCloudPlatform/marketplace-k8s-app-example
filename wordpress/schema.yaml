@@ -35,7 +35,7 @@ properties:
         length: 16
   serverReplicas:
     title: Server replicas
-    type: int
+    type: integer
     default: 1
     minimum: 1
     maximum: 128
@@ -45,6 +45,10 @@ properties:
     type: string
     maxLength: 128
     pattern: '[A-Za-z0-9 -]+'
+  testMode:
+    title: Testing mode
+    type: boolean
+    default: false
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
@@ -53,3 +57,6 @@ required:
 - IMAGE_MYSQL
 - IMAGE_UBBAGENT
 - DB_PASSWORD
+- serverReplicas
+- blogTitle
+- testMode
