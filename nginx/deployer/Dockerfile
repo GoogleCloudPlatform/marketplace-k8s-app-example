@@ -4,7 +4,7 @@ FROM launcher.gcr.io/google/debian9 AS build
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
 
-ADD chart /tmp/chart
+ADD nginx /tmp/chart
 RUN cd /tmp \
     && tar -czvf /tmp/nginx.tar.gz chart
 ADD apptest/deployer/chart /tmp/test/chart
