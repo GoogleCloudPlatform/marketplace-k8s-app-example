@@ -27,10 +27,7 @@ chmod 600 /root/.ssh/googlecloudplatform_ubbagent
 
 ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
 
-git submodule init
-
-ssh-agent bash -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools; git submodule update vendor/marketplace-tools"
+ssh-agent bash -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools; git submodule init; git submodule update vendor/marketplace-tools"
 
 cd vendor/marketplace-tools
-ssh-agent bash -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_ubbagent; git submodule update vendor/ubbagent"
-
+ssh-agent bash -c "ssh-add -D; ssh-add /root/.ssh/googlecloudplatform_ubbagent; git submodule init; git submodule update vendor/ubbagent"
