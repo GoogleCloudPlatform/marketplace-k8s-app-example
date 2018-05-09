@@ -28,7 +28,7 @@ app/build:: .build/deployer .build/nginx
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -47,7 +47,7 @@ app/build-test:: app/build .build/tester
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/nginx: $(APP_BUILD)/registry_prefix | app/setup
+.build/nginx: $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
 	gcloud docker -- pull launcher.gcr.io/google/nginx1
 	docker tag launcher.gcr.io/google/nginx1 "$(APP_REGISTRY):$(APP_TAG)"
 	gcloud docker -- push "$(APP_REGISTRY):$(APP_TAG)"
