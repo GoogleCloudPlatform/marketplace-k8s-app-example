@@ -10,7 +10,7 @@ steps:
   - name: 'ssh'
     path: /root/.ssh
 
-# Fetch deploy keys for tools repo
+# Fetch deploy keys for ubbagent repo
 - name: 'gcr.io/cloud-builders/gsutil'
   args:
   - cp

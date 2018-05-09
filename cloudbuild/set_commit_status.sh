@@ -66,10 +66,6 @@ jwt_token="$($DIR/get_jwt.py --secret "$secret" --issuer " $issuer")"
 accept_header="Accept: application/vnd.github.machine-man-preview+json"
 auth_header="Authorization: Bearer $jwt_token"
 
-curl -X GET https://api.github.com/app/installations \
--H "$accept_header" \
--H "$auth_header"
-
 install_id=$(curl -X GET https://api.github.com/app/installations \
 -H "$accept_header" \
 -H "$auth_header" | jq -r '.[0].id')
