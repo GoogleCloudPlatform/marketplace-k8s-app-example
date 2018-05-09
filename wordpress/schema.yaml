@@ -33,6 +33,22 @@ properties:
       type: GENERATED_PASSWORD
       generatedPassword:
         length: 16
+  customString:
+    title: Blog title
+    description: WordPress requires a blog title for setup. This can be changed later.
+    type: string
+    maxLength: 128
+    pattern: '[A-Za-z0-9 -]+'
+  customInteger:
+    title: Server replicas
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 128
+  customBoolean:
+    title: A custom boolean parameter.
+    type: boolean
+    default: false
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
@@ -41,3 +57,6 @@ required:
 - IMAGE_MYSQL
 - IMAGE_UBBAGENT
 - DB_PASSWORD
+- customString
+- customInteger
+- customBoolean
