@@ -1,5 +1,5 @@
 properties:
-  APP_INSTANCE_NAME:
+  NAME:
     type: string
     x-google-marketplace:
       type: NAME
@@ -51,7 +51,7 @@ properties:
     type: boolean
     default: false
 required:
-- APP_INSTANCE_NAME
+- NAME
 - NAMESPACE
 - IMAGE_WORDPRESS
 - IMAGE_INIT

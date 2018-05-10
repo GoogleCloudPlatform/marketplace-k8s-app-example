@@ -15,7 +15,7 @@ APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
 
 define APP_PARAMETERS
 { \
-  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
+  "NAME": "$(NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
   "IMAGE_WORDPRESS": "$(APP_REGISTRY):$(APP_TAG)", \
   "IMAGE_INIT": "$(APP_REGISTRY)/init:$(APP_TAG)", \

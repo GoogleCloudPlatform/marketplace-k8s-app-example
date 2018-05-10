@@ -12,7 +12,7 @@ APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
 
 define APP_PARAMETERS
 { \
-  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
+  "NAME": "$(NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
   "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
 }
