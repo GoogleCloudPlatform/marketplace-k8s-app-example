@@ -35,7 +35,7 @@ app/build:: .build/deployer .build/wordpress .build/init .build/mysql .build/ubb
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix | app/setup
+.build/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY_FOR_DEPLOYER)" \
 	    --build-arg TAG="$(APP_TAG)" \
@@ -46,7 +46,7 @@ app/build-test:: app/build .build/tester
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/tester: apptest/* $(APP_BUILD)/registry_prefix | app/setup
+.build/tester: apptest/* $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
 	docker build \
 	    --tag "$(APP_TESTER_IMAGE)" \
 	    -f apptest/tester/Dockerfile \

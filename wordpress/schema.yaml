@@ -37,6 +37,7 @@ properties:
     title: Blog title
     description: WordPress requires a blog title for setup. This can be changed later.
     type: string
+    default: 'My blog'
     maxLength: 128
     pattern: '[A-Za-z0-9 -]+'
   customInteger:
