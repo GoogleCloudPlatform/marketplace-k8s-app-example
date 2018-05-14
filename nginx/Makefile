@@ -2,6 +2,12 @@ APP_NAME = nginx
 
 tools_path = ../vendor/marketplace-tools
 
+APP_PARAMETERS ?= { \
+  "NAME": "$(NAME)", \
+  "NAMESPACE": "$(NAMESPACE)", \
+  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
+}
+
 include $(tools_path)/gcloud.Makefile
 
 include $(tools_path)/crd.Makefile
@@ -10,13 +16,6 @@ include $(tools_path)/ubbagent.Makefile
 
 APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
 
-define APP_PARAMETERS
-{ \
-  "NAME": "$(NAME)", \
-  "NAMESPACE": "$(NAMESPACE)", \
-  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
-}
-endef
 
 define TEST_PARAMETERS
 { \

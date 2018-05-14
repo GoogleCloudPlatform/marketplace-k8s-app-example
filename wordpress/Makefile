@@ -2,6 +2,15 @@ APP_NAME ?= wordpress
 
 tools_path = ../vendor/marketplace-tools
 
+APP_PARAMETERS ?= { \
+  "NAME": "$(NAME)", \
+  "NAMESPACE": "$(NAMESPACE)", \
+  "IMAGE_WORDPRESS": "$(APP_REGISTRY):$(APP_TAG)", \
+  "IMAGE_INIT": "$(APP_REGISTRY)/init:$(APP_TAG)", \
+  "IMAGE_MYSQL": "$(APP_REGISTRY)/mysql:$(APP_TAG)", \
+  "IMAGE_UBBAGENT": "$(APP_REGISTRY)/ubbagent:$(APP_TAG)" \
+}
+
 include $(tools_path)/gcloud.Makefile
 
 include $(tools_path)/crd.Makefile
@@ -13,16 +22,6 @@ REGISTRY_FOR_DEPLOYER ?= $(APP_REGISTRY)
 # TODO(ruela) Double check the correct registry to use here.
 APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
 
-define APP_PARAMETERS
-{ \
-  "NAME": "$(NAME)", \
-  "NAMESPACE": "$(NAMESPACE)", \
-  "IMAGE_WORDPRESS": "$(APP_REGISTRY):$(APP_TAG)", \
-  "IMAGE_INIT": "$(APP_REGISTRY)/init:$(APP_TAG)", \
-  "IMAGE_MYSQL": "$(APP_REGISTRY)/mysql:$(APP_TAG)", \
-  "IMAGE_UBBAGENT": "$(APP_REGISTRY)/ubbagent:$(APP_TAG)" \
-}
-endef
 
 define TEST_PARAMETERS
 { \
