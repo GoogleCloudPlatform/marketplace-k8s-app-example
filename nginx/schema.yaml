@@ -1,5 +1,5 @@
 properties:
-  APP_INSTANCE_NAME:
+  NAME:
     type: string
     x-google-marketplace:
       type: NAME
@@ -14,6 +14,6 @@ properties:
     x-google-marketplace:
       type: IMAGE
 required:
-- APP_INSTANCE_NAME
+- NAME
 - NAMESPACE
 - IMAGE_NGINX

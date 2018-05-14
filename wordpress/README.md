@@ -37,7 +37,7 @@ Follow these instructions to install WordPress from the command line.
 
 Set environment variables (modify if necessary):
 ```
-export APP_INSTANCE_NAME=wordpress-1
+export NAME=wordpress-1
 export NAMESPACE=default
 export IMAGE_WORDPRESS=launcher.gcr.io/google/wordpress:4
 export IMAGE_INIT=launcher.gcr.io/google/wordpress/init:4

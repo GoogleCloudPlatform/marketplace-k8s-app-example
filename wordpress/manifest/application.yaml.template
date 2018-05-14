@@ -2,7 +2,7 @@
 apiVersion: app.k8s.io/v1alpha1
 kind: Application
 metadata:
-  name: "$APP_INSTANCE_NAME"
+  name: "$NAME"
   namespace: "$NAMESPACE"
   annotations:
     kubernetes-engine.cloud.google.com/icon: >-
@@ -14,7 +14,7 @@ metadata:
       Additional support is available on
       [community forums](https://en.forums.wordpress.com).
   labels:
-    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/name: "$NAME"
 spec:
   type: Wordpress
   version: '0.1'
@@ -27,7 +27,7 @@ spec:
     url: https://codex.wordpress.org/Getting_Started_with_WordPress
   selector:
     matchLabels:
-      app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+      app.kubernetes.io/name: "$NAME"
   componentKinds:
   - kind: Deployment
   - kind: ServiceAccount
@@ -44,7 +44,7 @@ spec:
     following command to expose an external IP:
 
     ```
-    kubectl patch svc "$APP_INSTANCE_NAME-wordpress-svc" \
+    kubectl patch svc "$NAME-wordpress-svc" \
       --namespace "$NAMESPACE" \
       -p '{"spec": {"type": "LoadBalancer"}}'
     ```
@@ -57,7 +57,7 @@ spec:
     ```
     SERVICE_IP=$(kubectl get \
       --namespace ${NAMESPACE} \
-      svc ${APP_INSTANCE_NAME}-wordpress-svc \
+      svc ${NAME}-wordpress-svc \
       -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
     echo "http://${SERVICE_IP}"
