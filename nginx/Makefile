@@ -52,10 +52,12 @@ app/build-test:: app/build .build/tester
 	gcloud container builds submit \
 	  --config ../vendor/marketplace-tools/testrunner/cloudbuild.yaml \
 	  ../vendor/marketplace-tools/testrunner
+	@touch "$@"
 
 .build/tester: \
 	$(APP_BUILD)/registry_prefix \
 	$(APP_BUILD)/tag \
+	.build/testrunner \
 	apptest/tester/* \
 	apptest/tester/testspecs/* \
 	| app/setup

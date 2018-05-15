@@ -36,9 +36,9 @@ app/build:: .build/deployer .build/wordpress .build/init .build/mysql .build/ubb
 app/build-test:: app/build .build/tester
 
 .build/deployer: \
-	$(MARKETPLACE_BASE_BUILD)/deployer-kubectl \
 	$(APP_BUILD)/registry_prefix \
 	$(APP_BUILD)/tag \
+	$(MARKETPLACE_BASE_BUILD)/deployer-kubectl \
 	apptest/deployer/* \
 	apptest/deployer/manifest/* \
 	deployer/* \

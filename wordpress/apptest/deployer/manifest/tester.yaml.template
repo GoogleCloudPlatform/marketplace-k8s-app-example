@@ -10,8 +10,5 @@ spec:
       containers:
       - name: tester
         image: "$APP_TESTER_IMAGE"
-        args: 
-        - -logtostderr
-        - --test_spec=/tester/testspecs/basic_tests.yaml
       restartPolicy: Never
   backoffLimit: 0
