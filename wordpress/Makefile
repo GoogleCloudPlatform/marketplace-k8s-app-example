@@ -30,7 +30,7 @@ APP_TEST_PARAMETERS ?= { \
 # End Required Variables #
 ##########################
 
-# TODO(trironkk): Remove.
+# TODO(https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/issues/63)
 APP_INSTANCE_NAME = $(NAME)
 
 include ../vendor/marketplace-tools/app.Makefile
