@@ -5,7 +5,6 @@
 replicaCount: 1
 
 imageNginx:
-  image: launcher.gcr.io/google/nginx1
   pullPolicy: IfNotPresent
 
 service:
