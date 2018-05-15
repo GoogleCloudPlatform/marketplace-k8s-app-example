@@ -5,6 +5,7 @@
 replicaCount: 1
 
 imageNginx:
+  image: $IMAGE_NGINX
   pullPolicy: IfNotPresent
 
 service:
