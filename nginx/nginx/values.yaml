@@ -6,7 +6,7 @@ replicaCount: 1
 
 imageNginx:
   # Note: This value is parameterized via schema.yaml, and will be overriden at runtime.
-  image: launcher.gcr.io/google/nginx1
+  image: launcher.gcr.io/google/nginx
   pullPolicy: IfNotPresent
 
 service:
