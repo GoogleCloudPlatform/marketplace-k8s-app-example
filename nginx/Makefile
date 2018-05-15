@@ -28,7 +28,18 @@ app/build:: .build/deployer .build/nginx
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/deployer: \
+	$(APP_BUILD)/registry_prefix \
+	$(APP_BUILD)/tag \
+	$(MARKETPLACE_BASE_BUILD)/deployer-helm \
+	apptest/deployer/* \
+	apptest/deployer/nginx/* \
+	apptest/deployer/nginx/templates/* \
+	deployer/* \
+	nginx/* \
+	nginx/templates/* \
+	schema.yaml \
+	| app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -37,11 +48,22 @@ app/build-test:: app/build .build/tester
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/tester: apptest/* $(APP_BUILD)/registry_prefix | app/setup
+.build/testrunner: ../vendor/marketplace-tools/testrunner/*
+	gcloud container builds submit \
+	  --config ../vendor/marketplace-tools/testrunner/cloudbuild.yaml \
+	  ../vendor/marketplace-tools/testrunner
+
+.build/tester: \
+	$(APP_BUILD)/registry_prefix \
+	$(APP_BUILD)/tag \
+	apptest/tester/* \
+	apptest/tester/testspecs/* \
+	| app/setup
 	docker build \
+	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(APP_TESTER_IMAGE)" \
 	    -f apptest/tester/Dockerfile \
-	    .
+	    apptest/tester
 	gcloud docker -- push "$(APP_TESTER_IMAGE)"
 	@touch "$@"
 

@@ -35,7 +35,16 @@ app/build:: .build/deployer .build/wordpress .build/init .build/mysql .build/ubb
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* $(MARKETPLACE_BASE_BUILD)/deployer-kubectl $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/deployer: \
+	$(MARKETPLACE_BASE_BUILD)/deployer-kubectl \
+	$(APP_BUILD)/registry_prefix \
+	$(APP_BUILD)/tag \
+	apptest/deployer/* \
+	apptest/deployer/manifest/* \
+	deployer/* \
+	manifest/* \
+	schema.yaml \
+	| app/setup
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY_FOR_DEPLOYER)" \
 	    --build-arg TAG="$(APP_TAG)" \
@@ -46,11 +55,22 @@ app/build-test:: app/build .build/tester
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/tester: apptest/* $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/testrunner: ../vendor/marketplace-tools/testrunner/*
+	gcloud container builds submit \
+	  --config ../vendor/marketplace-tools/testrunner/cloudbuild.yaml \
+	  ../vendor/marketplace-tools/testrunner
+
+.build/tester: \
+	$(APP_BUILD)/registry_prefix \
+	$(APP_BUILD)/tag \
+	apptest/tester/* \
+	apptest/tester/testspecs/* \
+	| app/setup
 	docker build \
+	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(APP_TESTER_IMAGE)" \
 	    -f apptest/tester/Dockerfile \
-	    .
+	    apptest/tester
 	gcloud docker -- push "$(APP_TESTER_IMAGE)"
 	@touch "$@"
 

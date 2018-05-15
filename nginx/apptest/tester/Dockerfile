@@ -1,3 +1,3 @@
-FROM launcher.gcr.io/google/debian9 AS tester
-COPY apptest/tester/tester_sample.sh /bin
-ENTRYPOINT ["/bin/bash", "/bin/tester_sample.sh"]
+ARG REGISTRY
+FROM ${REGISTRY}/testrunner AS tester
+COPY testspecs/basic_tests.yaml /tester/testspecs/basic_tests.yaml

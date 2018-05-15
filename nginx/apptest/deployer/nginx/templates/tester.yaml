@@ -10,10 +10,8 @@ spec:
       containers:
       - name: tester
         image: "{{ .Values.tester.image }}"
-        env:
-        - name: EXITCODE
-          value: "{{ .Values.tester.exitcode }}"
-        - name: DURATION
-          value: "{{ .Values.tester.duration }}"
+        args: 
+        - -logtostderr
+        - --test_spec=/tester/testspecs/basic_tests.yaml
       restartPolicy: Never
   backoffLimit: 0

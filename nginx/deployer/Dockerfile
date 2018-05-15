@@ -7,7 +7,7 @@ RUN apt-get update \
 ADD nginx /tmp/chart
 RUN cd /tmp \
     && tar -czvf /tmp/nginx.tar.gz chart
-ADD apptest/deployer/chart /tmp/test/chart
+ADD apptest/deployer/nginx /tmp/test/chart
 RUN cd /tmp/test \
     && tar -czvf /tmp/test/nginx.tar.gz chart/
 

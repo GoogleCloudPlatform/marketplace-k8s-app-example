@@ -13,46 +13,11 @@
 # limitations under the License.
 
 actions:
-- name: GET google.com should be 200 OK
+- name: GET wordpress-1-wordpress-svc should be 200 OK
   httpTest:
-    url: http://www.google.com
+    url: http://wordpress-1-wordpress-svc
     headers:
       Cache-Control: no-cache
     expect:
       statusCode:
         equals: 200
-      bodyText:
-        html:
-          title:
-            contains: Google
-- name: GET google.com (TLS) should be 200 OK
-  condition:
-    failuresSoFar:
-      equals: 0
-  httpTest:
-    url: https://www.google.com
-    expect:
-      statusCode:
-        equals: 200
-      bodyText:
-        html:
-          title:
-            contains: Google
-- name: If failure
-  condition:
-    failuresSoFar:
-      greaterThan: 0
-  httpTest:
-    url: https://www.google.com
-- name: POST google.com should be rejected
-  httpTest:
-    url: http://www.google.com
-    method: POST
-    expect:
-      statusCode:
-        atLeast: 400
-        atMost: 499
-      bodyText:
-        html:
-          title:
-            contains: (Method Not Allowed)

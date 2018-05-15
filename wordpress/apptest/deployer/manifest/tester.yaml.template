@@ -10,10 +10,8 @@ spec:
       containers:
       - name: tester
         image: "$APP_TESTER_IMAGE"
-        env:
-        - name: EXITCODE
-          value: "0"
-        - name: DURATION
-          value: "10"
+        args: 
+        - -logtostderr
+        - --test_spec=/tester/testspecs/basic_tests.yaml
       restartPolicy: Never
   backoffLimit: 0
