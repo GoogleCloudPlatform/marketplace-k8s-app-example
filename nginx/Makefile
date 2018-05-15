@@ -14,13 +14,13 @@ define APP_PARAMETERS
 { \
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
-  "IMAGE_NGINX": "$(APP_REGISTRY):$(APP_TAG)" \
+  "imageNginx.image": "$(APP_REGISTRY):$(APP_TAG)" \
 }
 endef
 
 define TEST_PARAMETERS
 { \
-  "APP_TESTER_IMAGE": "$(APP_TESTER_IMAGE)" \
+  "tester.image": "$(APP_TESTER_IMAGE)" \
 }
 endef
 
