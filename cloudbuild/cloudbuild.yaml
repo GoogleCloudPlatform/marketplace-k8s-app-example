@@ -1,46 +1,15 @@
 steps:
 
-# Fetch deploy keys for tools repo
-- name: 'gcr.io/cloud-builders/gsutil'
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_marketplace-k8s-app-tools
-  - /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
-
-# Fetch deploy keys for ubbagent repo
-- name: 'gcr.io/cloud-builders/gsutil'
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_ubbagent
-  - /root/.ssh/googlecloudplatform_ubbagent
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
-
-# Fetch key for the github app
-- name: 'gcr.io/cloud-builders/gsutil'
+- id: Fetch key for the github app
+  name: 'gcr.io/cloud-builders/gsutil'
   args:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/appkeys/cloudbuild
   - cloudbuild.pem
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
 
-# Setup git repo
-- name: 'gcr.io/cloud-builders/git'
-  entrypoint: 'bash'
-  args:
-  - cloudbuild/fetch_submodules.sh
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
-
-# Set commit as pending
-- name: 'gcr.io/$PROJECT_ID/verifier'
+- id: Set commit as pending
+  waitFor: [ 'Fetch key for the github app' ]
+  name: 'gcr.io/$PROJECT_ID/verifier'
   entrypoint: 'bash'
   args:
   - -c
@@ -54,12 +23,44 @@ steps:
       --context="google-cloud/builder/integration-test" \
       --repo="$_REPO_NAME" \
       --commit=$COMMIT_SHA
+
+- id: Fetch deploy keys for tools repo
+  waitFor: [ '-' ]
+  name: 'gcr.io/cloud-builders/gsutil'
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_marketplace-k8s-app-tools
+  - /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
   volumes:
   - name: 'ssh'
     path: /root/.ssh
 
-# Run the verification on nginx
-- name: 'gcr.io/$PROJECT_ID/verifier'
+- id: Fetch deploy keys for ubbagent repo
+  waitFor: [ '-' ]
+  name: 'gcr.io/cloud-builders/gsutil'
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_ubbagent
+  - /root/.ssh/googlecloudplatform_ubbagent
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+- id: Setup git repo
+  waitFor: 
+  - Fetch deploy keys for tools repo
+  - Fetch deploy keys for ubbagent repo
+  name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'bash'
+  args:
+  - cloudbuild/fetch_submodules.sh
+  volumes:
+  - name: 'ssh'
+    path: /root/.ssh
+
+- id: Run the verification on nginx
+  name: 'gcr.io/$PROJECT_ID/verifier'
+  waitFor: [ 'Setup git repo' ]
   entrypoint: 'bash'
   dir: 'nginx'
   args:
@@ -68,8 +69,9 @@ steps:
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
     make app/verify
 
-# Run the verification on wordpress
-- name: 'gcr.io/$PROJECT_ID/verifier'
+- id: Run the verification on wordpress
+  name: 'gcr.io/$PROJECT_ID/verifier'
+  waitFor: [ 'Setup git repo' ]
   entrypoint: 'bash'
   dir: 'wordpress'
   args:
@@ -78,8 +80,8 @@ steps:
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
     make app/verify
 
-# Set commit as succeeded
-- name: 'gcr.io/$PROJECT_ID/verifier'
+- id: Set commit as succeeded
+  name: 'gcr.io/$PROJECT_ID/verifier'
   entrypoint: 'bash'
   args: 
   - -c
@@ -93,6 +95,3 @@ steps:
       --context="google-cloud/builder/integration-test" \
       --repo="$_REPO_NAME" \
       --commit=$COMMIT_SHA
-  volumes:
-  - name: 'ssh'
-    path: /root/.ssh
