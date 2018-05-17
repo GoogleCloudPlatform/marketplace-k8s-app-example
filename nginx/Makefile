@@ -8,7 +8,7 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
-APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
+APP_TESTER_IMAGE = $(APP_REGISTRY)/tester:latest
 
 define APP_PARAMETERS
 { \
