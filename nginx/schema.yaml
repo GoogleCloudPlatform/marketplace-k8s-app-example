@@ -7,7 +7,7 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  IMAGE_NGINX:
+  imageNginx.image:
     type: string
     # TODO(ruela): use proper nginx path when it is ready
     default: gcr.io/cloud-marketplace/e2e-testing/k8s-app/nginx:latest
@@ -16,4 +16,4 @@ properties:
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
-- IMAGE_NGINX
+- imageNginx.image
