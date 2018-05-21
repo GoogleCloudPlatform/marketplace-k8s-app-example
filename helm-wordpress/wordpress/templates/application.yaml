@@ -33,3 +33,4 @@ spec:
   - kind: Job
   - kind: ConfigMap
   - kind: StatefulSet
+  - kind: Pod
