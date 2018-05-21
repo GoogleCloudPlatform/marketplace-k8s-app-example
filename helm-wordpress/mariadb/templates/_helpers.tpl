@@ -31,10 +31,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Return the proper image name
 */}}
 {{- define "mariadb.image" -}}
-{{- $registryName :=  .Values.image.registry -}}
-{{- $repositoryName := .Values.image.repository -}}
-{{- $tag := .Values.image.tag -}}
-{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- printf "%s" .Values.image.MariaDB.fullReference -}}
 {{- end -}}
 
 {{/*
