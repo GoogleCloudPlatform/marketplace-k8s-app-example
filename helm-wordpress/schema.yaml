@@ -1,0 +1,18 @@
+properties:
+  APP_INSTANCE_NAME:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  NAMESPACE:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  imageWordPress.image:
+    type: string
+    default: docker.io/bitnami/wordpress:4.9.5
+    x-google-marketplace:
+      type: IMAGE
+required:
+- APP_INSTANCE_NAME
+- NAMESPACE
+- imageWordPress.image
