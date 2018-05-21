@@ -13,8 +13,8 @@ define APP_PARAMETERS
 { \
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
-  "imageWordPress.image": "$(APP_REGISTRY):$(APP_TAG)", \
-  "imageMariaDb.image": "$(APP_REGISTRY):$(APP_TAG)" \
+  "image.WordPress.fullReference": "$(APP_REGISTRY):$(APP_TAG)", \
+  "image.MariaDB.fullReference": "$(APP_REGISTRY):$(APP_TAG)" \
 }
 endef
 
