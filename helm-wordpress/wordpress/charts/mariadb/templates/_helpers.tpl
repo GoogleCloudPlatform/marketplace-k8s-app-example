@@ -14,32 +14,3 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
-
-{{- define "master.fullname" -}}
-{{- printf "%s-%s" .Release.Name "mariadb-master" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "slave.fullname" -}}
-{{- printf "%s-%s" .Release.Name "mariadb-slave" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "mariadb.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{/*
-Return the proper image name
-*/}}
-{{- define "mariadb.image" -}}
-{{- printf "%s" .Values.image.MariaDB.fullReference -}}
-{{- end -}}
-
-{{/*
-Return the proper image name
-*/}}
-{{- define "metrics.image" -}}
-{{- $registryName :=  .Values.metrics.mage.registry -}}
-{{- $repositoryName := .Values.metrics.image.repository -}}
-{{- $tag := .Values.metrics.image.tag -}}
-{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-{{- end -}}
