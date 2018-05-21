@@ -28,7 +28,7 @@ app/build:: .build/deployer .build/wordpress .build/mariadb
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: schema.yaml deployer/* mariadb/* wordpress/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/deployer: schema.yaml deployer/* wordpress/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
