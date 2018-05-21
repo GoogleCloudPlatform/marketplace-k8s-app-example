@@ -1,3 +1,6 @@
+# TODO(https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example/issues/73):
+# Provide a structure for building/verify multiple tracks with different
+# application images.
 TAG ?= latest
 
 NAME ?= wordpress-1
