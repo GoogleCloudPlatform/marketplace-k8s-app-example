@@ -1,4 +1,4 @@
-APP_NAME = wordpress
+APP_NAME = helm-example-wordpress
 
 tools_path = ../vendor/marketplace-tools
 
@@ -14,7 +14,7 @@ define APP_PARAMETERS
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
   "NAMESPACE": "$(NAMESPACE)", \
   "image.WordPress.fullReference": "$(APP_REGISTRY):$(APP_TAG)", \
-  "image.MariaDB.fullReference": "$(APP_REGISTRY):$(APP_TAG)" \
+  "mariadb.image": "$(APP_REGISTRY)-mariadb:$(APP_TAG)" \
 }
 endef
 
@@ -56,7 +56,7 @@ app/build-test:: app/build .build/tester
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
 .build/mariadb: $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
-	gcloud docker -- pull docker.io/bitnami/mariadb:10.2.14
-	docker tag docker.io/bitnami/mariadb:10.2.14 "$(APP_REGISTRY):$(APP_TAG)"
-	gcloud docker -- push "$(APP_REGISTRY):$(APP_TAG)"
+	gcloud docker -- pull docker.io/bitnami/mariadb:10.1.29-r1
+	docker tag docker.io/bitnami/mariadb:10.1.29-r1 "$(APP_REGISTRY)-mariadb:$(APP_TAG)"
+	gcloud docker -- push "$(APP_REGISTRY)-mariadb:$(APP_TAG)"
 	@touch "$@"

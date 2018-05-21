@@ -12,13 +12,13 @@ properties:
     default: docker.io/bitnami/wordpress:4.9.5
     x-google-marketplace:
       type: IMAGE
-  image.MariaDB.fullReference:
+  mariadb.image:
     type: string
-    default: docker.io/bitnami/mariadb:10.2.14
+    default: docker.io/bitnami/mariadb:10.1.29-r1
     x-google-marketplace:
       type: IMAGE
 required:
 - APP_INSTANCE_NAME
 - NAMESPACE
 - image.WordPress.fullReference
-- image.MariaDB.fullReference
+- mariadb.image
