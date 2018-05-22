@@ -5,7 +5,11 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
 
 ADD wordpress /tmp/wordpress/chart
+
 RUN find /tmp/wordpress/chart -type f -exec sed -i 's/release: "{{ .Release.Name }}"/release: "{{ .Release.Name }}"\n    app.kubernetes.io\/name: "{{ .Release.Name }}"/' {} \;
+RUN rm -r /tmp/wordpress/chart/templates/tests
+RUN rm /tmp/wordpress/chart/charts/mariadb/templates/test-runner.yaml
+RUN rm /tmp/wordpress/chart/charts/mariadb/templates/tests.yaml
 
 RUN cd /tmp/wordpress \
     && tar -czvf /tmp/wordpress.tar.gz chart
