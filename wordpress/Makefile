@@ -55,14 +55,10 @@ app/build-test:: app/build .build/tester
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/testrunner: ../vendor/marketplace-tools/testrunner/*
-	gcloud container builds submit \
-	  --config ../vendor/marketplace-tools/testrunner/cloudbuild.yaml \
-	  ../vendor/marketplace-tools/testrunner
-
 .build/tester: \
 	$(APP_BUILD)/registry_prefix \
 	$(APP_BUILD)/tag \
+	$(MARKETPLACE_BASE_BUILD)/testrunner \
 	apptest/tester/* \
 	apptest/tester/testspecs/* \
 	| app/setup
