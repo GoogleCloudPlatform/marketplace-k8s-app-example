@@ -2,9 +2,13 @@
 ## ref: https://hub.docker.com/r/bitnami/wordpress/tags/
 ##
 image:
-  registry: docker.io
-  repository: bitnami/wordpress
-  tag: 4.9.5
+  WordPress.fullReference: docker.io/bitnami/wordpress:4.9.5
+
+  # Replaced the following properties with a single value reference, matching the GKE Marketplace feature.
+  #registry: docker.io
+  #repository: bitnami/wordpress
+  #tag: 4.9.5
+
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
