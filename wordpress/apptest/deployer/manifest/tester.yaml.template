@@ -10,5 +10,21 @@ spec:
       containers:
       - name: tester
         image: "$APP_TESTER_IMAGE"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /tester/config
       restartPolicy: Never
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "$APP_INSTANCE_NAME-testconfig"
   backoffLimit: 0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "$APP_INSTANCE_NAME-testconfig"
+  labels:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+data:
+  service_name: "$APP_INSTANCE_NAME-wordpress-svc"

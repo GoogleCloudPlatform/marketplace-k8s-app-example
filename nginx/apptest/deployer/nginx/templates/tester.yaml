@@ -10,5 +10,21 @@ spec:
       containers:
       - name: tester
         image: "{{ .Values.tester.image }}"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /tester/config
       restartPolicy: Never
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{ .Release.Name }}-testconfig"
   backoffLimit: 0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-testconfig"
+  labels:
+    app.kubernetes.io/name: "{{ .Release.Name }}"
+data:
+  service_name: "{{ .Release.Name }}"

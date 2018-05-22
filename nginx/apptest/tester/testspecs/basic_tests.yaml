@@ -13,9 +13,9 @@
 # limitations under the License.
 
 actions:
-- name: GET nginx-1 should be 200 OK
+- name: GET {{.service_name}} should be 200 OK
   httpTest:
-    url: http://nginx-1:8080
+    url: http://{{.service_name}}:8080
     headers:
       Cache-Control: no-cache
     expect:

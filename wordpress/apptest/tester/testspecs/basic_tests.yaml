@@ -13,9 +13,9 @@
 # limitations under the License.
 
 actions:
-- name: GET wordpress-1-wordpress-svc should be 200 OK
+- name: GET {{.service_name}} should be 200 OK
   httpTest:
-    url: http://wordpress-1-wordpress-svc
+    url: http://{{.service_name}}
     headers:
       Cache-Control: no-cache
     expect:
