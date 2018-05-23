@@ -4,21 +4,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     docker \
-    g++ \
     gettext \
     jq \
     make \
-    pkg-config \
     python \
     python-dev \
     python-pip \
     python-setuptools \
     python-yaml \
-    unzip \
     uuid-runtime \
     wget \
-    zip \
-    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install pyjwt
@@ -33,8 +28,3 @@ RUN wget -q -O /usr/bin/google-cloud-sdk-199.0.0-linux-x86_64.tar.gz \
     && tar xfC /usr/bin/google-cloud-sdk-199.0.0-linux-x86_64.tar.gz /usr/bin \
     && ln -s /usr/bin/google-cloud-sdk/bin/gcloud /usr/bin/gcloud \
     && chmod 755 /usr/bin/google-cloud-sdk/bin/gcloud
-
-RUN wget -q -O bazel-0.13.0-installer-linux-x86_64.sh \
-        https://github.com/bazelbuild/bazel/releases/download/0.13.0/bazel-0.13.0-installer-linux-x86_64.sh \
-    && chmod +x bazel-0.13.0-installer-linux-x86_64.sh \
-    && ./bazel-0.13.0-installer-linux-x86_64.sh

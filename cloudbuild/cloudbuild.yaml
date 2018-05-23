@@ -66,6 +66,7 @@ steps:
   args:
   - -c
   - |
+    touch .build/marketplace-base-containers
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
     make app/verify
 
@@ -77,6 +78,7 @@ steps:
   args:
   - -c
   - |
+    touch .build/marketplace-base-containers
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
     make app/verify
 
