@@ -38,5 +38,3 @@ RUN wget -q -O bazel-0.13.0-installer-linux-x86_64.sh \
         https://github.com/bazelbuild/bazel/releases/download/0.13.0/bazel-0.13.0-installer-linux-x86_64.sh \
     && chmod +x bazel-0.13.0-installer-linux-x86_64.sh \
     && ./bazel-0.13.0-installer-linux-x86_64.sh
-
-ENV PATH "/usr/local/bin:${PATH}"
