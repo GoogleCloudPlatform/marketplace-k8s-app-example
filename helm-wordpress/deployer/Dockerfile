@@ -5,15 +5,18 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
 
 ADD wordpress /tmp/wordpress/chart
-
-RUN find /tmp/wordpress/chart -type f -exec sed -i 's/release: "{{ .Release.Name }}"/release: "{{ .Release.Name }}"\n    app.kubernetes.io\/name: "{{ .Release.Name }}"/' {} \;
-RUN rm -r /tmp/wordpress/chart/templates/tests
-RUN rm /tmp/wordpress/chart/charts/mariadb/templates/test-runner.yaml
-RUN rm /tmp/wordpress/chart/charts/mariadb/templates/tests.yaml
-
+RUN find /tmp/wordpress/chart -type f \
+    -exec sed -i 's/release: "{{ .Release.Name }}"/release: "{{ .Release.Name }}"\n    app.kubernetes.io\/name: "{{ .Release.Name }}"/' {} \;
 RUN cd /tmp/wordpress \
     && tar -czvf /tmp/wordpress.tar.gz chart
 
+ADD apptest/deployer/chart /tmp/test/chart
+RUN cd /tmp/test \
+    && tar -czvf /tmp/test/wordpress.tar.gz chart/
+
 FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
 COPY --from=build /tmp/wordpress.tar.gz /data/chart/
+COPY --from=build /tmp/test/wordpress.tar.gz /data-test/chart/
+COPY apptest/deployer/config.yaml /data-test/
+COPY apptest/deployer/schema.yaml /data-test/
 COPY schema.yaml /data/schema.yaml

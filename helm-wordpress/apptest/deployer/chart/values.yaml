@@ -1,0 +1,8 @@
+tester:
+  # Note: This value is parameterized via schema.yaml, and will be overriden at runtime.
+  image: launcher.gcr.io/google/nginx/tester
+  duration: "10"
+  exitcode: "0"
+
+service:
+  port: 8080

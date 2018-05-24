@@ -1,0 +1,3 @@
+properties:
+  tester.image:
+    type: string
