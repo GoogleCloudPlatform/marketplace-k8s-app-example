@@ -1,0 +1,85 @@
+apiVersion: marketplace.cloud.google.com/v1
+kind: Application
+metadata:
+  annotations:
+    marketplace.cloud.google.com: |
+      {
+        "name":"Memcached",
+        "version":"1.5.5",
+        "description":"Memcached is an open source in-memory, key-value store. Key features of this solution include high performance and ease of distribution. Although Memcached is intended to be use with dynamic web applications, it can be used as a caching system for a number of databases.",
+        "url":"https://memcached.org",
+        "tagline":"Open source key-value cache and store",
+        "support_info":"Community support",
+        "documentations":[{
+          "url":"https://github.com/GoogleCloudPlatform/memcached-docker/blob/master/1/README.md",
+          "title":"Memcached Getting Started",
+          "description":"Getting Started with Google Cloud Platform's Memcached container image"
+        }]
+      }
+  ApplicationStatus:
+    ready: true
+  generation: 0
+  initializers: null
+  name: "$APP_INSTANCE_NAME"
+  namespace: "$NAMESPACE"
+spec:
+  components:
+  - $APP_INSTANCE_NAME-controller:
+      kind: Deployment
+  - $APP_INSTANCE_NAME-controller-sa:
+      kind: ServiceAccount
+  - $APP_INSTANCE_NAME-controller-approle:
+      kind: Role
+  - $APP_INSTANCE_NAME-controller-apprb:
+      kind: RoleBinding
+  - $APP_INSTANCE_NAME-controller-editrb:
+      kind: RoleBinding
+  - $APP_INSTANCE_NAME-memcached:
+      kind: StatefulSet
+  - $APP_INSTANCE_NAME-memcached-svc:
+      kind: Service
+  - $APP_INSTANCE_NAME-deployer:
+      kind: Job
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: $APP_INSTANCE_NAME-memcached
+  labels: &MemcachedDeploymentLabels
+    app: $APP_INSTANCE_NAME
+    component: memcached-server
+spec:
+  selector:
+    matchLabels: *MemcachedDeploymentLabels
+  serviceName: $APP_INSTANCE_NAME-memcached-svc
+  replicas: 1
+  template:
+    metadata:
+      labels: *MemcachedDeploymentLabels
+    spec:
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: memcached
+        image: launcher.gcr.io/google/memcached1:latest
+        imagePullPolicy: Always
+        ports:
+        - name: memcached
+          containerPort: 11211
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $APP_INSTANCE_NAME-memcached-svc
+  labels:
+    app: $APP_INSTANCE_NAME
+    component: memcached-server
+spec:
+  ports:
+  - name: memcached-port
+    port: 11211
+    protocol: TCP
+  selector:
+    app: $APP_INSTANCE_NAME
+    component: memcached-server
+  type: LoadBalancer
