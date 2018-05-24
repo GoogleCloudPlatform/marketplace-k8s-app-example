@@ -15,6 +15,7 @@ include ../vendor/marketplace-tools/base_containers.Makefile
 include ../vendor/marketplace-tools/crd.Makefile
 include ../vendor/marketplace-tools/gcloud.Makefile
 include ../vendor/marketplace-tools/ubbagent.Makefile
+include ../vendor/marketplace-tools/var.Makefile
 
 ##############################################
 # Define variables required by app.Makefile. #
@@ -38,7 +39,11 @@ app/build:: .build/deployer .build/nginx
 
 app/build-test:: app/build .build/tester
 
-.build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* base/build/deployer/helm | gcloud/REGISTRY
+.build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* \
+                 .build/marketplace-base-containers/deployer-helm \
+                 .build/var/REGISTRY \
+                 .build/var/MARKETPLACE_REGISTRY \
+                 .build/var/APP_DEPLOYER_IMAGE
 	docker build \
 	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
@@ -47,7 +52,8 @@ app/build-test:: app/build .build/tester
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/tester: apptest/* | gcloud/REGISTRY
+.build/tester: apptest/* \
+               .build/var/REGISTRY
 	docker build \
 	    --tag "$(REGISTRY)/tester:latest" \
 	    -f apptest/tester/Dockerfile \
@@ -57,7 +63,7 @@ app/build-test:: app/build .build/tester
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/nginx: | gcloud/REGISTRY
+.build/nginx: .build/var/REGISTRY
 	gcloud docker -- pull launcher.gcr.io/google/nginx1
 	docker tag launcher.gcr.io/google/nginx1 "$(NGINX_IMAGE)"
 	gcloud docker -- push "$(NGINX_IMAGE)"
