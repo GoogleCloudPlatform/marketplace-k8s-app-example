@@ -14,9 +14,9 @@ APP_TESTER_IMAGE ?= $(REGISTRY)/tester:latest
 ########################################
 
 include ../vendor/marketplace-tools/app.Makefile
-include ../vendor/marketplace-tools/base_containers.Makefile
 include ../vendor/marketplace-tools/crd.Makefile
 include ../vendor/marketplace-tools/gcloud.Makefile
+include ../vendor/marketplace-tools/marketplace.Makefile
 include ../vendor/marketplace-tools/ubbagent.Makefile
 include ../vendor/marketplace-tools/var.Makefile
 
@@ -41,31 +41,40 @@ APP_TEST_PARAMETERS ?= { \
 # Define extensions for app.Makefile. #
 #######################################
 
-app/build:: .build/deployer .build/wordpress .build/init .build/mysql .build/ubbagent
+.PHONY: .build/wordpress
+.build/wordpress:
+	mkdir -p "$@"
 
-app/build-test:: app/build .build/tester
+app/build:: .build/wordpress/deployer \
+            .build/wordpress/wordpress \
+            .build/wordpress/init \
+            .build/wordpress/mysql \
+            .build/wordpress/ubbagent
 
-.build/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* \
-                 .build/marketplace-base-containers/deployer-kubectl \
-                 .build/var/APP_DEPLOYER_IMAGE \
-                 .build/var/MARKETPLACE_REGISTRY \
-                 .build/var/REGISTRY \
-                 .build/var/REGISTRY_FOR_DEPLOYER \
-                 .build/var/TAG
+app/build-test:: app/build \
+                 .build/wordpress/tester
+
+.build/wordpress/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* \
+                           .build/marketplace/deployer/envsubst \
+                           .build/var/APP_DEPLOYER_IMAGE \
+                           .build/var/REGISTRY \
+                           .build/var/REGISTRY_FOR_DEPLOYER \
+                           .build/var/TAG \
+                           | .build/wordpress
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY_FOR_DEPLOYER)" \
 	    --build-arg TAG="$(TAG)" \
-	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
+	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/tester: apptest/* \
-               .build/var/REGISTRY \
-               .build/var/APP_TESTER_IMAGE \
-               .build/var/TAG
+.build/wordpress/tester: apptest/* \
+                         .build/var/REGISTRY \
+                         .build/var/APP_TESTER_IMAGE \
+                         | .build/wordpress
 	docker build \
 	    --tag "$(APP_TESTER_IMAGE)" \
 	    -f apptest/tester/Dockerfile \
@@ -75,36 +84,39 @@ app/build-test:: app/build .build/tester
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/wordpress: .build/var/REGISTRY \
-                  .build/var/TAG
+.build/wordpress/wordpress: .build/var/REGISTRY \
+                            .build/var/TAG \
+                            | .build/wordpress
 	gcloud docker -- pull launcher.gcr.io/google/wordpress4-php5-apache
 	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY):$(TAG)"
 	gcloud docker -- push "$(REGISTRY):$(TAG)"
 	@touch "$@"
 
 # Build secondary app image.
-.build/init: init/* \
-             .build/var/REGISTRY \
-             .build/var/TAG
+.build/wordpress/init: init/* \
+                       .build/var/REGISTRY \
+                       .build/var/TAG \
+                       | .build/wordpress
 	cd init \
 	&& docker build --tag "$(REGISTRY)/init:$(TAG)" .
 	gcloud docker -- push "$(REGISTRY)/init:$(TAG)"
 	@touch "$@"
 
 # Relocate public mysql image to $REGISTRY.
-.build/mysql: .build/var/REGISTRY \
-              .build/var/TAG
+.build/wordpress/mysql: .build/var/REGISTRY \
+                        .build/var/TAG \
+                        | .build/wordpress
 	gcloud docker -- pull launcher.gcr.io/google/mysql5
 	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/mysql:$(TAG)"
 	gcloud docker -- push "$(REGISTRY)/mysql:$(TAG)"
 	@touch "$@"
 
 # Relocate public ubbagent image to $REGISTRY.
-.build/ubbagent: $(UBBAGENT_BUILD)/ubbagent \
-                 .build/var/MARKETPLACE_REGISTRY \
+.build/wordpress/ubbagent: .build/ubbagent/ubbagent \
                  .build/var/REGISTRY \
-                 .build/var/TAG
-	gcloud docker -- pull "$(MARKETPLACE_REGISTRY)/ubbagent"
-	docker tag "$(MARKETPLACE_REGISTRY)/ubbagent" "$(REGISTRY)/ubbagent:$(TAG)"
+                 .build/var/TAG \
+                 | .build/wordpress
+	#gcloud docker -- pull "gcr.io/google-marketplace-tools/ubbagent"
+	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/ubbagent:$(TAG)"
 	gcloud docker -- push "$(REGISTRY)/ubbagent:$(TAG)"
 	@touch "$@"

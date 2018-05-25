@@ -11,9 +11,9 @@ NGINX_IMAGE ?= $(REGISTRY)/nginx:latest
 ########################################
 
 include ../vendor/marketplace-tools/app.Makefile
-include ../vendor/marketplace-tools/base_containers.Makefile
 include ../vendor/marketplace-tools/crd.Makefile
 include ../vendor/marketplace-tools/gcloud.Makefile
+include ../vendor/marketplace-tools/marketplace.Makefile
 include ../vendor/marketplace-tools/ubbagent.Makefile
 include ../vendor/marketplace-tools/var.Makefile
 
@@ -40,12 +40,11 @@ app/build:: .build/deployer .build/nginx
 app/build-test:: app/build .build/tester
 
 .build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* \
-                 .build/marketplace-base-containers/deployer-helm \
+                 .build/marketplace/deployer/helm \
                  .build/var/REGISTRY \
-                 .build/var/MARKETPLACE_REGISTRY \
                  .build/var/APP_DEPLOYER_IMAGE
 	docker build \
-	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
+	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .

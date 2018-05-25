@@ -1,5 +1,5 @@
-ARG MARKETPLACE_REGISTRY
-FROM ${MARKETPLACE_REGISTRY}/deployer_kubectl_base
+ARG REGISTRY
+FROM "gcr.io/google-marketplace-tools/k8s/deployer_envsubst"
 
 # TODO: Remove environment parameters once the frontend supports parameters.
 ARG REGISTRY
