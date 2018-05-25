@@ -29,14 +29,22 @@ spec:
     matchLabels:
       app.kubernetes.io/name: "$APP_INSTANCE_NAME"
   componentKinds:
-  - kind: Deployment
-  - kind: ServiceAccount
-  - kind: Role
-  - kind: RoleBinding
-  - kind: PersistentVolumeClaim
-  - kind: Service
-  - kind: Job
-  - kind: Secret
+  - group: apps/v1beta1
+    kind: Deployment
+  - group: batch/v1
+    kind: Job
+  - group: v1
+    kind: PersistentVolumeClaim
+  - group: rbac.authorization.k8s.io/v1
+    kind: Role
+  - group: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+  - group: v1
+    kind: Secret
+  - group: v1
+    kind: Service
+  - group: v1
+    kind: ServiceAccount
   notes: |-
     # Expose WordPress service
 
