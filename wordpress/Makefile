@@ -41,15 +41,15 @@ APP_TEST_PARAMETERS ?= { \
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
 app/build:: .build/wordpress/deployer \
-            .build/wordpress/image-wordpress \
-            .build/wordpress/image-init \
-            .build/wordpress/image-mysql \
-            .build/wordpress/image-ubbagent
+            .build/wordpress/wordpress \
+            .build/wordpress/init \
+            .build/wordpress/mysql \
+            .build/wordpress/ubbagent
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
 app/build-test:: app/build \
-                 .build/wordpress/image-tester
+                 .build/wordpress/tester
 
 .build/wordpress: | .build
 	mkdir -p "$@"
@@ -72,9 +72,9 @@ app/build-test:: app/build \
 	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/wordpress/image-tester: apptest/* \
-                               .build/var/TESTER_IMAGE \
-                               | .build/wordpress
+.build/wordpress/tester: apptest/* \
+                         .build/var/TESTER_IMAGE \
+                         | .build/wordpress
 	docker build \
 	    --tag "$(TESTER_IMAGE)" \
 	    -f apptest/tester/Dockerfile \
@@ -84,38 +84,38 @@ app/build-test:: app/build \
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/wordpress/image-wordpress: .build/var/REGISTRY \
-                                  .build/var/TAG \
-                                  | .build/wordpress
+.build/wordpress/wordpress: .build/var/REGISTRY \
+                            .build/var/TAG \
+                            | .build/wordpress
 	docker pull launcher.gcr.io/google/wordpress4-php5-apache
 	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/wordpress:$(TAG)"
 	docker push "$(REGISTRY)/wordpress:$(TAG)"
 	@touch "$@"
 
 # Build secondary app image.
-.build/wordpress/image-init: init/* \
-                             .build/var/REGISTRY \
-                             .build/var/TAG \
-                             | .build/wordpress
+.build/wordpress/init: init/* \
+                       .build/var/REGISTRY \
+                       .build/var/TAG \
+                       | .build/wordpress
 	cd init \
 	&& docker build --tag "$(REGISTRY)/wordpress/init:$(TAG)" .
 	docker push "$(REGISTRY)/wordpress/init:$(TAG)"
 	@touch "$@"
 
 # Relocate public mysql image to $REGISTRY.
-.build/wordpress/image-mysql: .build/var/REGISTRY \
-                              .build/var/TAG \
-                              | .build/wordpress
+.build/wordpress/mysql: .build/var/REGISTRY \
+                        .build/var/TAG \
+                        | .build/wordpress
 	docker pull launcher.gcr.io/google/mysql5
 	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/wordpress/mysql:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/mysql:$(TAG)"
 	@touch "$@"
 
 # Relocate ubbagent image to $REGISTRY.
-.build/wordpress/image-ubbagent: .build/ubbagent/ubbagent \
-                                 .build/var/REGISTRY \
-                                 .build/var/TAG \
-                                 | .build/wordpress
+.build/wordpress/ubbagent: .build/ubbagent/ubbagent \
+                           .build/var/REGISTRY \
+                           .build/var/TAG \
+                           | .build/wordpress
 	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	@touch "$@"
