@@ -1,69 +1,88 @@
-###########################################################
-# Define convenience parameters (if not already defined). #
-###########################################################
+TAG ?= latest
 
-NAME ?= nginx-1
-NAMESPACE ?= default
-NGINX_IMAGE ?= $(REGISTRY)/nginx:latest
-
-########################################
-# Include marketplace-tools Makefiles. #
-########################################
-
-include ../vendor/marketplace-tools/app.Makefile
+# crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile
+
+# gcloud.Makefile provides default values for
+# REGISTRY and NAMESPACE derived from local
+# gcloud and kubectl environments.
 include ../vendor/marketplace-tools/gcloud.Makefile
+
+# marketplace.Makefile provides targets such as
+# ".build/marketplace/deployer/envsubst" to build the base
+# deployer images locally.
 include ../vendor/marketplace-tools/marketplace.Makefile
+
+# ubbagent.Makefile provides ".build/ubbagent/ubbagent"
+# target to build the ubbagent image locally.
 include ../vendor/marketplace-tools/ubbagent.Makefile
 include ../vendor/marketplace-tools/var.Makefile
 
-##############################################
-# Define variables required by app.Makefile. #
-##############################################
+# app.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined as followed.
+include ../vendor/marketplace-tools/app.Makefile
 
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/deployer:latest
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/nginx/deployer:$(TAG)
+NAME ?= nginx-1
 APP_PARAMETERS ?= { \
-  "APP_INSTANCE_NAME": "$(NAME)", \
-  "NAMESPACE": "$(NAMESPACE)", \
-  "imageNginx.image": "$(NGINX_IMAGE)" \
+  "name": "$(NAME)", \
+  "namespace": "$(NAMESPACE)", \
+  "imageNginx.image": "$(REGISTRY)/nginx:$(TAG)" \
 }
+TESTER_IMAGE ?= $(REGISTRY)/nginx/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
-  "tester.image": "$(REGISTRY)/tester:latest" \
+  "tester.image": "$(TESTER_IMAGE)" \
 }
 
-#######################################
-# Define extensions for app.Makefile. #
-#######################################
+# Extend the target as defined in app.Makefile to
+# include real dependencies.
+app/build:: .build/nginx/deployer \
+            .build/nginx/nginx
 
-app/build:: .build/deployer .build/nginx
+# Extend the target as defined in app.Makefile to
+# include real dependencies.
+app/build-test:: app/build \
+                 .build/nginx/tester
 
-app/build-test:: app/build .build/tester
+.build/nginx: | .build
+	mkdir -p "$@"
 
-.build/deployer: schema.yaml deployer/* nginx/* apptest/deployer/* \
-                 .build/marketplace/deployer/helm \
-                 .build/var/REGISTRY \
-                 .build/var/APP_DEPLOYER_IMAGE
+.build/nginx/deployer: schema.yaml \
+                       deployer/* \
+                       nginx/* \
+                       apptest/deployer/* \
+                       .build/marketplace/deployer/helm \
+                       .build/var/REGISTRY \
+                       .build/var/TAG \
+                       .build/var/APP_DEPLOYER_IMAGE \
+                       | .build/nginx
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
+	    --build-arg TAG="$(TAG)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
-	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
+	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/tester: apptest/* \
-               .build/var/REGISTRY
+.build/nginx/tester: apptest/* \
+                     .build/var/REGISTRY \
+                     .build/var/TAG \
+                     | .build/nginx
 	docker build \
-	    --tag "$(REGISTRY)/tester:latest" \
+	    --tag "$(REGISTRY)/nginx/tester:$(TAG)" \
 	    -f apptest/tester/Dockerfile \
 	    .
-	gcloud docker -- push "$(REGISTRY)/tester:latest"
+	docker push "$(REGISTRY)/nginx/tester:latest"
 	@touch "$@"
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/nginx: .build/var/REGISTRY
-	gcloud docker -- pull launcher.gcr.io/google/nginx1
-	docker tag launcher.gcr.io/google/nginx1 "$(NGINX_IMAGE)"
-	gcloud docker -- push "$(NGINX_IMAGE)"
+.build/nginx/nginx: .build/var/REGISTRY \
+                    .build/var/TAG \
+                    | .build/nginx
+	docker pull launcher.gcr.io/google/nginx1
+	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/nginx:$(TAG)"
+	docker push "$(REGISTRY)/nginx:$(TAG)"
 	@touch "$@"
