@@ -1,122 +1,121 @@
-###########################################################
-# Define convenience parameters (if not already defined). #
-###########################################################
-
-NAME ?= wordpress
 TAG ?= latest
 
-REGISTRY_FOR_DEPLOYER ?= $(REGISTRY)
-# TODO(ruela) Double check the correct registry to use here.
-APP_TESTER_IMAGE ?= $(REGISTRY)/tester:latest
-
-########################################
-# Include marketplace-tools Makefiles. #
-########################################
-
-include ../vendor/marketplace-tools/app.Makefile
+# crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile
+
+# gcloud.Makefile provides default values for
+# REGISTRY and NAMESPACE derived from local
+# gcloud and kubectl environments.
 include ../vendor/marketplace-tools/gcloud.Makefile
+
+# marketplace.Makefile provides targets such as
+# ".build/marketplace/deployer/envsubst" to build the base
+# deployer images locally.
 include ../vendor/marketplace-tools/marketplace.Makefile
+
+# ubbagent.Makefile provides ".build/ubbagent/ubbagent"
+# target to build the ubbagent image locally.
 include ../vendor/marketplace-tools/ubbagent.Makefile
 include ../vendor/marketplace-tools/var.Makefile
 
-##############################################
-# Define variables required by app.Makefile. #
-##############################################
+# app.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined as followed.
+include ../vendor/marketplace-tools/app.Makefile
 
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/deployer:latest
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/wordpress/deployer:$(TAG)
+NAME ?= wordpress-1
 APP_PARAMETERS ?= { \
-  "APP_INSTANCE_NAME": "$(NAME)", \
-  "NAMESPACE": "$(NAMESPACE)", \
-  "IMAGE_WORDPRESS": "$(REGISTRY):$(TAG)", \
-  "IMAGE_INIT": "$(REGISTRY)/init:$(TAG)", \
-  "IMAGE_MYSQL": "$(REGISTRY)/mysql:$(TAG)", \
-  "IMAGE_UBBAGENT": "$(REGISTRY)/ubbagent:$(TAG)" \
+  "name": "$(NAME)", \
+  "namespace": "$(NAMESPACE)", \
+  "imageWordpress": "$(REGISTRY)/wordpress:$(TAG)", \
+  "imageInit": "$(REGISTRY)/wordpress/init:$(TAG)", \
+  "imageMysql": "$(REGISTRY)/wordpress/mysql:$(TAG)", \
+  "imageUbbagent": "$(REGISTRY)/wordpress/ubbagent:$(TAG)" \
 }
+TESTER_IMAGE ?= $(REGISTRY)/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
-  "APP_TESTER_IMAGE": "$(APP_TESTER_IMAGE)" \
+  "imageTester": "$(TESTER_IMAGE)" \
 }
 
-#######################################
-# Define extensions for app.Makefile. #
-#######################################
+# Extend the target as defined in app.Makefile to
+# include real dependencies.
+app/build:: .build/wordpress/deployer \
+            .build/wordpress/image-wordpress \
+            .build/wordpress/image-init \
+            .build/wordpress/image-mysql \
+            .build/wordpress/image-ubbagent
 
-.PHONY: .build/wordpress
-.build/wordpress:
+# Extend the target as defined in app.Makefile to
+# include real dependencies.
+app/build-test:: app/build \
+                 .build/wordpress/image-tester
+
+.build/wordpress: | .build
 	mkdir -p "$@"
 
-app/build:: .build/wordpress/deployer \
-            .build/wordpress/wordpress \
-            .build/wordpress/init \
-            .build/wordpress/mysql \
-            .build/wordpress/ubbagent
-
-app/build-test:: app/build \
-                 .build/wordpress/tester
-
-.build/wordpress/deployer: schema.yaml deployer/* manifest/* apptest/deployer/* \
+.build/wordpress/deployer: schema.yaml \
+                           deployer/* \
+                           manifest/* \
+                           apptest/deployer/* \
                            .build/marketplace/deployer/envsubst \
-                           .build/var/APP_DEPLOYER_IMAGE \
                            .build/var/REGISTRY \
-                           .build/var/REGISTRY_FOR_DEPLOYER \
                            .build/var/TAG \
+                           .build/var/APP_DEPLOYER_IMAGE \
                            | .build/wordpress
 	docker build \
-	    --build-arg REGISTRY="$(REGISTRY_FOR_DEPLOYER)" \
+	    --build-arg REGISTRY="$(REGISTRY)/wordpress" \
 	    --build-arg TAG="$(TAG)" \
-	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
-	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
+	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/wordpress/tester: apptest/* \
-                         .build/var/REGISTRY \
-                         .build/var/APP_TESTER_IMAGE \
-                         | .build/wordpress
+.build/wordpress/image-tester: apptest/* \
+                               .build/var/TESTER_IMAGE \
+                               | .build/wordpress
 	docker build \
-	    --tag "$(APP_TESTER_IMAGE)" \
+	    --tag "$(TESTER_IMAGE)" \
 	    -f apptest/tester/Dockerfile \
 	    .
-	gcloud docker -- push "$(APP_TESTER_IMAGE)"
+	docker push "$(TESTER_IMAGE)"
 	@touch "$@"
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/wordpress/wordpress: .build/var/REGISTRY \
-                            .build/var/TAG \
-                            | .build/wordpress
-	gcloud docker -- pull launcher.gcr.io/google/wordpress4-php5-apache
-	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY):$(TAG)"
-	gcloud docker -- push "$(REGISTRY):$(TAG)"
+.build/wordpress/image-wordpress: .build/var/REGISTRY \
+                                  .build/var/TAG \
+                                  | .build/wordpress
+	docker pull launcher.gcr.io/google/wordpress4-php5-apache
+	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/wordpress:$(TAG)"
+	docker push "$(REGISTRY)/wordpress:$(TAG)"
 	@touch "$@"
 
 # Build secondary app image.
-.build/wordpress/init: init/* \
-                       .build/var/REGISTRY \
-                       .build/var/TAG \
-                       | .build/wordpress
+.build/wordpress/image-init: init/* \
+                             .build/var/REGISTRY \
+                             .build/var/TAG \
+                             | .build/wordpress
 	cd init \
-	&& docker build --tag "$(REGISTRY)/init:$(TAG)" .
-	gcloud docker -- push "$(REGISTRY)/init:$(TAG)"
+	&& docker build --tag "$(REGISTRY)/wordpress/init:$(TAG)" .
+	docker push "$(REGISTRY)/wordpress/init:$(TAG)"
 	@touch "$@"
 
 # Relocate public mysql image to $REGISTRY.
-.build/wordpress/mysql: .build/var/REGISTRY \
-                        .build/var/TAG \
-                        | .build/wordpress
-	gcloud docker -- pull launcher.gcr.io/google/mysql5
-	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/mysql:$(TAG)"
-	gcloud docker -- push "$(REGISTRY)/mysql:$(TAG)"
+.build/wordpress/image-mysql: .build/var/REGISTRY \
+                              .build/var/TAG \
+                              | .build/wordpress
+	docker pull launcher.gcr.io/google/mysql5
+	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/wordpress/mysql:$(TAG)"
+	docker push "$(REGISTRY)/wordpress/mysql:$(TAG)"
 	@touch "$@"
 
-# Relocate public ubbagent image to $REGISTRY.
-.build/wordpress/ubbagent: .build/ubbagent/ubbagent \
-                 .build/var/REGISTRY \
-                 .build/var/TAG \
-                 | .build/wordpress
-	#gcloud docker -- pull "gcr.io/google-marketplace-tools/ubbagent"
-	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/ubbagent:$(TAG)"
-	gcloud docker -- push "$(REGISTRY)/ubbagent:$(TAG)"
+# Relocate ubbagent image to $REGISTRY.
+.build/wordpress/image-ubbagent: .build/ubbagent/ubbagent \
+                                 .build/var/REGISTRY \
+                                 .build/var/TAG \
+                                 | .build/wordpress
+	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
+	docker push "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	@touch "$@"
