@@ -1,33 +1,33 @@
 properties:
-  APP_INSTANCE_NAME:
+  name:
     type: string
     x-google-marketplace:
       type: NAME
-  NAMESPACE:
+  namespace:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  IMAGE_WORDPRESS:
+  imageWordpress:
     type: string
     default: $REGISTRY:$TAG
     x-google-marketplace:
       type: IMAGE
-  IMAGE_INIT:
+  imageInit:
     type: string
     default: $REGISTRY/init:$TAG
     x-google-marketplace:
       type: IMAGE
-  IMAGE_MYSQL:
+  imageMysql:
     type: string
     default: $REGISTRY/mysql:$TAG
     x-google-marketplace:
       type: IMAGE
-  IMAGE_UBBAGENT:
+  imageUbbagent:
     type: string
     default: $REGISTRY/ubbagent:$TAG
     x-google-marketplace:
       type: IMAGE
-  DB_PASSWORD:
+  dbPassword:
     type: string
     x-google-marketplace:
       type: GENERATED_PASSWORD
@@ -51,13 +51,13 @@ properties:
     type: boolean
     default: false
 required:
-- APP_INSTANCE_NAME
-- NAMESPACE
-- IMAGE_WORDPRESS
-- IMAGE_INIT
-- IMAGE_MYSQL
-- IMAGE_UBBAGENT
-- DB_PASSWORD
+- name
+- namespace
+- imageWordpress
+- imageInit
+- imageMysql
+- imageUbbagent
+- dbPassword
 - customString
 - customInteger
 - customBoolean
