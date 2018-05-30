@@ -41,10 +41,10 @@ APP_TEST_PARAMETERS ?= { \
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
 app/build:: .build/wordpress/deployer \
-            .build/wordpress/wordpress \
             .build/wordpress/init \
             .build/wordpress/mysql \
-            .build/wordpress/ubbagent
+            .build/wordpress/ubbagent \
+            .build/wordpress/wordpress
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
@@ -54,14 +54,14 @@ app/build-test:: app/build \
 .build/wordpress: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: schema.yaml \
+.build/wordpress/deployer: apptest/deployer/* \
                            deployer/* \
                            manifest/* \
-                           apptest/deployer/* \
+                           schema.yaml \
                            .build/marketplace/deployer/envsubst \
+                           .build/var/APP_DEPLOYER_IMAGE \
                            .build/var/REGISTRY \
                            .build/var/TAG \
-                           .build/var/APP_DEPLOYER_IMAGE \
                            | .build/wordpress
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)/wordpress" \

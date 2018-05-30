@@ -48,14 +48,14 @@ app/build-test:: app/build \
 .build/nginx: | .build
 	mkdir -p "$@"
 
-.build/nginx/deployer: schema.yaml \
+.build/nginx/deployer: apptest/deployer/* \
                        deployer/* \
                        nginx/* \
-                       apptest/deployer/* \
+                       schema.yaml \
                        .build/marketplace/deployer/helm \
+                       .build/var/APP_DEPLOYER_IMAGE \
                        .build/var/REGISTRY \
                        .build/var/TAG \
-                       .build/var/APP_DEPLOYER_IMAGE \
                        | .build/nginx
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
