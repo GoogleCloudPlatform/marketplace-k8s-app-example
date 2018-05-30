@@ -10,7 +10,6 @@ type: Opaque
 data:
   password: "$dbPassword"
 ---
-# TODO(huyhuynh): Change this to using StatefulSet
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -73,7 +72,6 @@ spec:
     app.kubernetes.io/component: wordpress-mysql
   clusterIP: None
 ---
-# TODO(huyhuynh): Change this to using StatefulSet
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
