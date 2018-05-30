@@ -28,7 +28,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: "{{ .Release.Name }}"
   componentKinds:
-  - group: apps/v1
+  - group: apps/v1beta1
     kind: Deployment
   - group: batch/v1
     kind: Job
