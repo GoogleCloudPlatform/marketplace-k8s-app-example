@@ -1,4 +1,3 @@
-ARG MARKETPLACE_REGISTRY
 FROM launcher.gcr.io/google/debian9 AS build
 
 RUN apt-get update \
@@ -11,8 +10,19 @@ ADD apptest/deployer/nginx /tmp/test/chart
 RUN cd /tmp/test \
     && tar -czvf /tmp/test/nginx.tar.gz chart/
 
-FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
+ADD schema.yaml /tmp/schema.yaml
+
+# Provide registry prefix and tag for default values for images.
+ARG REGISTRY
+ARG TAG
+RUN cat /tmp/schema.yaml \
+    | env -i "REGISTRY=$REGISTRY" "TAG=$TAG" envsubst \
+    > /tmp/schema.yaml.new \
+    && mv /tmp/schema.yaml.new /tmp/schema.yaml
+
+
+FROM gcr.io/google-marketplace-tools/k8s/deployer_helm
 COPY --from=build /tmp/nginx.tar.gz /data/chart/
 COPY --from=build /tmp/test/nginx.tar.gz /data-test/chart/
 COPY apptest/deployer/schema.yaml /data-test/
-COPY schema.yaml /data/schema.yaml
+COPY --from=build /tmp/schema.yaml /data/

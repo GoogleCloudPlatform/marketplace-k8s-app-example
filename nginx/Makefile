@@ -1,53 +1,79 @@
-APP_NAME = nginx
+TAG ?= latest
 
-tools_path = ../vendor/marketplace-tools
+# crd.Makefile provides targets to install Application CRD.
+include ../vendor/marketplace-tools/crd.Makefile
 
-include $(tools_path)/gcloud.Makefile
+# gcloud.Makefile provides default values for
+# REGISTRY and NAMESPACE derived from local
+# gcloud and kubectl environments.
+include ../vendor/marketplace-tools/gcloud.Makefile
 
-include $(tools_path)/crd.Makefile
-include $(tools_path)/app.Makefile
-include $(tools_path)/ubbagent.Makefile
+# marketplace.Makefile provides targets such as
+# ".build/marketplace/deployer/envsubst" to build the base
+# deployer images locally.
+include ../vendor/marketplace-tools/marketplace.Makefile
 
-define APP_PARAMETERS
-{ \
-  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
-  "NAMESPACE": "$(NAMESPACE)", \
-  "imageNginx.image": "$(APP_REGISTRY):$(APP_TAG)" \
+# ubbagent.Makefile provides ".build/ubbagent/ubbagent"
+# target to build the ubbagent image locally.
+include ../vendor/marketplace-tools/ubbagent.Makefile
+include ../vendor/marketplace-tools/var.Makefile
+
+# app.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined as followed.
+include ../vendor/marketplace-tools/app.Makefile
+
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/nginx/deployer:$(TAG)
+NAME ?= nginx-1
+APP_PARAMETERS ?= { \
+  "name": "$(NAME)", \
+  "namespace": "$(NAMESPACE)", \
+  "imageNginx.image": "$(REGISTRY)/nginx:$(TAG)" \
 }
-endef
-
-define TEST_PARAMETERS
-{ \
+TESTER_IMAGE ?= $(REGISTRY)/nginx/tester:$(TAG)
+APP_TEST_PARAMETERS ?= { \
   "tester.image": "cosmintitei/bash-curl" \
 }
-endef
 
-app/build:: .build/deployer .build/nginx
+# Extend the target as defined in app.Makefile to
+# include real dependencies.
+app/build:: .build/nginx/deployer \
+            .build/nginx/nginx
 
-.build/deployer: \
-	$(APP_BUILD)/registry_prefix \
-	$(APP_BUILD)/tag \
-	$(MARKETPLACE_BASE_BUILD)/deployer-helm \
-	apptest/deployer/* \
-	apptest/deployer/nginx/* \
-	apptest/deployer/nginx/templates/* \
-	deployer/* \
-	nginx/* \
-	nginx/templates/* \
-	schema.yaml \
-	| app/setup
+
+.build/nginx: | .build
+	mkdir -p "$@"
+
+.build/nginx/deployer: apptest/deployer/* \
+											 apptest/deployer/nginx/* \
+											 apptest/deployer/nginx/templates/* \
+                       deployer/* \
+                       nginx/* \
+                       nginx/templates/* \
+                       schema.yaml \
+                       .build/marketplace/deployer/helm \
+                       .build/var/APP_DEPLOYER_IMAGE \
+                       .build/var/REGISTRY \
+                       .build/var/TAG \
+                       | .build/nginx
+	$(SHOW_TARGET)
 	docker build \
-	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
+	    --build-arg REGISTRY="$(REGISTRY)" \
+	    --build-arg TAG="$(TAG)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
-	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
+	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
+
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/nginx: $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
-	gcloud docker -- pull launcher.gcr.io/google/nginx1
-	docker tag launcher.gcr.io/google/nginx1 "$(APP_REGISTRY):$(APP_TAG)"
-	gcloud docker -- push "$(APP_REGISTRY):$(APP_TAG)"
+.build/nginx/nginx: .build/var/REGISTRY \
+                    .build/var/TAG \
+                    | .build/nginx
+	$(SHOW_TARGET)
+	docker pull launcher.gcr.io/google/nginx1
+	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/nginx:$(TAG)"
+	docker push "$(REGISTRY)/nginx:$(TAG)"
 	@touch "$@"
