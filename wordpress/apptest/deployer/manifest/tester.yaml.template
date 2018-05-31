@@ -1,30 +1,46 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Pod
 metadata:
-  name: tester
+  name: "$APP_INSTANCE_NAME-tester"
   labels:
     app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+  annotations:
+    marketplace.cloud.google.com/verification: test
 spec:
-  template:
-    spec:
-      containers:
-      - name: tester
-        image: "$APP_TESTER_IMAGE"
-        volumeMounts:
-        - name: config-volume
-          mountPath: /tester/config
-      restartPolicy: Never
-      volumes:
-      - name: config-volume
-        configMap:
-          name: "$APP_INSTANCE_NAME-testconfig"
-  backoffLimit: 0
+  containers:
+  - name: tester
+    image: "$APP_TESTER_IMAGE"
+    volumeMounts:
+    - name: config-volume
+      mountPath: /tester
+    command: ["bash"]
+    args: ["/tester/run.sh"]
+  restartPolicy: Never
+  volumes:
+  - name: config-volume
+    configMap:
+      name: "$APP_INSTANCE_NAME-test"
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "$APP_INSTANCE_NAME-testconfig"
+  name: "$APP_INSTANCE_NAME-test"
   labels:
     app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+  annotations:
+    marketplace.cloud.google.com/verification: test
 data:
-  service_name: "$APP_INSTANCE_NAME-wordpress-svc"
+  run.sh: |-
+    set -x
+    endpoint="http://$APP_INSTANCE_NAME"
+    echo GET $endpoint
+    http_status_code=$(curl -o /dev/null -s -w "%{http_code}\n" $endpoint)
+    echo "Expected http status code: 200"
+    echo "Actual http status code: $http_status_code"
+    if [[ "$http_status_code" == "200" ]]; then
+      echo SUCCESS
+      echo 0
+    else
+      echo FAILURE
+      exit 1
+    fi

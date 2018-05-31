@@ -14,6 +14,5 @@ RUN cd /tmp/test \
 FROM ${MARKETPLACE_REGISTRY}/deployer_helm_base
 COPY --from=build /tmp/nginx.tar.gz /data/chart/
 COPY --from=build /tmp/test/nginx.tar.gz /data-test/chart/
-COPY apptest/deployer/config.yaml /data-test/
 COPY apptest/deployer/schema.yaml /data-test/
 COPY schema.yaml /data/schema.yaml

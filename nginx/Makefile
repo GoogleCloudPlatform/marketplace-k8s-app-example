@@ -8,8 +8,6 @@ include $(tools_path)/crd.Makefile
 include $(tools_path)/app.Makefile
 include $(tools_path)/ubbagent.Makefile
 
-APP_TESTER_IMAGE = $(APP_REGISTRY)/tester:latest
-
 define APP_PARAMETERS
 { \
   "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
@@ -20,13 +18,11 @@ endef
 
 define TEST_PARAMETERS
 { \
-  "tester.image": "$(APP_TESTER_IMAGE)" \
+  "tester.image": "cosmintitei/bash-curl" \
 }
 endef
 
 app/build:: .build/deployer .build/nginx
-
-app/build-test:: app/build .build/tester
 
 .build/deployer: \
 	$(APP_BUILD)/registry_prefix \
@@ -46,21 +42,6 @@ app/build-test:: app/build .build/tester
 	    -f deployer/Dockerfile \
 	    .
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
-	@touch "$@"
-
-.build/tester: \
-	$(APP_BUILD)/registry_prefix \
-	$(APP_BUILD)/tag \
-	$(MARKETPLACE_BASE_BUILD)/testrunner \
-	apptest/tester/* \
-	apptest/tester/testspecs/* \
-	| app/setup
-	docker build \
-	    --build-arg REGISTRY="$(REGISTRY)" \
-	    --tag "$(APP_TESTER_IMAGE)" \
-	    -f apptest/tester/Dockerfile \
-	    apptest/tester
-	gcloud docker -- push "$(APP_TESTER_IMAGE)"
 	@touch "$@"
 
 # Simulate building of primary app image. Actually just copying public image to
