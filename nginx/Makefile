@@ -56,7 +56,7 @@ app/build:: .build/nginx/deployer \
                        .build/var/REGISTRY \
                        .build/var/TAG \
                        | .build/nginx
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --build-arg TAG="$(TAG)" \
@@ -72,7 +72,7 @@ app/build:: .build/nginx/deployer \
 .build/nginx/nginx: .build/var/REGISTRY \
                     .build/var/TAG \
                     | .build/nginx
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/nginx1
 	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/nginx:$(TAG)"
 	docker push "$(REGISTRY)/nginx:$(TAG)"

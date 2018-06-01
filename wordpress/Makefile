@@ -65,7 +65,7 @@ app/build-test:: app/build \
                            .build/var/REGISTRY \
                            .build/var/TAG \
                            | .build/wordpress
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)/wordpress" \
 	    --build-arg TAG="$(TAG)" \
@@ -81,7 +81,7 @@ app/build-test:: app/build \
 .build/wordpress/wordpress: .build/var/REGISTRY \
                             .build/var/TAG \
                             | .build/wordpress
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/wordpress4-php5-apache
 	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/wordpress:$(TAG)"
 	docker push "$(REGISTRY)/wordpress:$(TAG)"
@@ -92,7 +92,7 @@ app/build-test:: app/build \
                        .build/var/REGISTRY \
                        .build/var/TAG \
                        | .build/wordpress
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	cd init \
 	&& docker build --tag "$(REGISTRY)/wordpress/init:$(TAG)" .
 	docker push "$(REGISTRY)/wordpress/init:$(TAG)"
@@ -102,7 +102,7 @@ app/build-test:: app/build \
 .build/wordpress/mysql: .build/var/REGISTRY \
                         .build/var/TAG \
                         | .build/wordpress
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/mysql5
 	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/wordpress/mysql:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/mysql:$(TAG)"
@@ -113,7 +113,7 @@ app/build-test:: app/build \
                            .build/var/REGISTRY \
                            .build/var/TAG \
                            | .build/wordpress
-	$(SHOW_TARGET)
+	$(call print_target, $@)
 	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	@touch "$@"
