@@ -45,8 +45,8 @@ app/build:: .build/nginx/deployer \
 	mkdir -p "$@"
 
 .build/nginx/deployer: apptest/deployer/* \
-											 apptest/deployer/nginx/* \
-											 apptest/deployer/nginx/templates/* \
+                       apptest/deployer/nginx/* \
+                       apptest/deployer/nginx/templates/* \
                        deployer/* \
                        nginx/* \
                        nginx/templates/* \
