@@ -39,7 +39,6 @@ data:
     echo "Actual http status code: $http_status_code"
     if [[ "$http_status_code" == "200" ]]; then
       echo SUCCESS
-      echo 0
     else
       echo FAILURE
       exit 1

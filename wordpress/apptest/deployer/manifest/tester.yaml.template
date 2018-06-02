@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "$NAME-tester"
+  name: "${name}-tester"
   labels:
-    app.kubernetes.io/name: "$NAME"
+    app.kubernetes.io/name: "${name}"
   annotations:
     marketplace.cloud.google.com/verification: test
 spec:
   containers:
   - name: tester
-    image: "$APP_TESTER_IMAGE"
+    image: "${imageTester}"
     volumeMounts:
     - name: config-volume
       mountPath: /tester
@@ -19,27 +19,26 @@ spec:
   volumes:
   - name: config-volume
     configMap:
-      name: "$NAME-test"
+      name: "${name}-test"
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "$NAME-test"
+  name: "${name}-test"
   labels:
-    app.kubernetes.io/name: "$NAME"
+    app.kubernetes.io/name: "${name}"
   annotations:
     marketplace.cloud.google.com/verification: test
 data:
   run.sh: |-
     set -x
-    endpoint="http://$NAME"
+    endpoint="http://${name}-wordpress-svc"
     echo GET $endpoint
     http_status_code=$(curl -o /dev/null -s -w "%{http_code}\n" $endpoint)
-    echo "Expected http status code: 200"
+    echo "Expected http status code: 302"
     echo "Actual http status code: $http_status_code"
-    if [[ "$http_status_code" == "200" ]]; then
+    if [[ "$http_status_code" == "302" ]]; then
       echo SUCCESS
-      echo 0
     else
       echo FAILURE
       exit 1
