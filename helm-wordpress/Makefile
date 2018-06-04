@@ -1,34 +1,47 @@
-# This name should uniquely identify your application
-APP_NAME = helm-example-wordpress
+TAG ?= latest
 
+# crd.Makefile provides targets to install Application CRD.
+include ../vendor/marketplace-tools/crd.Makefile
 
-# A relative path to a submodule with marketplace tools repository.
-# It will deliver generic Makefiles to be extended here and base container images specifications.
-tools_path = ../vendor/marketplace-tools
+# gcloud.Makefile provides default values for
+# REGISTRY and NAMESPACE derived from local
+# gcloud and kubectl environments.
+include ../vendor/marketplace-tools/gcloud.Makefile
 
+# marketplace.Makefile provides targets such as
+# ".build/marketplace/deployer/envsubst" to build the base
+# deployer images locally.
+include ../vendor/marketplace-tools/marketplace.Makefile
 
-# Include generic Makefiles from the marketplace-tools repository, ideally linked as
-# a git submodule of the current repository.
-include $(tools_path)/gcloud.Makefile
-include $(tools_path)/crd.Makefile
-include $(tools_path)/app.Makefile
+# ubbagent.Makefile provides ".build/ubbagent/ubbagent"
+# target to build the ubbagent image locally.
+include ../vendor/marketplace-tools/ubbagent.Makefile
+include ../vendor/marketplace-tools/var.Makefile
 
+# app.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined as followed.
+include ../vendor/marketplace-tools/app.Makefile
 
-# Define the image reference for the integration testing container.
-APP_TESTER_IMAGE = $(REGISTRY)/tester:latest
+# Define the deployer image reference
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/helm-wordpress/deployer:$(TAG)
 
+# Define the name of the deployment, if not defined yet
+NAME ?= helm-wordpress-1
 
 # Define all the properties that will be populated to the deployment process.
 # The list should cover all the required properties of the schema.yaml file.
 define APP_PARAMETERS
 { \
-  "APP_INSTANCE_NAME": "$(APP_INSTANCE_NAME)", \
-  "NAMESPACE": "$(NAMESPACE)", \
-  "image.WordPress.fullReference": "$(APP_REGISTRY):$(APP_TAG)", \
-  "mariadb.image": "$(APP_REGISTRY)-mariadb:$(APP_TAG)" \
+  "name": "$(NAME)", \
+  "namespace": "$(NAMESPACE)", \
+  "image.WordPress.fullReference": "$(REGISTRY)/helm-wordpress:$(TAG)", \
+  "mariadb.image": "$(REGISTRY)/helm-wordpress-mariadb:$(TAG)" \
 }
 endef
 
+# Define the image reference for the integration testing container.
+TESTER_IMAGE = $(REGISTRY)/tester:latest
 
 # Define any additional properties that should be combined with APP_PARAMETERS to run
 # a verification deployment (executing integration tests after the app installation).
@@ -40,7 +53,9 @@ endef
 
 
 # Define all the dependencies that should be executed before running the application installation.
-app/build:: .build/deployer .build/wordpress .build/mariadb
+app/build:: .build/helm-wordpress/deployer \
+            .build/helm-wordpress/wordpress \
+            .build/helm-wordpress/mariadb
 
 
 # Define all the dependencies that should be executed before running the verification (installation
@@ -48,41 +63,58 @@ app/build:: .build/deployer .build/wordpress .build/mariadb
 app/build-test:: app/build .build/tester
 
 
+.build/helm-wordpress: | .build
+	mkdir -p "$@"
+
 # Dependencies and actual instructions that should be executed to build your application's Deployer.
-.build/deployer: schema.yaml deployer/* wordpress/* $(MARKETPLACE_BASE_BUILD)/deployer-helm $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/helm-wordpress/deployer: schema.yaml deployer/* wordpress/* \
+                                .build/marketplace/deployer/helm \
+                                .build/var/APP_DEPLOYER_IMAGE \
+                                .build/var/REGISTRY \
+                                .build/var/TAG \
+                                | .build/helm-wordpress
 	docker build \
-	    --build-arg MARKETPLACE_REGISTRY="$(MARKETPLACE_REGISTRY)" \
-	    --tag "$(APP_DEPLOYER_IMAGE)" \
-	    -f deployer/Dockerfile \
-	    .
+		--build-arg REGISTRY="$(REGISTRY)" \
+		--build-arg TAG="$(TAG)" \
+		--tag "$(APP_DEPLOYER_IMAGE)" \
+		-f deployer/Dockerfile \
+		.
 	gcloud docker -- push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
 
 # Dependencies and actual instructions that should be executed to build your application's
 # integration testing container image.
-.build/tester: apptest/* $(APP_BUILD)/registry_prefix | app/setup
+.build/helm-wordpress/tester: apptest/* \
+                              .build/var/REGISTRY \
+                              .build/var/TAG \
+                              | .build/helm-wordpress
 	docker build \
-	    --tag "$(APP_TESTER_IMAGE)" \
-	    -f apptest/tester/Dockerfile \
-	    .
-	gcloud docker -- push "$(APP_TESTER_IMAGE)"
+		--tag "$(REGISTRY)/helm-wordpress/tester:$(TAG)" \
+		-f apptest/tester/Dockerfile \
+		.
+	docker push "$(REGISTRY)/helm-wordpress/tester:latest"
 	@touch "$@"
 
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/wordpress: $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/helm-wordpress/wordpress: .build/var/REGISTRY \
+                                 .build/var/TAG \
+                                 | .build/helm-wordpress
 	gcloud docker -- pull docker.io/bitnami/wordpress:4.9.5
-	docker tag docker.io/bitnami/wordpress:4.9.5 "$(APP_REGISTRY):$(APP_TAG)"
-	gcloud docker -- push "$(APP_REGISTRY):$(APP_TAG)"
+	docker tag docker.io/bitnami/wordpress:4.9.5 "$(REGISTRY)/helm-wordpress:$(TAG)"
+	gcloud docker -- push "$(REGISTRY)/helm-wordpress:$(TAG)"
 	@touch "$@"
 
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/mariadb: $(APP_BUILD)/registry_prefix $(APP_BUILD)/tag | app/setup
+.build/helm-wordpress/mariadb: .build/var/REGISTRY \
+                               .build/var/TAG \
+                               | .build/helm-wordpress
 	gcloud docker -- pull docker.io/bitnami/mariadb:10.1.29-r1
-	docker tag docker.io/bitnami/mariadb:10.1.29-r1 "$(APP_REGISTRY)-mariadb:$(APP_TAG)"
-	gcloud docker -- push "$(APP_REGISTRY)-mariadb:$(APP_TAG)"
+	docker tag docker.io/bitnami/mariadb:10.1.29-r1 "$(REGISTRY)/helm-wordpress-mariadb:$(TAG)"
+	gcloud docker -- push "$(REGISTRY)/helm-wordpress-mariadb:$(TAG)"
 	@touch "$@"
+
