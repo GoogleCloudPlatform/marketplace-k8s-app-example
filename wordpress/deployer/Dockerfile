@@ -1,19 +1,21 @@
-ARG MARKETPLACE_REGISTRY
-FROM ${MARKETPLACE_REGISTRY}/deployer_kubectl_base
+FROM launcher.gcr.io/google/debian9 AS build
 
-# TODO: Remove environment parameters once the frontend supports parameters.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext
+
+ADD schema.yaml /tmp/schema.yaml
+
+# Provide registry prefix and tag for default values for images.
 ARG REGISTRY
 ARG TAG
-ENV IMAGE_WORDPRESS "$REGISTRY:$TAG"
-ENV IMAGE_INIT "$REGISTRY/init:$TAG"
-ENV IMAGE_MYSQL "$REGISTRY/mysql:$TAG"
-ENV IMAGE_UBBAGENT "$REGISTRY/ubbagent:$TAG"
+RUN cat /tmp/schema.yaml \
+    | env -i "REGISTRY=$REGISTRY" "TAG=$TAG" envsubst \
+    > /tmp/schema.yaml.new \
+    && mv /tmp/schema.yaml.new /tmp/schema.yaml
 
-ADD schema.yaml /data/
+
+FROM gcr.io/google-marketplace-tools/k8s/deployer_envsubst
+
 COPY manifest /data/manifest
 COPY apptest/deployer /data-test/
-
-RUN cat /data/schema.yaml \
-    | env -i "REGISTRY=$REGISTRY" "TAG=$TAG" envsubst \
-    > /data/schema.yaml.new \
-    && mv /data/schema.yaml.new /data/schema.yaml
+COPY --from=build /tmp/schema.yaml /data/
