@@ -35,7 +35,7 @@ APP_PARAMETERS ?= { \
 }
 TESTER_IMAGE ?= $(REGISTRY)/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
-  "imageTester": "cosmintitei/bash-curl" \
+  "imageTester": "$(TESTER_IMAGE)" \
 }
 
 # Extend the target as defined in app.Makefile to
@@ -43,13 +43,9 @@ APP_TEST_PARAMETERS ?= { \
 app/build:: .build/wordpress/deployer \
             .build/wordpress/init \
             .build/wordpress/mysql \
+            .build/wordpress/tester \
             .build/wordpress/ubbagent \
-            .build/wordpress/wordpress
-
-# Extend the target as defined in app.Makefile to
-# include real dependencies.
-app/build-test:: app/build \
-                 .build/wordpress/tester
+            .build/wordpress/wordpress 
 
 
 .build/wordpress: | .build
@@ -75,6 +71,13 @@ app/build-test:: app/build \
 	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
+
+.build/wordpress/tester: 
+	$(call print_target, $@)
+	docker pull cosmintitei/bash-curl
+	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
+	docker push "$(TESTER_IMAGE)"
+	@touch "$@"
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.

@@ -32,13 +32,14 @@ APP_PARAMETERS ?= { \
 }
 TESTER_IMAGE ?= $(REGISTRY)/nginx/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
-  "tester.image": "cosmintitei/bash-curl" \
+  "tester.image": "$(TESTER_IMAGE)" \
 }
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
 app/build:: .build/nginx/deployer \
-            .build/nginx/nginx
+            .build/nginx/nginx \
+            .build/nginx/tester
 
 
 .build/nginx: | .build
@@ -64,6 +65,14 @@ app/build:: .build/nginx/deployer \
 	    -f deployer/Dockerfile \
 	    .
 	docker push "$(APP_DEPLOYER_IMAGE)"
+	@touch "$@"
+
+
+.build/nginx/tester:
+	$(call print_target, $@)
+	docker pull cosmintitei/bash-curl
+	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
+	docker push "$(TESTER_IMAGE)"
 	@touch "$@"
 
 
