@@ -43,18 +43,16 @@ APP_TEST_PARAMETERS ?= { \
 app/build:: .build/wordpress/deployer \
             .build/wordpress/init \
             .build/wordpress/mysql \
+            .build/wordpress/tester \
             .build/wordpress/ubbagent \
-            .build/wordpress/wordpress
+            .build/wordpress/wordpress 
 
-# Extend the target as defined in app.Makefile to
-# include real dependencies.
-app/build-test:: app/build \
-                 .build/wordpress/tester
 
 .build/wordpress: | .build
 	mkdir -p "$@"
 
 .build/wordpress/deployer: apptest/deployer/* \
+                           apptest/deployer/manifest/* \
                            deployer/* \
                            manifest/* \
                            schema.yaml \
@@ -63,6 +61,7 @@ app/build-test:: app/build \
                            .build/var/REGISTRY \
                            .build/var/TAG \
                            | .build/wordpress
+	$(call print_target, $@)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)/wordpress" \
 	    --build-arg TAG="$(TAG)" \
@@ -72,13 +71,11 @@ app/build-test:: app/build \
 	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/wordpress/tester: apptest/* \
-                         .build/var/TESTER_IMAGE \
-                         | .build/wordpress
-	docker build \
-	    --tag "$(TESTER_IMAGE)" \
-	    -f apptest/tester/Dockerfile \
-	    .
+
+.build/wordpress/tester: 
+	$(call print_target, $@)
+	docker pull cosmintitei/bash-curl
+	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
 	docker push "$(TESTER_IMAGE)"
 	@touch "$@"
 
@@ -87,6 +84,7 @@ app/build-test:: app/build \
 .build/wordpress/wordpress: .build/var/REGISTRY \
                             .build/var/TAG \
                             | .build/wordpress
+	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/wordpress4-php5-apache
 	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/wordpress:$(TAG)"
 	docker push "$(REGISTRY)/wordpress:$(TAG)"
@@ -97,6 +95,7 @@ app/build-test:: app/build \
                        .build/var/REGISTRY \
                        .build/var/TAG \
                        | .build/wordpress
+	$(call print_target, $@)
 	cd init \
 	&& docker build --tag "$(REGISTRY)/wordpress/init:$(TAG)" .
 	docker push "$(REGISTRY)/wordpress/init:$(TAG)"
@@ -106,6 +105,7 @@ app/build-test:: app/build \
 .build/wordpress/mysql: .build/var/REGISTRY \
                         .build/var/TAG \
                         | .build/wordpress
+	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/mysql5
 	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/wordpress/mysql:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/mysql:$(TAG)"
@@ -116,6 +116,7 @@ app/build-test:: app/build \
                            .build/var/REGISTRY \
                            .build/var/TAG \
                            | .build/wordpress
+	$(call print_target, $@)
 	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	@touch "$@"

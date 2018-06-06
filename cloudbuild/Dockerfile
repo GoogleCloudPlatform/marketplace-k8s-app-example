@@ -6,12 +6,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker \
     gettext \
     jq \
+    make \
     python \
     python-dev \
     python-pip \
     python-setuptools \
     python-yaml \
-    make \
     uuid-runtime \
     wget \
     && rm -rf /var/lib/apt/lists/*

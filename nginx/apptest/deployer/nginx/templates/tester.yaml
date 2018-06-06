@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "${name}-tester"
+  name: "{{ .Release.Name }}-tester"
   labels:
-    app.kubernetes.io/name: "${name}"
+    app.kubernetes.io/name: "{{ .Release.Name }}"
   annotations:
-    marketplace.cloud.google.com/verification: test
+    helm.sh/hook: test-success
 spec:
   containers:
   - name: tester
-    image: "${imageTester}"
+    image: "{{ .Values.tester.image }}"
     volumeMounts:
     - name: config-volume
       mountPath: /tester
@@ -19,25 +19,25 @@ spec:
   volumes:
   - name: config-volume
     configMap:
-      name: "${name}-test"
+      name: "{{ .Release.Name }}-test"
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "${name}-test"
+  name: "{{ .Release.Name }}-test"
   labels:
-    app.kubernetes.io/name: "${name}"
+    app.kubernetes.io/name: "{{ .Release.Name }}"
   annotations:
     marketplace.cloud.google.com/verification: test
 data:
   run.sh: |-
     set -x
-    endpoint="http://${name}-wordpress-svc"
+    endpoint="http://{{ .Release.Name }}:{{ .Values.service.port }}"
     echo GET $endpoint
     http_status_code=$(curl -o /dev/null -s -w "%{http_code}\n" $endpoint)
-    echo "Expected http status code: 302"
+    echo "Expected http status code: 200"
     echo "Actual http status code: $http_status_code"
-    if [[ "$http_status_code" == "302" ]]; then
+    if [[ "$http_status_code" == "200" ]]; then
       echo SUCCESS
     else
       echo FAILURE

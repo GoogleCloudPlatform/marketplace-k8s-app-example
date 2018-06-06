@@ -38,25 +38,26 @@ APP_TEST_PARAMETERS ?= { \
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
 app/build:: .build/nginx/deployer \
-            .build/nginx/nginx
+            .build/nginx/nginx \
+            .build/nginx/tester
 
-# Extend the target as defined in app.Makefile to
-# include real dependencies.
-app/build-test:: app/build \
-                 .build/nginx/tester
 
 .build/nginx: | .build
 	mkdir -p "$@"
 
 .build/nginx/deployer: apptest/deployer/* \
+                       apptest/deployer/nginx/* \
+                       apptest/deployer/nginx/templates/* \
                        deployer/* \
                        nginx/* \
+                       nginx/templates/* \
                        schema.yaml \
                        .build/marketplace/deployer/helm \
                        .build/var/APP_DEPLOYER_IMAGE \
                        .build/var/REGISTRY \
                        .build/var/TAG \
                        | .build/nginx
+	$(call print_target, $@)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --build-arg TAG="$(TAG)" \
@@ -66,22 +67,21 @@ app/build-test:: app/build \
 	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
-.build/nginx/tester: apptest/* \
-                     .build/var/REGISTRY \
-                     .build/var/TAG \
-                     | .build/nginx
-	docker build \
-	    --tag "$(REGISTRY)/nginx/tester:$(TAG)" \
-	    -f apptest/tester/Dockerfile \
-	    .
-	docker push "$(REGISTRY)/nginx/tester:latest"
+
+.build/nginx/tester:
+	$(call print_target, $@)
+	docker pull cosmintitei/bash-curl
+	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
+	docker push "$(TESTER_IMAGE)"
 	@touch "$@"
+
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
 .build/nginx/nginx: .build/var/REGISTRY \
                     .build/var/TAG \
                     | .build/nginx
+	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/nginx1
 	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/nginx:$(TAG)"
 	docker push "$(REGISTRY)/nginx:$(TAG)"
