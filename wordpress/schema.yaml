@@ -50,6 +50,10 @@ properties:
     title: A custom boolean parameter.
     type: boolean
     default: false
+  reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
 required:
 - name
 - namespace
@@ -61,3 +65,4 @@ required:
 - customString
 - customInteger
 - customBoolean
+- reportingSecret
