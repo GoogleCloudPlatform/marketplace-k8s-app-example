@@ -31,7 +31,8 @@ APP_PARAMETERS ?= { \
   "imageWordpress": "$(REGISTRY)/wordpress:$(TAG)", \
   "imageInit": "$(REGISTRY)/wordpress/init:$(TAG)", \
   "imageMysql": "$(REGISTRY)/wordpress/mysql:$(TAG)", \
-  "imageUbbagent": "$(REGISTRY)/wordpress/ubbagent:$(TAG)" \
+  "imageUbbagent": "$(REGISTRY)/wordpress/ubbagent:$(TAG)", \
+  "reportingSecret": "$(NAME)-reporting-secret" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
