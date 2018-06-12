@@ -54,7 +54,6 @@ properties:
     type: string
     x-google-marketplace:
       type: REPORTING_SECRET
-    default: 'my-reporting-secret'
 required:
 - name
 - namespace
