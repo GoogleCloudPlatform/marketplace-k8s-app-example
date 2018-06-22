@@ -130,6 +130,16 @@ spec:
           value: /var/lib/ubbagent
         - name: AGENT_REPORT_DIR
           value: /var/lib/ubbagent/reports
+        - name: AGENT_ENCODED_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "$reportingSecret"
+              key: reporting-key
+        - name: AGENT_CONSUMER_ID
+          valueFrom:
+            secretKeyRef:
+              name: "$reportingSecret"
+              key: consumer-id
         volumeMounts:
         - name: ubbagent-config
           mountPath: /etc/ubbagent
