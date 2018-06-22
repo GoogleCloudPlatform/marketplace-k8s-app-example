@@ -46,7 +46,7 @@ app/build:: .build/wordpress/deployer \
             .build/wordpress/mysql \
             .build/wordpress/tester \
             .build/wordpress/ubbagent \
-            .build/wordpress/wordpress 
+            .build/wordpress/wordpress
 
 
 .build/wordpress: | .build
@@ -73,7 +73,7 @@ app/build:: .build/wordpress/deployer \
 	@touch "$@"
 
 
-.build/wordpress/tester: 
+.build/wordpress/tester:
 	$(call print_target, $@)
 	docker pull cosmintitei/bash-curl
 	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
@@ -118,6 +118,6 @@ app/build:: .build/wordpress/deployer \
                            .build/var/TAG \
                            | .build/wordpress
 	$(call print_target, $@)
-	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
+	docker tag "gcr.io/cloud-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	docker push "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
 	@touch "$@"
