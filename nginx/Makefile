@@ -23,14 +23,14 @@ include ../vendor/marketplace-tools/var.Makefile
 # It requires several APP_* variables defined as followed.
 include ../vendor/marketplace-tools/app.Makefile
 
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/nginx/deployer:$(TAG)
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/nginx/deployer:$(TAG)
 NAME ?= nginx-1
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)", \
-  "imageNginx.image": "$(REGISTRY)/nginx:$(TAG)" \
+  "imageNginx.image": "$(REGISTRY)/example/nginx:$(TAG)" \
 }
-TESTER_IMAGE ?= $(REGISTRY)/nginx/tester:$(TAG)
+TESTER_IMAGE ?= $(REGISTRY)/example/nginx/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "tester.image": "$(TESTER_IMAGE)" \
 }
@@ -83,6 +83,6 @@ app/build:: .build/nginx/deployer \
                     | .build/nginx
 	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/nginx1
-	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/nginx:$(TAG)"
-	docker push "$(REGISTRY)/nginx:$(TAG)"
+	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/example/nginx:$(TAG)"
+	docker push "$(REGISTRY)/example/nginx:$(TAG)"
 	@touch "$@"

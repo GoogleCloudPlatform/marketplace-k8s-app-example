@@ -23,18 +23,18 @@ include ../vendor/marketplace-tools/var.Makefile
 # It requires several APP_* variables defined as followed.
 include ../vendor/marketplace-tools/app.Makefile
 
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/wordpress/deployer:$(TAG)
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
 NAME ?= wordpress-1
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)", \
-  "imageWordpress": "$(REGISTRY)/wordpress:$(TAG)", \
-  "imageInit": "$(REGISTRY)/wordpress/init:$(TAG)", \
-  "imageMysql": "$(REGISTRY)/wordpress/mysql:$(TAG)", \
-  "imageUbbagent": "$(REGISTRY)/wordpress/ubbagent:$(TAG)", \
-  "reportingSecret": "$(NAME)-reporting-secret" \
+  "imageWordpress": "$(REGISTRY)/example/wordpress:$(TAG)", \
+  "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
+  "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
+  "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
+  "reportingSecret": "gs://cloud-marketplace-ops-test-resources/marketplace-k8s-app-example/reporting-secret.yaml" \
 }
-TESTER_IMAGE ?= $(REGISTRY)/wordpress/tester:$(TAG)
+TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
@@ -46,7 +46,7 @@ app/build:: .build/wordpress/deployer \
             .build/wordpress/mysql \
             .build/wordpress/tester \
             .build/wordpress/ubbagent \
-            .build/wordpress/wordpress 
+            .build/wordpress/wordpress
 
 
 .build/wordpress: | .build
@@ -64,7 +64,7 @@ app/build:: .build/wordpress/deployer \
                            | .build/wordpress
 	$(call print_target, $@)
 	docker build \
-	    --build-arg REGISTRY="$(REGISTRY)/wordpress" \
+	    --build-arg REGISTRY="$(REGISTRY)/example/wordpress" \
 	    --build-arg TAG="$(TAG)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
@@ -73,7 +73,7 @@ app/build:: .build/wordpress/deployer \
 	@touch "$@"
 
 
-.build/wordpress/tester: 
+.build/wordpress/tester:
 	$(call print_target, $@)
 	docker pull cosmintitei/bash-curl
 	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
@@ -87,8 +87,8 @@ app/build:: .build/wordpress/deployer \
                             | .build/wordpress
 	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/wordpress4-php5-apache
-	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/wordpress:$(TAG)"
-	docker push "$(REGISTRY)/wordpress:$(TAG)"
+	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/example/wordpress:$(TAG)"
+	docker push "$(REGISTRY)/example/wordpress:$(TAG)"
 	@touch "$@"
 
 # Build secondary app image.
@@ -98,8 +98,8 @@ app/build:: .build/wordpress/deployer \
                        | .build/wordpress
 	$(call print_target, $@)
 	cd init \
-	&& docker build --tag "$(REGISTRY)/wordpress/init:$(TAG)" .
-	docker push "$(REGISTRY)/wordpress/init:$(TAG)"
+	&& docker build --tag "$(REGISTRY)/example/wordpress/init:$(TAG)" .
+	docker push "$(REGISTRY)/example/wordpress/init:$(TAG)"
 	@touch "$@"
 
 # Relocate public mysql image to $REGISTRY.
@@ -108,8 +108,8 @@ app/build:: .build/wordpress/deployer \
                         | .build/wordpress
 	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/mysql5
-	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/wordpress/mysql:$(TAG)"
-	docker push "$(REGISTRY)/wordpress/mysql:$(TAG)"
+	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/example/wordpress/mysql:$(TAG)"
+	docker push "$(REGISTRY)/example/wordpress/mysql:$(TAG)"
 	@touch "$@"
 
 # Relocate ubbagent image to $REGISTRY.
@@ -118,6 +118,6 @@ app/build:: .build/wordpress/deployer \
                            .build/var/TAG \
                            | .build/wordpress
 	$(call print_target, $@)
-	docker tag "gcr.io/google-marketplace-tools/ubbagent" "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
-	docker push "$(REGISTRY)/wordpress/ubbagent:$(TAG)"
+	docker tag "gcr.io/cloud-marketplace-tools/ubbagent" "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
+	docker push "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
 	@touch "$@"
