@@ -81,12 +81,11 @@ steps:
   waitFor: [ 'Setup git repo', 'Fetch application credentials' ]
   entrypoint: 'bash'
   dir: 'wordpress'
-  env:
-  - GOOGLE_APPLICATION_CREDENTIALS=/workspace/service_account.json
   args:
   - -c
   - |
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
+    export GOOGLE_APPLICATION_CREDENTIALS=/workspace/service_account.json
     make app/verify
 
 - id: Set commit as succeeded
