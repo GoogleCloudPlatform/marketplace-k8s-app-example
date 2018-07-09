@@ -5,7 +5,7 @@ steps:
   args:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/application_credentials
-  - /workspace/wordpress/service_account.json
+  - /workspace/service_account.json
 
 - id: Fetch key for the github app
   name: 'gcr.io/cloud-builders/gsutil'
@@ -82,7 +82,7 @@ steps:
   entrypoint: 'bash'
   dir: 'wordpress'
   env:
-  - GOOGLE_APPLICATION_CREDENTIALS=service_account.json
+  - GOOGLE_APPLICATION_CREDENTIALS=/workspace/service_account.json
   args:
   - -c
   - |
