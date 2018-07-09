@@ -54,24 +54,6 @@ properties:
     type: string
     x-google-marketplace:
       type: REPORTING_SECRET
-  serviceAccount:
-    type: string
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        roles:
-        - type: Role
-          rulesType: PREDEFINED
-          rulesFromRoleName: view
-        - type: ClusterRole
-          rulesType: PREDEFINED
-          rulesFromRoleName: view
-  storageClass:
-    type: string
-    x-google-marketplace:
-      type: STORAGE_CLASS
-      storageClass:
-        type: SSD
 required:
 - name
 - namespace
@@ -84,5 +66,3 @@ required:
 - customInteger
 - customBoolean
 - reportingSecret
-- serviceAccount
-- storageClass

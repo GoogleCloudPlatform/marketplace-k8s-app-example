@@ -25,7 +25,6 @@ spec:
     metadata:
       labels: *MysqlDeploymentLabels
     spec:
-      serviceAccount: $serviceAccount
       containers:
       - image: $imageMysql
         name: mysql
@@ -53,7 +52,7 @@ metadata:
     app.kubernetes.io/component: wordpress-mysql
 spec:
   accessModes: [ReadWriteOnce]
-  storageClassName: $storageClass
+  storageClassName: standard
   resources:
     requests:
       storage: 5Gi
