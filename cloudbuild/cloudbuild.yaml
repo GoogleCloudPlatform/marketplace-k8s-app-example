@@ -1,12 +1,5 @@
 steps:
 
-- id: Fetch application credentials
-  name: 'gcr.io/cloud-builders/gsutil'
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/application_credentials
-  - /workspace/service_account.json
-
 - id: Fetch key for the github app
   name: 'gcr.io/cloud-builders/gsutil'
   args:
@@ -78,14 +71,13 @@ steps:
 
 - id: Run the verification on wordpress
   name: 'gcr.io/$PROJECT_ID/verifier'
-  waitFor: [ 'Setup git repo', 'Fetch application credentials' ]
+  waitFor: [ 'Setup git repo' ]
   entrypoint: 'bash'
   dir: 'wordpress'
   args:
   - -c
   - |
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
-    export GOOGLE_APPLICATION_CREDENTIALS=/workspace/service_account.json
     make app/verify
 
 - id: Set commit as succeeded
