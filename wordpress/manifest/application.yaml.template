@@ -1,5 +1,5 @@
 ---
-apiVersion: app.k8s.io/v1alpha1
+apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
   name: "$name"
@@ -13,14 +13,15 @@ metadata:
 spec:
   type: Wordpress
   version: '0.1'
-  description: |-
-    The most popular blogging platform.
+  descriptor:
+    description: |-
+      The most popular blogging platform.
 
-    # Support
-    Community support is available on
-    [Stack Overflow](https://stackoverflow.com/questions/tagged/wordpress).
-    Additional support is available on
-    [community forums](https://en.forums.wordpress.com).
+      # Support
+      Community support is available on
+      [Stack Overflow](https://stackoverflow.com/questions/tagged/wordpress).
+      Additional support is available on
+      [community forums](https://en.forums.wordpress.com).
   maintainers:
   - name: Google Click to Deploy
     url: https://cloud.google.com/solutions/#click-to-deploy

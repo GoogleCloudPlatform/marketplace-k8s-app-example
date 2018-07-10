@@ -1,5 +1,5 @@
 ---
-apiVersion: app.k8s.io/v1alpha1
+apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
   name: "{{ .Release.Name }}"
@@ -13,11 +13,12 @@ metadata:
 spec:
   type: Nginx
   versions: '0.1'
-  description: |-
-    An HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.
+  descriptor:
+    description: |-
+      An HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.
 
-    # Support
-    Visi [NGINX support](https://www.nginx.com/support/).
+      # Support
+      Visit [NGINX support](https://www.nginx.com/support/).
   maintainers:
   - name: Google Click to Deploy
     url: https://cloud.google.com/solutions/#click-to-deploy
