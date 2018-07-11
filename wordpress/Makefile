@@ -32,7 +32,7 @@ APP_PARAMETERS ?= { \
   "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
   "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
   "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
-  "reportingSecret": "gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml" \
+  "reportingSecret": "reportingsecret" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \

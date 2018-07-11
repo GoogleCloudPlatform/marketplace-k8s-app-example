@@ -11,20 +11,20 @@ metadata:
   labels:
     app.kubernetes.io/name: "{{ .Release.Name }}"
 spec:
-  type: Nginx
-  versions: '0.1'
   descriptor:
+    type: Nginx
+    versions: '0.1'
     description: |-
       An HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.
 
       # Support
       Visit [NGINX support](https://www.nginx.com/support/).
-  maintainers:
-  - name: Google Click to Deploy
-    url: https://cloud.google.com/solutions/#click-to-deploy
-  links:
-  - description: Getting Started
-    url: https://www.nginx.com/resources/wiki/start/
+    maintainers:
+    - name: Google Click to Deploy
+      url: https://cloud.google.com/solutions/#click-to-deploy
+    links:
+    - description: Getting Started
+      url: https://www.nginx.com/resources/wiki/start/
   selector:
     matchLabels:
       app.kubernetes.io/name: "{{ .Release.Name }}"
