@@ -13,6 +13,11 @@ properties:
     default: $REGISTRY:$TAG
     x-google-marketplace:
       type: IMAGE
+      image:
+        generatedProperties:
+          splitByColon:
+            before: imageNginx.repo
+            after: imageNginx.tag
 required:
 - name
 - namespace
