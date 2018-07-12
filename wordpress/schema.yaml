@@ -49,6 +49,7 @@ properties:
     maximum: 128
   customBoolean:
     title: A custom boolean parameter.
+    description: tooltip for check box.
     type: boolean
     default: false
   reportingSecret:
