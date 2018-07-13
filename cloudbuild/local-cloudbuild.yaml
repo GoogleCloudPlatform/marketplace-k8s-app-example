@@ -1,0 +1,15 @@
+steps:
+- id: Build dev image
+  name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/k8s/dev', '.']
+# - id: Run the verification on wordpress
+#   name: gcr.io/cloud-builders/docker
+#   args:
+#   - -i
+#   - -e CLOUDSDK_API_ENDPOINT_OVERRIDES_CONTAINER
+#   - |
+#     set -e
+#     CLOUDSDK_API_ENDPOINT_OVERRIDES_CONTAINER=https://staging-container.sandbox.googleapis.com/ gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
+#     find .
+#     cd wordpress
+#     make app/verify
