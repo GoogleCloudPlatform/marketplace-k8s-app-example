@@ -13,6 +13,11 @@ properties:
     default: $REGISTRY:$TAG
     x-google-marketplace:
       type: IMAGE
+      image:
+        generatedProperties:
+          splitByColon:
+            before: imageWordpressRepo
+            after: imageWordpressTag
   imageInit:
     type: string
     default: $REGISTRY/init:$TAG

@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: "{{ .Chart.Name }}"
-          image: "{{ .Values.imageNginx.image }}"
+          image: "{{ .Values.imageNginx.repo }}:{{ .Values.imageNginx.tag }}"
           imagePullPolicy: {{ .Values.imageNginx.pullPolicy }}
           ports:
             - name: http
