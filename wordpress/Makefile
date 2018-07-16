@@ -23,6 +23,7 @@ include ../vendor/marketplace-tools/var.Makefile
 # It requires several APP_* variables defined as followed.
 include ../vendor/marketplace-tools/app.Makefile
 
+SERVICE_ACCOUNT_JSON_FILE = service_account.json
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
 NAME ?= wordpress-1
 APP_PARAMETERS ?= { \
