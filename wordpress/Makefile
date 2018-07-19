@@ -57,7 +57,6 @@ app/build:: .build/wordpress/deployer \
                            deployer/* \
                            manifest/* \
                            schema.yaml \
-                           .build/marketplace/deployer/envsubst \
                            .build/var/APP_DEPLOYER_IMAGE \
                            .build/var/REGISTRY \
                            .build/var/TAG \
@@ -73,7 +72,7 @@ app/build:: .build/wordpress/deployer \
 	@touch "$@"
 
 
-.build/wordpress/tester:
+.build/wordpress/tester: .build/var/TESTER_IMAGE
 	$(call print_target, $@)
 	docker pull cosmintitei/bash-curl
 	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"

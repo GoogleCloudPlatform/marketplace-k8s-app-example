@@ -1,16 +1,24 @@
 steps:
 
+- id: Fetch service account key
+  name: gcr.io/cloud-builders/gsutil
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/application_credentials
+  - /builder/home/service_account.json
+
 - id: Fetch key for the github app
-  name: 'gcr.io/cloud-builders/gsutil'
+  name: gcr.io/cloud-builders/gsutil
   args:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/appkeys/cloudbuild
   - cloudbuild.pem
 
 - id: Set commit as pending
-  waitFor: [ 'Fetch key for the github app' ]
-  name: 'gcr.io/$PROJECT_ID/verifier'
-  entrypoint: 'bash'
+  waitFor:
+  - Fetch key for the github app
+  name: gcr.io/$PROJECT_ID/verifier
+  entrypoint: bash
   args:
   - -c
   - |
@@ -25,65 +33,132 @@ steps:
       --commit=$COMMIT_SHA
 
 - id: Fetch deploy keys for tools repo
-  waitFor: [ '-' ]
-  name: 'gcr.io/cloud-builders/gsutil'
+  waitFor:
+  - '-'
+  name: gcr.io/cloud-builders/gsutil
   args:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_marketplace-k8s-app-tools
   - /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
   volumes:
-  - name: 'ssh'
+  - name: ssh
     path: /root/.ssh
 
 - id: Fetch deploy keys for ubbagent repo
-  waitFor: [ '-' ]
-  name: 'gcr.io/cloud-builders/gsutil'
+  waitFor:
+  - '-'
+  name: gcr.io/cloud-builders/gsutil
   args:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_ubbagent
   - /root/.ssh/googlecloudplatform_ubbagent
   volumes:
-  - name: 'ssh'
+  - name: ssh
     path: /root/.ssh
 
 - id: Setup git repo
-  waitFor: 
+  waitFor:
   - Fetch deploy keys for tools repo
   - Fetch deploy keys for ubbagent repo
-  name: 'gcr.io/cloud-builders/git'
-  entrypoint: 'bash'
+  name: gcr.io/cloud-builders/git
+  entrypoint: bash
   args:
   - cloudbuild/fetch_submodules.sh
   volumes:
-  - name: 'ssh'
+  - name: ssh
     path: /root/.ssh
 
-- id: Run the verification on nginx
-  name: 'gcr.io/$PROJECT_ID/verifier'
-  waitFor: [ 'Setup git repo' ]
-  entrypoint: 'bash'
-  dir: 'nginx'
+- id: Authenticate
+  name: gcr.io/cloud-marketplace-tools/k8s/dev
+  waitFor:
+  - Fetch service account key
+  volumes:
+  - name: gcloud
+    path: /root/.config/gcloud
+  - name: kubectl
+    path: /root/.kube
   args:
+  - -e
   - -c
   - |
+    gcloud auth activate-service-account --key-file="/builder/home/service_account.json"
     gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
-    make app/verify
 
-- id: Run the verification on wordpress
-  name: 'gcr.io/$PROJECT_ID/verifier'
-  waitFor: [ 'Setup git repo' ]
-  entrypoint: 'bash'
-  dir: 'wordpress'
+- id: Build Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - '-'
+  dir: wordpress
+  args:
+  - -c
+  - rm -rf .build ; make app/build
+
+- id: Verify Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Build Wordpress
+  - Authenticate
+  volumes:
+  - name: gcloud
+    path: /root/.config/gcloud
+  - name: kubectl
+    path: /root/.kube
   args:
   - -c
   - |
-    gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
-    make app/verify
+    /scripts/driver_internal.sh \
+        --deployer=gcr.io/$PROJECT_ID/example/wordpress/deployer:latest  \
+        --parameters='{
+                        "name": "wordpress-1",
+                        "namespace": "default",
+                        "imageWordpress": "gcr.io/$PROJECT_ID/example/wordpress:latest",
+                        "imageInit": "gcr.io/$PROJECT_ID/example/wordpress/init:latest",
+                        "imageMysql": "gcr.io/$PROJECT_ID/example/wordpress/mysql:latest",
+                        "imageUbbagent": "gcr.io/$PROJECT_ID/example/wordpress/ubbagent:latest",
+                        "reportingSecret": "wordpress-1-reporting-secret",
+                        "imageTester": "gcr.io/$PROJECT_ID/example/wordpress/tester:latest"
+                      }' \
+        --wait_timeout=600
+
+- id: Build NGINX
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - '-'
+  dir: nginx
+  args:
+  - -c
+  - rm -rf .build ; make app/build
+
+- id: Verify NGINX
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Build NGINX
+  - Authenticate
+  volumes:
+  - name: gcloud
+    path: /root/.config/gcloud
+  - name: kubectl
+    path: /root/.kube
+  args:
+  - -c
+  - |
+    /scripts/driver_internal.sh \
+        --deployer=gcr.io/$PROJECT_ID/example/nginx/deployer:latest  \
+        --parameters='{
+                        "name": "nginx-1",
+                        "namespace": "default",
+                        "imageNginx.image": "gcr.io/$PROJECT_ID/example/nginx:latest",
+                        "tester.image": "gcr.io/$PROJECT_ID/example/nginx/tester:latest"
+                      }' \
+        --wait_timeout=600
 
 - id: Set commit as succeeded
-  name: 'gcr.io/$PROJECT_ID/verifier'
-  entrypoint: 'bash'
-  args: 
+  name: gcr.io/$PROJECT_ID/verifier
+  waitFor:
+  - Verify Wordpress
+  - Verify NGINX
+  entrypoint: bash
+  args:
   - -c
   - |
     cloudbuild/set_commit_status.sh \

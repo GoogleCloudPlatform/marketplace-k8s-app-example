@@ -1,0 +1,94 @@
+steps:
+
+- id: Fetch service account key
+  name: gcr.io/cloud-builders/gsutil
+  waitFor:
+  - '-'
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/application_credentials
+  - /builder/home/service_account.json
+
+- id: Authenticate
+  name: gcr.io/cloud-marketplace-tools/k8s/dev
+  waitFor:
+  - Fetch service account key
+  volumes:
+  - name: gcloud
+    path: /root/.config/gcloud
+  - name: kubectl
+    path: /root/.kube
+  args:
+  - -e
+  - -c
+  - |
+    gcloud auth activate-service-account --key-file="/builder/home/service_account.json"
+    CLOUDSDK_API_ENDPOINT_OVERRIDES_CONTAINER=https://staging-container.sandbox.googleapis.com/ gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
+
+- id: Build Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - '-'
+  dir: wordpress
+  args:
+  - -c
+  - rm -rf .build ; make app/build
+
+- id: Verify Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Build Wordpress
+  - Authenticate
+  volumes:
+  - name: gcloud
+    path: /root/.config/gcloud
+  - name: kubectl
+    path: /root/.kube
+  args:
+  - -c
+  - |
+    /scripts/driver_internal.sh \
+        --deployer=$_REGISTRY/example/wordpress/deployer:latest  \
+        --parameters='{
+                        "name": "wordpress-1",
+                        "namespace": "default",
+                        "imageWordpress": "$_REGISTRY/example/wordpress:latest",
+                        "imageInit": "$_REGISTRY/example/wordpress/init:latest",
+                        "imageMysql": "$_REGISTRY/example/wordpress/mysql:latest",
+                        "imageUbbagent": "$_REGISTRY/example/wordpress/ubbagent:latest",
+                        "reportingSecret": "wordpress-1-reporting-secret",
+                        "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
+                      }' \
+        --wait_timeout=600
+
+- id: Build NGINX
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - '-'
+  dir: nginx
+  args:
+  - -c
+  - rm -rf .build ; make app/build
+
+- id: Verify NGINX
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Build NGINX
+  - Authenticate
+  volumes:
+  - name: gcloud
+    path: /root/.config/gcloud
+  - name: kubectl
+    path: /root/.kube
+  args:
+  - -c
+  - |
+    /scripts/driver_internal.sh \
+        --deployer=$_REGISTRY/example/nginx/deployer:latest  \
+        --parameters='{
+                        "name": "nginx-1",
+                        "namespace": "default",
+                        "imageNginx.image": "$_REGISTRY/example/nginx:latest",
+                        "tester.image": "$_REGISTRY/example/nginx/tester:latest"
+                      }' \
+        --wait_timeout=600
