@@ -73,8 +73,8 @@ you can override them by exporting the appropriate environment variables:
 ```shell
 export REGISTRY=gcr.io/your-registry
 export NAMESPACE=your-namespace
-export APP_INSTANCE_NAME=your-installation-name
-export APP_TAG=your-tag
+export NAME=your-installation-name
+export TAG=your-tag
 ```
 
 # Marketplace Integration Requirements
