@@ -6,11 +6,11 @@ steps:
   - '-'
   args:
   - cp
-  - gs://cloud-marketplace-ops-test-kokoro/application_credentials
+  - gs://cloud-marketplace-ops-test-kokoro/cloud-marketplace-ops-test-5cb3e979a3ae.json
   - /builder/home/service_account.json
 
 - id: Authenticate
-  name: gcr.io/cloud-marketplace-tools/k8s/dev
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
   - Fetch service account key
   volumes:
@@ -32,7 +32,7 @@ steps:
   dir: wordpress
   args:
   - -c
-  - rm -rf .build ; make app/build
+  - make clean app/build
 
 - id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -44,22 +44,26 @@ steps:
     path: /root/.config/gcloud
   - name: kubectl
     path: /root/.kube
+  env:
+  - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
+  - |
+    APP_PARAMETERS={
+                     "name": "wordpress-1",
+                     "namespace": "default",
+                     "imageWordpress": "$_REGISTRY/example/wordpress:latest",
+                     "imageInit": "$_REGISTRY/example/wordpress/init:latest",
+                     "imageMysql": "$_REGISTRY/example/wordpress/mysql:latest",
+                     "imageUbbagent": "$_REGISTRY/example/wordpress/ubbagent:latest",
+                     "reportingSecret": "wordpress-1-reporting-secret",
+                     "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
+                   }
   args:
+  - -x
   - -c
   - |
     /scripts/driver_internal.sh \
-        --deployer=$_REGISTRY/example/wordpress/deployer:latest  \
-        --parameters='{
-                        "name": "wordpress-1",
-                        "namespace": "default",
-                        "imageWordpress": "$_REGISTRY/example/wordpress:latest",
-                        "imageInit": "$_REGISTRY/example/wordpress/init:latest",
-                        "imageMysql": "$_REGISTRY/example/wordpress/mysql:latest",
-                        "imageUbbagent": "$_REGISTRY/example/wordpress/ubbagent:latest",
-                        "reportingSecret": "wordpress-1-reporting-secret",
-                        "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
-                      }' \
-        --wait_timeout=600
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"
 
 - id: Build NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -68,7 +72,7 @@ steps:
   dir: nginx
   args:
   - -c
-  - rm -rf .build ; make app/build
+  - make clean app/build
 
 - id: Verify NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -80,15 +84,19 @@ steps:
     path: /root/.config/gcloud
   - name: kubectl
     path: /root/.kube
+  env:
+  - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
+  - |
+    APP_PARAMETERS={
+                     "name": "nginx-1",
+                     "namespace": "default",
+                     "imageNginx.image": "$_REGISTRY/example/nginx:latest",
+                     "tester.image": "$_REGISTRY/example/nginx/tester:latest"
+                   }
   args:
+  - -x
   - -c
   - |
     /scripts/driver_internal.sh \
-        --deployer=$_REGISTRY/example/nginx/deployer:latest  \
-        --parameters='{
-                        "name": "nginx-1",
-                        "namespace": "default",
-                        "imageNginx.image": "$_REGISTRY/example/nginx:latest",
-                        "tester.image": "$_REGISTRY/example/nginx/tester:latest"
-                      }' \
-        --wait_timeout=600
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"
