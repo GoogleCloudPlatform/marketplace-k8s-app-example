@@ -1,3 +1,15 @@
+# Example Usage:
+#
+# $ gcloud container builds submit \
+#     --config cloudbuild/local-cloudbuild.yaml \
+#     --substitutions=_CLUSTER_LOCATION=<zone>,_CLUSTER_NAME=<cluster>,_REGISTRY=<registry> \
+#     .
+#
+# $ container-builder-local \
+#     --config cloudbuild/local-cloudbuild.yaml \
+#     --substitutions=_CLUSTER_LOCATION=<zone>,_CLUSTER_NAME=<cluster>,_REGISTRY=<registry> \
+#     --dryrun=false \
+#     .
 steps:
 
 - id: Fetch service account key
@@ -17,7 +29,7 @@ steps:
   - name: gcloud
     path: /root/.config/gcloud
   - name: kubectl
-    path: /root/.kube
+    path: /root/builder/.kube
   args:
   - -e
   - -c
@@ -43,7 +55,7 @@ steps:
   - name: gcloud
     path: /root/.config/gcloud
   - name: kubectl
-    path: /root/.kube
+    path: /root/builder/.kube
   env:
   - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
   - |
@@ -58,7 +70,6 @@ steps:
                      "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
                    }
   args:
-  - -x
   - -c
   - |
     /scripts/driver_internal.sh \
@@ -83,7 +94,7 @@ steps:
   - name: gcloud
     path: /root/.config/gcloud
   - name: kubectl
-    path: /root/.kube
+    path: /root/builder/.kube
   env:
   - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
   - |
@@ -94,7 +105,6 @@ steps:
                      "tester.image": "$_REGISTRY/example/nginx/tester:latest"
                    }
   args:
-  - -x
   - -c
   - |
     /scripts/driver_internal.sh \

@@ -107,8 +107,6 @@ steps:
   - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
   - |
     APP_PARAMETERS={
-                     "name": "wordpress-1",
-                     "namespace": "default",
                      "imageWordpress": "$_REGISTRY/example/wordpress:latest",
                      "imageInit": "$_REGISTRY/example/wordpress/init:latest",
                      "imageMysql": "$_REGISTRY/example/wordpress/mysql:latest",
@@ -117,7 +115,6 @@ steps:
                      "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
                    }
   args:
-  - -x
   - -c
   - |
     /scripts/driver_internal.sh \
@@ -147,13 +144,10 @@ steps:
   - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
   - |
     APP_PARAMETERS={
-                     "name": "nginx-1",
-                     "namespace": "default",
                      "imageNginx.image": "$_REGISTRY/example/nginx:latest",
                      "tester.image": "$_REGISTRY/example/nginx/tester:latest"
                    }
   args:
-  - -x
   - -c
   - |
     /scripts/driver_internal.sh \

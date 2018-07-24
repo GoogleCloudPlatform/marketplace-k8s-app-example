@@ -41,25 +41,27 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/wordpress/deployer \
+app/build:: .build/marketplace/dev \
+            .build/wordpress/deployer \
             .build/wordpress/init \
             .build/wordpress/mysql \
             .build/wordpress/tester \
             .build/wordpress/ubbagent \
-            .build/wordpress/wordpress
+            .build/wordpress/wordpress \
 
 
 .build/wordpress: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: apptest/deployer/* \
+.build/wordpress/deployer: .build/marketplace/deployer/envsubst \
+                           .build/var/APP_DEPLOYER_IMAGE \
+                           .build/var/REGISTRY \
+                           .build/var/TAG \
+                           apptest/deployer/* \
                            apptest/deployer/manifest/* \
                            deployer/* \
                            manifest/* \
                            schema.yaml \
-                           .build/var/APP_DEPLOYER_IMAGE \
-                           .build/var/REGISTRY \
-                           .build/var/TAG \
                            | .build/wordpress
 	$(call print_target, $@)
 	docker build \
