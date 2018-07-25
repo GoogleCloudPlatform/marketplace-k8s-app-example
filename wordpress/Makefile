@@ -47,7 +47,7 @@ app/build:: .build/marketplace/dev \
             .build/wordpress/mysql \
             .build/wordpress/tester \
             .build/wordpress/ubbagent \
-            .build/wordpress/wordpress \
+            .build/wordpress/wordpress
 
 
 .build/wordpress: | .build
