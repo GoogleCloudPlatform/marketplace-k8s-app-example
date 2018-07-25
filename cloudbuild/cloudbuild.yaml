@@ -25,41 +25,13 @@ steps:
       --repo="$_REPO_NAME" \
       --commit=$COMMIT_SHA
 
-- id: Fetch deploy keys for tools repo
-  waitFor:
-  - '-'
-  name: gcr.io/cloud-builders/gsutil
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_marketplace-k8s-app-tools
-  - /root/.ssh/googlecloudplatform_marketplace-k8s-app-tools
-  volumes:
-  - name: ssh
-    path: /root/.ssh
-
-- id: Fetch deploy keys for ubbagent repo
-  waitFor:
-  - '-'
-  name: gcr.io/cloud-builders/gsutil
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/deploykeys/googlecloudplatform_ubbagent
-  - /root/.ssh/googlecloudplatform_ubbagent
-  volumes:
-  - name: ssh
-    path: /root/.ssh
-
 - id: Setup git repo
   waitFor:
-  - Fetch deploy keys for tools repo
-  - Fetch deploy keys for ubbagent repo
+  - '-'
   name: gcr.io/cloud-builders/git
   entrypoint: bash
   args:
   - cloudbuild/fetch_submodules.sh
-  volumes:
-  - name: ssh
-    path: /root/.ssh
 
 - id: Authenticate
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
