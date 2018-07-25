@@ -4,7 +4,7 @@ steps:
   name: gcr.io/cloud-builders/gsutil
   args:
   - cp
-  - gs://cloud-marketplace-ops-test-kokoro/application_credentials
+  - gs://cloud-marketplace-ops-test-kokoro/cloud-marketplace-ops-test-5cb3e979a3ae.json
   - /builder/home/service_account.json
 
 - id: Fetch key for the github app
