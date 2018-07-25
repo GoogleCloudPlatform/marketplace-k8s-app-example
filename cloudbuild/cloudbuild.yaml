@@ -76,7 +76,7 @@ steps:
   - name: gcloud
     path: /root/.config/gcloud
   - name: kubectl
-    path: /root/.kube
+    path: /root/builder/.kube
   args:
   - -e
   - -c
@@ -102,7 +102,7 @@ steps:
   - name: gcloud
     path: /root/.config/gcloud
   - name: kubectl
-    path: /root/.kube
+    path: /root/builder/.kube
   env:
   - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
   - |
@@ -139,7 +139,7 @@ steps:
   - name: gcloud
     path: /root/.config/gcloud
   - name: kubectl
-    path: /root/.kube
+    path: /root/builder/.kube
   env:
   - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
   - |
@@ -151,7 +151,7 @@ steps:
   - -c
   - |
     /scripts/driver_internal.sh \
-        --deployer="$$APP_DEPLOYER"
+        --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
 
 - id: Set commit as succeeded

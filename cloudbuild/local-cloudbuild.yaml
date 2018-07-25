@@ -99,8 +99,6 @@ steps:
   - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
   - |
     APP_PARAMETERS={
-                     "name": "nginx-1",
-                     "namespace": "default",
                      "imageNginx.image": "$_REGISTRY/example/nginx:latest",
                      "tester.image": "$_REGISTRY/example/nginx/tester:latest"
                    }
