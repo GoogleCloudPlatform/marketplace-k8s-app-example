@@ -1,12 +1,5 @@
 steps:
 
-- id: Fetch service account key
-  name: gcr.io/cloud-builders/gsutil
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/cloud-marketplace-ops-test-5cb3e979a3ae.json
-  - /builder/home/service_account.json
-
 - id: Fetch key for the github app
   name: gcr.io/cloud-builders/gsutil
   args:
@@ -71,18 +64,11 @@ steps:
 - id: Authenticate
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - Fetch service account key
-  volumes:
-  - name: gcloud
-    path: /root/.config/gcloud
-  - name: kubectl
-    path: /root/builder/.kube
+  - '-'
   args:
   - -e
   - -c
-  - |
-    gcloud auth activate-service-account --key-file="/builder/home/service_account.json"
-    gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
+  - gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
 
 - id: Build Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -98,11 +84,6 @@ steps:
   waitFor:
   - Build Wordpress
   - Authenticate
-  volumes:
-  - name: gcloud
-    path: /root/.config/gcloud
-  - name: kubectl
-    path: /root/builder/.kube
   env:
   - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
   - |
@@ -135,11 +116,6 @@ steps:
   waitFor:
   - Build NGINX
   - Authenticate
-  volumes:
-  - name: gcloud
-    path: /root/.config/gcloud
-  - name: kubectl
-    path: /root/builder/.kube
   env:
   - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
   - |
