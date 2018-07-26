@@ -46,7 +46,7 @@ steps:
 - id: Build Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - '-'
+  - Setup git repo
   dir: wordpress
   args:
   - -c
@@ -86,7 +86,7 @@ steps:
 - id: Build NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - '-'
+  - Setup git repo
   dir: nginx
   args:
   - -c
