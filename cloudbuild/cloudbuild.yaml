@@ -46,36 +46,6 @@ steps:
 - id: Build Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - Setup git repo
-  dir: wordpress
-  args:
-  - -c
-  - make clean app/build
-
-- id: Verify Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - Build Wordpress
-  - Authenticate
-  env:
-  - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "imageWordpress": "$_REGISTRY/example/wordpress:latest",
-                     "imageInit": "$_REGISTRY/example/wordpress/init:latest",
-                     "imageMysql": "$_REGISTRY/example/wordpress/mysql:latest",
-                     "imageUbbagent": "$_REGISTRY/example/wordpress/ubbagent:latest",
-                     "reportingSecret": "wordpress-1-reporting-secret",
-                     "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
-                   }
-  args:
-  - -e
-  - -c
-  - gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
-
-- id: Build Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
   - '-'
   dir: wordpress
   args:
