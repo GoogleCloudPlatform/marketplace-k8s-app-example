@@ -41,7 +41,8 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/wordpress/deployer \
+app/build:: .build/marketplace/dev \
+            .build/wordpress/deployer \
             .build/wordpress/init \
             .build/wordpress/mysql \
             .build/wordpress/tester \
@@ -52,15 +53,15 @@ app/build:: .build/wordpress/deployer \
 .build/wordpress: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: apptest/deployer/* \
+.build/wordpress/deployer: .build/marketplace/deployer/envsubst \
+                           .build/var/APP_DEPLOYER_IMAGE \
+                           .build/var/REGISTRY \
+                           .build/var/TAG \
+                           apptest/deployer/* \
                            apptest/deployer/manifest/* \
                            deployer/* \
                            manifest/* \
                            schema.yaml \
-                           .build/marketplace/deployer/envsubst \
-                           .build/var/APP_DEPLOYER_IMAGE \
-                           .build/var/REGISTRY \
-                           .build/var/TAG \
                            | .build/wordpress
 	$(call print_target, $@)
 	docker build \
@@ -73,7 +74,7 @@ app/build:: .build/wordpress/deployer \
 	@touch "$@"
 
 
-.build/wordpress/tester:
+.build/wordpress/tester: .build/var/TESTER_IMAGE
 	$(call print_target, $@)
 	docker pull cosmintitei/bash-curl
 	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
