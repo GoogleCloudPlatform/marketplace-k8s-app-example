@@ -1,0 +1,7 @@
+steps:
+- id: Fetch key for the github app
+  name: gcr.io/cloud-builders/gsutil
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/appkeys/cloudbuild
+  - cloudbuild.pem
