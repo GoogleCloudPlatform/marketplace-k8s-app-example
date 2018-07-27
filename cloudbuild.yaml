@@ -1,10 +1,62 @@
 steps:
 
-- id: start
-  name: launcher.gcr.io/google/ubuntu16_04
+- id: Initialize Submodules
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - '-'
   entrypoint: bash
   args:
   - -c
+  - make submodule/init
+
+- id: Authenticate
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - '-'
+  args:
+  - -e
+  - -c
+  - gcloud container clusters get-credentials "limani-integ" --region "us-central1"
+
+# Wordpress Verification
+
+- id: Fetch Wordpress Reporting Secret
+  name: gcr.io/cloud-builders/gsutil
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
+  - reporting-secret.json
+
+- id: Build Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Initialize Submodules
+  dir: wordpress
+  args:
+  - -c
+  - make clean app/build
+
+- id: Verify Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Build Wordpress
+  - Authenticate
+  - Fetch Wordpress Reporting Secret
+  env:
+  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
   - |
-    echo $$PWD
-    find .
+    APP_PARAMETERS={
+                     "imageWordpress": "gcr.io/cloud-marketplace-ops-test/example/wordpress:latest",
+                     "imageInit": "gcr.io/cloud-marketplace-ops-test/example/wordpress/init:latest",
+                     "imageMysql": "gcr.io/cloud-marketplace-ops-test/example/wordpress/mysql:latest",
+                     "imageUbbagent": "gcr.io/cloud-marketplace-ops-test/example/wordpress/ubbagent:latest",
+                     "reportingSecret": "file://reporting-secret.json",
+                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
+                   }
+  args:
+  - -x
+  - -c
+  - |
+    /scripts/driver_internal.sh \
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"
