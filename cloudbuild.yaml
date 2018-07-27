@@ -16,7 +16,7 @@ steps:
   args:
   - -e
   - -c
-  - gcloud container clusters get-credentials "$_CLUSTER_NAME" --zone "$_CLUSTER_LOCATION"
+  - gcloud container clusters get-credentials "limani-integ" --zone "us-central1"
 
 - id: Build Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -41,15 +41,15 @@ steps:
   - Authenticate
   - Fetch wordpress reporting secret
   env:
-  - APP_DEPLOYER=$_REGISTRY/example/wordpress/deployer:latest
+  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
   - |
     APP_PARAMETERS={
-                     "imageWordpress": "$_REGISTRY/example/wordpress:latest",
-                     "imageInit": "$_REGISTRY/example/wordpress/init:latest",
-                     "imageMysql": "$_REGISTRY/example/wordpress/mysql:latest",
-                     "imageUbbagent": "$_REGISTRY/example/wordpress/ubbagent:latest",
+                     "imageWordpress": "gcr.io/cloud-marketplace-ops-test/example/wordpress:latest",
+                     "imageInit": "gcr.io/cloud-marketplace-ops-test/example/wordpress/init:latest",
+                     "imageMysql": "gcr.io/cloud-marketplace-ops-test/example/wordpress/mysql:latest",
+                     "imageUbbagent": "gcr.io/cloud-marketplace-ops-test/example/wordpress/ubbagent:latest",
                      "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "$_REGISTRY/example/wordpress/tester:latest"
+                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
                    }
   args:
   - -x
@@ -74,11 +74,11 @@ steps:
   - Build NGINX
   - Authenticate
   env:
-  - APP_DEPLOYER=$_REGISTRY/example/nginx/deployer:latest
+  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
   - |
     APP_PARAMETERS={
-                     "imageNginx.image": "$_REGISTRY/example/nginx:latest",
-                     "tester.image": "$_REGISTRY/example/nginx/tester:latest"
+                     "imageNginx.image": "gcr.io/cloud-marketplace-ops-test/example/nginx:latest",
+                     "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
                    }
   args:
   - -x
