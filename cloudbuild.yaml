@@ -1,11 +1,18 @@
 steps:
 
-- id: Initialize Submodules
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  entrypoint: bash
+- id: Initialize git
+  name: gcr.io/cloud-builders/git
   args:
-  - -c
-  - git init ; find . ; echo $$PWD ; make submodule/init
+  - init
+
+- id: Initialize Submodules
+  name: gcr.io/cloud-builders/git
+  waitFor:
+  - Initialize git
+  args:
+  - submodule
+  - update
+  - --init
 
 - id: Authenticate
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
