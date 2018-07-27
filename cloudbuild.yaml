@@ -5,7 +5,7 @@ steps:
   entrypoint: bash
   args:
   - -c
-  - find . ; echo $$PWD ; make submodule/init
+  - git init ; find . ; echo $$PWD ; make submodule/init
 
 - id: Authenticate
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
