@@ -2,8 +2,6 @@ steps:
 
 - id: Initialize Submodules
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - '-'
   entrypoint: bash
   args:
   - -c
