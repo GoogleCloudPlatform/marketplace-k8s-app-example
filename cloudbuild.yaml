@@ -1,18 +1,30 @@
 steps:
 
+# Initializations
+
 - id: Initialize git
   name: gcr.io/cloud-builders/git
   args:
   - init
 
-- id: Initialize Submodules
+- id: Sync Submodules
   name: gcr.io/cloud-builders/git
   waitFor:
   - Initialize git
   args:
   - submodule
+  - sync
+  - --recursive
+
+- id: Update Submodules
+  name: gcr.io/cloud-builders/git
+  waitFor:
+  - Sync Submodules
+  args:
+  - submodule
   - update
   - --init
+  - --recursive
 
 - id: Authenticate
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -22,6 +34,12 @@ steps:
   - -e
   - -c
   - gcloud container clusters get-credentials "limani-integ" --region "us-central1"
+
+- id: Initialized
+  name: bash
+  waitFor:
+  - Update Submodules
+  - Authenticate
 
 # Wordpress Verification
 
@@ -35,7 +53,7 @@ steps:
 - id: Build Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - Initialize Submodules
+  - Initialized
   dir: wordpress
   args:
   - -c
@@ -44,8 +62,8 @@ steps:
 - id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
+  - Initialized
   - Build Wordpress
-  - Authenticate
   - Fetch Wordpress Reporting Secret
   env:
   - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
