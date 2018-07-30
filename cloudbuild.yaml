@@ -9,15 +9,13 @@ steps:
   - -exc
   - |
     # For some reason, Cloud Build x GitHub integration is not including
-    # the .git/ directory. As a temporary workaround, we initialize a
-    # git repository and add a vendor/marketplace-tools submodule. This
-    # workaround has the implication that the GitHub x Cloud Build
-    # integration will disregard the actual submodule and always run
-    # against master, but hopefully this can be resolved before this
-    # pull request is merged.
-    git init
-    rmdir vendor/marketplace-tools
-    git submodule add https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools.git vendor/marketplace-tools
+    # the .git/ directory. As a temporary workaround, we clone the
+    # repository and reset it to this build's commit sha. Hopefully this
+    # can be resolved before this pull request is merged.
+    git clone 'https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example.git' tmp
+    mv tmp/.git .git
+    rm -rf tmp
+    git reset "$COMMIT_SHA"
     git submodule sync --recursive
     git submodule update --init --recursive
 
