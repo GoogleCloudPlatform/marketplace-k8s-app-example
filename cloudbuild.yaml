@@ -65,10 +65,6 @@ steps:
   - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
   - |
     APP_PARAMETERS={
-                     "imageWordpress": "gcr.io/cloud-marketplace-ops-test/example/wordpress:latest",
-                     "imageInit": "gcr.io/cloud-marketplace-ops-test/example/wordpress/init:latest",
-                     "imageMysql": "gcr.io/cloud-marketplace-ops-test/example/wordpress/mysql:latest",
-                     "imageUbbagent": "gcr.io/cloud-marketplace-ops-test/example/wordpress/ubbagent:latest",
                      "reportingSecret": "file://reporting-secret.json",
                      "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
                    }
@@ -99,7 +95,6 @@ steps:
   - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
   - |
     APP_PARAMETERS={
-                     "imageNginx.image": "gcr.io/cloud-marketplace-ops-test/example/nginx:latest",
                      "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
                    }
   args:
