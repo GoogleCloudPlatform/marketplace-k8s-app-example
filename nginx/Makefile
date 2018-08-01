@@ -68,7 +68,8 @@ app/build:: .build/nginx/deployer \
 	@touch "$@"
 
 
-.build/nginx/tester:
+.build/nginx/tester: .build/var/TESTER_IMAGE \
+                     | .build/nginx
 	$(call print_target, $@)
 	docker pull cosmintitei/bash-curl
 	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
