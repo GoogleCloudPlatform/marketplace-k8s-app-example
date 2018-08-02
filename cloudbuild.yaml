@@ -1,0 +1,105 @@
+steps:
+
+# Initializations
+
+- id: Initialize git
+  name: gcr.io/cloud-builders/git
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    # Cloud Build x GitHub integration uses source archives to fetch
+    # the source, rather than Git source fetching, and as a consequence
+    # does not include the .git/ directory. As a workaround, we clone
+    # the repository and reset it to this build's commit sha.
+    git clone 'https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example.git' tmp
+    mv tmp/.git .git
+    rm -rf tmp
+    git reset "$COMMIT_SHA"
+    git submodule sync --recursive
+    git submodule update --init --recursive
+
+- id: Get Kubernetes Credentials
+  name: gcr.io/cloud-builders/gcloud
+  args:
+  - container
+  - clusters
+  - get-credentials
+  - "limani-integ"
+  - --region
+  - "us-central1"
+  - --project
+  - "$PROJECT_ID"
+
+- id: Initialized
+  name: bash
+  waitFor:
+  - Initialize git
+  - Get Kubernetes Credentials
+
+# Wordpress Verification
+
+- id: Fetch Wordpress Reporting Secret
+  name: gcr.io/cloud-builders/gsutil
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
+  - reporting-secret.json
+
+- id: Build Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Initialized
+  dir: wordpress
+  args:
+  - -exc
+  - make -j4 clean app/build
+
+- id: Verify Wordpress
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Initialized
+  - Build Wordpress
+  - Fetch Wordpress Reporting Secret
+  env:
+  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
+  - |
+    APP_PARAMETERS={
+                     "reportingSecret": "file://reporting-secret.json",
+                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
+                   }
+  args:
+  - -exc
+  - |
+    /scripts/driver_internal.sh \
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"
+
+# NGINX Verification
+
+- id: Build NGINX
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Initialized
+  dir: nginx
+  args:
+  - -exc
+  - make -j4 clean app/build
+
+- id: Verify NGINX
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  waitFor:
+  - Initialized
+  - Build NGINX
+  env:
+  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
+  - |
+    APP_PARAMETERS={
+                     "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
+                   }
+  args:
+  - -exc
+  - |
+    /scripts/driver_internal.sh \
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"

@@ -10,7 +10,7 @@ properties:
       type: NAMESPACE
   imageNginx.image:
     type: string
-    default: $REGISTRY:$TAG
+    default: $REGISTRY/example/nginx:$TAG
     x-google-marketplace:
       type: IMAGE
       image:
