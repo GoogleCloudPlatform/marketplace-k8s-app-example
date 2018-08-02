@@ -53,7 +53,7 @@ steps:
   dir: wordpress
   args:
   - -exc
-  - make clean app/build
+  - make -j4 clean app/build
 
 - id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
@@ -84,7 +84,7 @@ steps:
   dir: nginx
   args:
   - -exc
-  - make clean app/build
+  - make -j4 clean app/build
 
 - id: Verify NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
