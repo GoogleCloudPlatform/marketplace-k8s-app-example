@@ -20,15 +20,15 @@ steps:
   args:
   - -exc
   - |
-    cp -r /builder/home/.kube kube/
+    cp -r /builder/home/.kube $$HOME/kube/
     find kube
-    cp -r /builder/home/.config config/
+    cp -r /builder/home/.config $$HOME/config/
     find config
     find wordpress
     docker run \
-        --volume "$$HOME/.kube:/kube:ro" \
-        --volume "$$HOME/.config:/config:ro" \
-        --volume "$$HOME/wordpress:/wordpress:ro" \
+        --volume "$$HOME/kube:/kube:ro" \
+        --volume "$$HOME/config:/config:ro" \
+        --volume "/workspace/wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
