@@ -41,7 +41,7 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/wordpress/deployer
+app/build:: .build/wordpress
 # app/build:: .build/marketplace/dev \
 #             .build/wordpress/deployer \
 #             .build/wordpress/init \
@@ -64,7 +64,7 @@ app/verify: .build/wordpress/verify
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -x \
 	    -c \
-	    "kubectl get namespace"
+	    "gcloud auth list; kubectl get namespace"
 	@touch "$@"
 
 .build/wordpress: | .build

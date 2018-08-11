@@ -37,7 +37,7 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/nginx/deployer
+app/build:: .build/nginx
 # app/build:: .build/nginx/deployer \
 #             .build/nginx/nginx \
 #             .build/nginx/tester
@@ -56,7 +56,7 @@ app/verify: .build/nginx/verify
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -x \
 	    -c \
-	    "kubectl get namespace"
+	    "gcloud auth list; kubectl get namespace"
 	@touch "$@"
 
 
