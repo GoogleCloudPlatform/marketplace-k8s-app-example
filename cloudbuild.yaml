@@ -29,7 +29,6 @@ steps:
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
+        -exc \
         -- \
-        -x \
-        -c \
         "find /root/mount/"
