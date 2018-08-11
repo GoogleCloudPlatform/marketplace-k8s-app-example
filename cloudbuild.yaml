@@ -50,6 +50,10 @@ steps:
   - Build dev
   - Initialize git
   - Get Kubernetes Credentials
+  args:
+  - -exc
+  - |
+    find /builder/home/.kube
 
 # Wordpress Verification
 

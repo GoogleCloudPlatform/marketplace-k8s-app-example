@@ -50,6 +50,24 @@ app/build:: .build/marketplace/dev \
             .build/wordpress/wordpress
 
 
+app/verify:: .build/wordpress/verify
+
+
+.build/wordpress/verify: | .build/wordpress
+	$(call print_target)
+	docker run \
+	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
+	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
+	    --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
+	    --rm \
+	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
+	    -- \
+	    -x \
+	    /scripts/verify \
+	          --deployer='$(APP_DEPLOYER_IMAGE)' \
+	          --parameters='$(call combined_parameters)'
+	@touch "$@"
+
 .build/wordpress: | .build
 	mkdir -p "$@"
 
