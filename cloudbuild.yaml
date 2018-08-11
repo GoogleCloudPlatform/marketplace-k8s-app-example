@@ -35,12 +35,13 @@ steps:
   name: gcr.io/cloud-builders/docker
   waitFor:
   - Initialize git
+  dir: vendor/marketplace-tools
   args:
   - build
   - --tag
   - gcr.io/cloud-marketplace-tools/k8s/dev:latest
   - --file
-  - vendor/marketplace-tools/marketplace/dev/Dockerfile
+  - marketplace/dev/Dockerfile
   - .
 
 - id: Initialized
