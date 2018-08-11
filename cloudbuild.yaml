@@ -24,6 +24,7 @@ steps:
     find /builder/home/.config
     docker --version
     docker run \
+        --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
         --volume "/builder/home/.kube:/root/mount/.kube:ro" \
         --volume "/builder/home/.config:/root/mount/.config:ro" \
         --rm \
