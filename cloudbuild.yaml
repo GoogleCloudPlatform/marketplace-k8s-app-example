@@ -22,14 +22,14 @@ steps:
   - |
     cp -r /builder/home/.kube $$HOME/kube/
     cp -r /builder/home/.config $$HOME/config/
-    chmod 777 -R $$HOME/kube
-    chmod 777 -R $$HOME/config
+    chmod 666 -R kube
+    chmod 666 -R config
     ls -Rla $$HOME/kube
     ls -Rla $$HOME/config
     ls -Rla wordpress
     docker run \
-        --volume "$$HOME/kube:/kube:ro" \
-        --volume "$$HOME/config:/config:ro" \
+        --volume "/workspace/kube:/kube:ro" \
+        --volume "/workspace/config:/config:ro" \
         --volume "/workspace/wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
