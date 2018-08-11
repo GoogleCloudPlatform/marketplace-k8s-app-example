@@ -1,9 +1,18 @@
 steps:
 
+- id: Fetch Service Account Key File
+  name: gcr.io/cloud-builders/gsutil
+  env:
+  - MARKETPLACE_TOOLS_TAG=latest
+  args:
+  - cp
+  - gs://cloud-marketplace-ops-test-kokoro/cloud-marketplace-ops-test-5cb3e979a3ae.json
+  - cloud-marketplace-ops-test-5cb3e979a3ae.json
+
 - id: Authenticate as Service Account
   name: gcr.io/cloud-builders/gcloud
   waitFor:
-  - '-'
+  - Fetch Service Account Key File
   args:
   - auth
   - activate-service-account
