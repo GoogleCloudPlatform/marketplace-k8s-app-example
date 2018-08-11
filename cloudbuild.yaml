@@ -34,7 +34,7 @@ steps:
 - id: Build dev
   name: gcr.io/cloud-builders/docker
   waitFor:
-  - '-'
+  - Initialize git
   args:
   - build
   - --tag
