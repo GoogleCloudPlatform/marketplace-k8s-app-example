@@ -21,11 +21,13 @@ steps:
   - -exc
   - |
     find /builder/home/.kube
+    find /builder/home/.config
     docker --version
     docker run \
         --volume "/builder/home/.kube:/root/mount/.kube:ro" \
+        --volume "/builder/home/.config:/root/mount/.config:ro" \
         --rm \
-        bash \
+        gcr.io/cloud-builders/docker \
         -x \
         -c \
         "find /root/mount/"
