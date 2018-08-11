@@ -77,6 +77,7 @@ steps:
         --volume "/workspace/kube:/root/mount/.kube:ro" \
         --volume "/workspace/config:/root/mount/.config:ro" \
         --volume "/workspace/wordpress:/wordpress:ro" \
+        --link metadata:metadata.google.internal \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
