@@ -44,7 +44,7 @@ app/build:: .build/nginx/deployer \
 
 testing:
 	$(call print_target)
-	ls -l /$(HOME)/.kube ; cat /$(HOME)/.kube/config ; gcloud auth list; kubectl get namespace
+	ls -l /$(HOME)/.kube
 	docker run \
 	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
 	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
@@ -53,7 +53,7 @@ testing:
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -x \
 	    -c \
-	    "ls -l /root/mount/.kube ; cat /root/mount/.kube/config ; source setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
+	    "find /root/mount/"
 	@touch "$@"
 
 
