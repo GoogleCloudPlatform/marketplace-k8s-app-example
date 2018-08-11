@@ -60,7 +60,7 @@ testing:
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -x \
 	    -c \
-	    "setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
+	    "source setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
 	@touch "$@"
 
 .build/wordpress: | .build
