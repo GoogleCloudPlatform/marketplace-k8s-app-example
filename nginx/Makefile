@@ -42,6 +42,25 @@ app/build:: .build/nginx/deployer \
             .build/nginx/tester
 
 
+app/verify: .build/nginx/verify
+
+
+.build/nginx/verify: | .build/nginx
+	$(call print_target)
+	docker run \
+	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
+	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
+	    --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
+	    --rm \
+	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
+	    -- \
+	    -x \
+	    /scripts/verify \
+	          --deployer='$(APP_DEPLOYER_IMAGE)' \
+	          --parameters='$(call combined_parameters)'
+	@touch "$@"
+
+
 .build/nginx: | .build
 	mkdir -p "$@"
 

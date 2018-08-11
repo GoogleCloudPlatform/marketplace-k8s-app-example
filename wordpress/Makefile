@@ -50,7 +50,7 @@ app/build:: .build/marketplace/dev \
             .build/wordpress/wordpress
 
 
-app/verify:: .build/wordpress/verify
+app/verify: .build/wordpress/verify
 
 
 .build/wordpress/verify: | .build/wordpress
