@@ -28,8 +28,8 @@ steps:
     ls -Rla config
     ls -Rla wordpress
     docker run \
-        --volume "/workspace/kube:/mount/.kube:ro" \
-        --volume "/workspace/config:/mount/.config:ro" \
+        --volume "/workspace/kube:/root/mount/.kube:ro" \
+        --volume "/workspace/config:/root/mount/.config:ro" \
         --volume "/workspace/wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
