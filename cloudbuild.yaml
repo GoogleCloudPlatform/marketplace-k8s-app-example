@@ -36,4 +36,4 @@ steps:
         gcr.io/cloud-builders/docker \
         -exc \
         -- \
-        "find /kube/ ; find /config/ ; find /wordpress/"
+        "find /kube/ ; find /config/ ; find /wordpress/ ; kubectl get namespace"
