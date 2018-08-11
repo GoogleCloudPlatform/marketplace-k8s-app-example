@@ -24,8 +24,8 @@ steps:
     cp -r /builder/home/.config config/
     chmod 666 -R kube
     chmod 666 -R config
-    ls -Rla $$HOME/kube
-    ls -Rla $$HOME/config
+    ls -Rla kube
+    ls -Rla config
     ls -Rla wordpress
     docker run \
         --volume "/workspace/kube:/kube:ro" \
