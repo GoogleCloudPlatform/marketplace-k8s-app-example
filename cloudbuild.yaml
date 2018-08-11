@@ -73,7 +73,6 @@ steps:
   - |
     cp -r /builder/home/.kube kube/
     cp -r /builder/home/.config config/
-    gcloud auth list
     docker run \
         --volume "/workspace/kube:/root/mount/.kube:ro" \
         --volume "/workspace/config:/root/mount/.config:ro" \
