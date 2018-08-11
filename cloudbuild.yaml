@@ -40,7 +40,7 @@ steps:
   - --tag
   - gcr.io/cloud-marketplace-tools/k8s/dev:latest
   - --file
-  - marketplace/dev/Dockerfile
+  - vendor/marketplace-tools/marketplace/dev/Dockerfile
   - .
 
 - id: Initialized
