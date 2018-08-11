@@ -24,6 +24,7 @@ steps:
     find kube
     cp -r /builder/home/.config config/
     find config
+    find wordpress
     docker run \
         --volume "kube:/kube:ro" \
         --volume "config:/config:ro" \
