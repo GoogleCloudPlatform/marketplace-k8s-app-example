@@ -20,13 +20,11 @@ steps:
   args:
   - -exc
   - |
-    find
     cp -r /builder/home/.kube /kube/
     find /kube
     cp -r /builder/home/.config /config/
     find /config
     docker run \
-        --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
         --volume "/kube:/kube:ro" \
         --volume "/config:/config:ro" \
         --rm \
