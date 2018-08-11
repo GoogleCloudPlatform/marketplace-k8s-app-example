@@ -1,43 +1,5 @@
 steps:
 
-# Initializations
-
-- id: Initialize git
-  name: gcr.io/cloud-builders/git
-  entrypoint: /bin/bash
-  args:
-  - -exc
-  - |
-    # Cloud Build x GitHub integration uses source archives to fetch
-    # the source, rather than Git source fetching, and as a consequence
-    # does not include the .git/ directory. As a workaround, we clone
-    # the repository and reset it to this build's commit sha.
-    git clone 'https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example.git' tmp
-    mv tmp/.git .git
-    rm -rf tmp
-    git reset "$COMMIT_SHA"
-    git submodule sync --recursive
-    git submodule update --init --recursive
-
-- id: Fetch Service Account Key File
-  name: gcr.io/cloud-builders/gsutil
-  env:
-  - MARKETPLACE_TOOLS_TAG=latest
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/cloud-marketplace-ops-test-5cb3e979a3ae.json
-  - cloud-marketplace-ops-test-5cb3e979a3ae.json
-
-- id: Authenticate as Service Account
-  name: gcr.io/cloud-builders/gcloud
-  waitFor:
-  - Fetch Service Account Key File
-  args:
-  - auth
-  - activate-service-account
-  - --key-file
-  - cloud-marketplace-ops-test-5cb3e979a3ae.json
-
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
   args:
@@ -50,26 +12,10 @@ steps:
   - --project
   - "$PROJECT_ID"
 
-# - id: Build dev
-#   name: gcr.io/cloud-builders/docker
-#   waitFor:
-#   - Initialize git
-#   dir: vendor/marketplace-tools
-#   args:
-#   - build
-#   - --tag
-#   - gcr.io/cloud-marketplace-tools/k8s/dev:latest
-#   - --file
-#   - marketplace/dev/Dockerfile
-#   - .
-
 - id: Initialized
   name: gcr.io/cloud-builders/docker
   entrypoint: /bin/bash
   waitFor:
-#  - Build dev
-  - Initialize git
-  - Authenticate as Service Account
   - Get Kubernetes Credentials
   args:
   - -exc
@@ -82,37 +28,3 @@ steps:
         -x \
         -c \
         "find /root/mount/"
-
-
-# Wordpress Verification
-
-- id: Fetch Wordpress Reporting Secret
-  name: gcr.io/cloud-builders/gsutil
-  env:
-  - MARKETPLACE_TOOLS_TAG=latest
-  args:
-  - cp
-  - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
-  - reporting-secret.json
-
-- id: Verify Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - Initialized
-  dir: wordpress
-  args:
-  - -exc
-  - make -j4 testing
-
-# NGINX Verification
-
-- id: Verify NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  env:
-  - MARKETPLACE_TOOLS_TAG=latest
-  waitFor:
-  - Initialized
-  dir: nginx
-  args:
-  - -exc
-  - make -j4 testing
