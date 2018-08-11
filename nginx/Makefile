@@ -37,16 +37,12 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/nginx
-# app/build:: .build/nginx/deployer \
-#             .build/nginx/nginx \
-#             .build/nginx/tester
+app/build:: .build/nginx/deployer \
+            .build/nginx/nginx \
+            .build/nginx/tester
 
 
-app/verify: .build/nginx/verify
-
-
-.build/nginx/verify: | .build/nginx
+testing:
 	$(call print_target)
 	docker run \
 	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \

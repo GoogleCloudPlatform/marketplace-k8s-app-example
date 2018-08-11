@@ -74,7 +74,7 @@ steps:
   dir: wordpress
   args:
   - -exc
-  - make -j4 clean app/verify
+  - make -j4 testing
 
 # NGINX Verification
 
@@ -87,4 +87,4 @@ steps:
   dir: nginx
   args:
   - -exc
-  - make -j4 clean app/verify
+  - make -j4 testing

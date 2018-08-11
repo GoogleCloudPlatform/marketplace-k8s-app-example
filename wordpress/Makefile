@@ -41,20 +41,16 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/wordpress
-# app/build:: .build/marketplace/dev \
-#             .build/wordpress/deployer \
-#             .build/wordpress/init \
-#             .build/wordpress/mysql \
-#             .build/wordpress/tester \
-#             .build/wordpress/ubbagent \
-#             .build/wordpress/wordpress
+app/build:: .build/marketplace/dev \
+            .build/wordpress/deployer \
+            .build/wordpress/init \
+            .build/wordpress/mysql \
+            .build/wordpress/tester \
+            .build/wordpress/ubbagent \
+            .build/wordpress/wordpress
 
 
-app/verify: .build/wordpress/verify
-
-
-.build/wordpress/verify: | .build/wordpress
+testing:
 	$(call print_target)
 	docker run \
 	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
