@@ -21,9 +21,9 @@ steps:
   - -exc
   - |
     cp -r /builder/home/.kube kube/
-    find /kube
+    find kube
     cp -r /builder/home/.config config/
-    find /config
+    find config
     docker run \
         --volume "kube:/kube:ro" \
         --volume "config:/config:ro" \
