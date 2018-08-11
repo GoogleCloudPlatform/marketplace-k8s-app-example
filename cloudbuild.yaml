@@ -73,11 +73,7 @@ steps:
   - |
     cp -r /builder/home/.kube kube/
     cp -r /builder/home/.config config/
-    # chmod 666 -R kube
-    # chmod 666 -R config
-    ls -Rla kube
-    ls -Rla config
-    ls -Rla wordpress
+    gcloud auth list
     docker run \
         --volume "/workspace/kube:/root/mount/.kube:ro" \
         --volume "/workspace/config:/root/mount/.config:ro" \
@@ -87,4 +83,4 @@ steps:
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
-        "source setup_kubeconfig.sh ;  kubectl get namespace"
+        "source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
