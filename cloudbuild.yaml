@@ -20,6 +20,7 @@ steps:
   args:
   - -exc
   - |
+    find
     find /builder/home/.kube
     find /builder/home/.config
     docker --version
@@ -27,9 +28,10 @@ steps:
         --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
         --volume "/builder/home/.kube:/root/mount/.kube:ro" \
         --volume "/builder/home/.config:/root/mount/.config:ro" \
+        --volume "/workspace/:/workspace/.config:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
         -exc \
         -- \
-        "find /root/mount/"
+        "find /root/mount/ ; find /workspace/"
