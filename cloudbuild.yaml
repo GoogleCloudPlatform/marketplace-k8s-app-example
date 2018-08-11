@@ -75,13 +75,13 @@ steps:
   - |
     cat /builder/home/.kube/config
     find /builder/home/.config/gcloud
-	  docker run \
-	      --volume "/builder/home/.kube:/root/mount/.kube:ro" \
-	      --rm \
-	      "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
-	      -x \
-	      -c \
-	      "find /root/mount/"
+    docker run \
+        --volume "/builder/home/.kube:/root/mount/.kube:ro" \
+        --rm \
+        bash \
+        -x \
+        -c \
+        "find /root/mount/"
 
 
 # Wordpress Verification
