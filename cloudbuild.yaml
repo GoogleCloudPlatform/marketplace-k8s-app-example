@@ -33,7 +33,7 @@ steps:
         --volume "/workspace/wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
-        gcr.io/cloud-marketplace-tools/dev:latest \
+        gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
         "find /kube/ ; find /config/ ; find /wordpress/ ; kubectl get namespace"
