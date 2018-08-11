@@ -53,15 +53,14 @@ steps:
   - |
     cp -r /builder/home/.kube /workspace/kube/
     cp -r /builder/home/.config /workspace/config/
-    find /workspace/config/
+    df -h
     docker run \
         --volume "/workspace/kube:/root/mount/.kube:ro" \
         --volume "/workspace/config:/root/mount/.config:ro" \
-        --volume "/workspace/wordpress:/wordpress:ro" \
         --link metadata:metadata.google.internal \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
-        "find /root/mount/ ; df -h ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
+        "find /root/mount/ ; ls -l / ; df -h ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
