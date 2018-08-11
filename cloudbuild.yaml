@@ -1,14 +1,14 @@
 steps:
 
- - id: Authenticate as Service Account
-   name: gcr.io/cloud-builders/gcloud
-   waitFor:
-   - '-'
-   args:
-   - auth
-   - activate-service-account
-   - --key-file
-   - cloud-marketplace-ops-test-5cb3e979a3ae.json
+- id: Authenticate as Service Account
+  name: gcr.io/cloud-builders/gcloud
+  waitFor:
+  - '-'
+  args:
+  - auth
+  - activate-service-account
+  - --key-file
+  - cloud-marketplace-ops-test-5cb3e979a3ae.json
 
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
