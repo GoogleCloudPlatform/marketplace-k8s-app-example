@@ -50,23 +50,23 @@ steps:
   - --project
   - "$PROJECT_ID"
 
-- id: Build dev
-  name: gcr.io/cloud-builders/docker
-  waitFor:
-  - Initialize git
-  dir: vendor/marketplace-tools
-  args:
-  - build
-  - --tag
-  - gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  - --file
-  - marketplace/dev/Dockerfile
-  - .
+# - id: Build dev
+#   name: gcr.io/cloud-builders/docker
+#   waitFor:
+#   - Initialize git
+#   dir: vendor/marketplace-tools
+#   args:
+#   - build
+#   - --tag
+#   - gcr.io/cloud-marketplace-tools/k8s/dev:latest
+#   - --file
+#   - marketplace/dev/Dockerfile
+#   - .
 
 - id: Initialized
-  name: bash
+  name: gcr.io/cloud-builders/docker
   waitFor:
-  - Build dev
+#  - Build dev
   - Initialize git
   - Authenticate as Service Account
   - Get Kubernetes Credentials
