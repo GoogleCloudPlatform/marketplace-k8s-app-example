@@ -74,8 +74,7 @@ steps:
   args:
   - -exc
   - |
-    cat /builder/home/.kube/config
-    find /builder/home/.config/gcloud
+    find /builder/home/.kube
     docker run \
         --volume "/builder/home/.kube:/root/mount/.kube:ro" \
         --rm \
