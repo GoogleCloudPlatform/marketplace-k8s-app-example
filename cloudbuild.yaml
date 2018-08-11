@@ -28,7 +28,7 @@ steps:
     docker run \
         --volume "kube:/kube:ro" \
         --volume "config:/config:ro" \
-        --volume "wordpress:/wordpress:ro" \
+        --volume "./wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
