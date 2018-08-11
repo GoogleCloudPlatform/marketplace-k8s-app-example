@@ -22,11 +22,13 @@ steps:
   - |
     find
     find /builder/home/.kube
+    cp -r /builder/home/.kube /kube/
     find /builder/home/.config
+    cp -r /builder/home/.config /config/
     docker run \
         --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
-        --volume "/builder/home/.kube:/kube:ro" \
-        --volume "/builder/home/.config:/config:ro" \
+        --volume "/kube:/kube:ro" \
+        --volume "/config:/config:ro" \
         --volume "/workspace/:/workspace/:ro" \
         --rm \
         --entrypoint=bash \
