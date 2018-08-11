@@ -71,11 +71,11 @@ steps:
   args:
   - -exc
   - |
-    cp -r /builder/home/.kube kube/
-    cp -r /builder/home/.config config/
+    cp -r /builder/home/.kube $$HOME/kube/
+    cp -r /builder/home/.config $$HOME/config/
     docker run \
-        --volume "/$$HOME/.kube:/root/mount/.kube:ro" \
-        --volume "/$$HOME/.config:/root/mount/.config:ro" \
+        --volume "/$$HOME/kube:/root/mount/.kube:ro" \
+        --volume "/$$HOME/config:/root/mount/.config:ro" \
         --volume "/workspace/wordpress:/wordpress:ro" \
         --link metadata:metadata.google.internal \
         --rm \
