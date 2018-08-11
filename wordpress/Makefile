@@ -52,15 +52,15 @@ app/build:: .build/marketplace/dev \
 
 testing:
 	$(call print_target)
-	docker run \
-	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
-	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
-	    --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
-	    --rm \
-	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
-	    -x \
-	    -c \
-	    "source setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
+	# docker run \
+	#     --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
+	#     --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
+	#     --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
+	#     --rm \
+	#     "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
+	#     -x \
+	#     -c \
+	#     "source setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
 	@touch "$@"
 
 .build/wordpress: | .build

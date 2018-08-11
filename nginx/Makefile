@@ -52,7 +52,7 @@ testing:
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -x \
 	    -c \
-	    "source setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
+	    "ls -l /root/mount/.kube ; cat /root/mount/.kube/config ; source setup_kubeconfig.sh ; gcloud auth list; kubectl get namespace"
 	@touch "$@"
 
 
