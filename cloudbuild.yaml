@@ -51,12 +51,12 @@ steps:
   args:
   - -exc
   - |
-    cp -r /builder/home/.kube /tmp/kube/
-    cp -r /builder/home/.config /tmp/config/
+    cp -r /builder/home/.kube /workspace/kube/
+    cp -r /builder/home/.config /workspace/config/
     df -h
     docker run \
-        --volume "/tmp/kube:/root/mount/.kube:ro" \
-        --volume "/tmp/config:/root/mount/.config:ro" \
+        --volume "/workspace/kube:/root/mount/.kube:ro" \
+        --volume "/workspace/config:/root/mount/.config:ro" \
         --link metadata:metadata.google.internal \
         --rm \
         --entrypoint=bash \
