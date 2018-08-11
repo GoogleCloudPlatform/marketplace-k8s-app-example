@@ -46,9 +46,7 @@ testing:
 	$(call print_target)
 	ls -l /$(HOME)/.kube
 	docker run \
-	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
 	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
-	    --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
 	    --rm \
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -x \
