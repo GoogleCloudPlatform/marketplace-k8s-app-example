@@ -3,7 +3,7 @@ steps:
  - id: Authenticate as Service Account
    name: gcr.io/cloud-builders/gcloud
    waitFor:
-   - Fetch Service Account Key File
+   - '-'
    args:
    - auth
    - activate-service-account
