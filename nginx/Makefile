@@ -44,6 +44,7 @@ app/build:: .build/nginx/deployer \
 
 testing:
 	$(call print_target)
+	ls -l /$(HOME)/.kube ; cat /$(HOME)/.kube/config ; gcloud auth list; kubectl get namespace
 	docker run \
 	    --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
 	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
