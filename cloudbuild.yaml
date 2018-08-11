@@ -21,18 +21,17 @@ steps:
   - -exc
   - |
     find
-    find /builder/home/.kube
     cp -r /builder/home/.kube /kube/
-    find /builder/home/.config
+    find /kube
     cp -r /builder/home/.config /config/
+    find /config
     docker run \
         --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
         --volume "/kube:/kube:ro" \
         --volume "/config:/config:ro" \
-        --volume "/workspace/:/workspace/:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
         -exc \
         -- \
-        "find /kube/ ; find /config ; find /workspace/"
+        "find /kube/ ; find /config/"
