@@ -61,8 +61,8 @@ app/verify: .build/wordpress/verify
 	    --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
 	    --rm \
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
-	    -- \
 	    -x \
+	    -- \
 	    /scripts/verify \
 	          --deployer='$(APP_DEPLOYER_IMAGE)' \
 	          --parameters='$(call combined_parameters)'
