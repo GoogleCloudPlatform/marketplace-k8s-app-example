@@ -1,4 +1,5 @@
 TAG ?= latest
+MARKETPLACE_TOOLS_TAG = latest
 
 # crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile
@@ -38,8 +39,6 @@ TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
-
-MARKETPLACE_TOOLS_TAG = latest
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
