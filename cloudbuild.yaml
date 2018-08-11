@@ -46,60 +46,22 @@ steps:
   - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
   - reporting-secret.json
 
-- id: Build Wordpress
+- id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
   - Initialized
   dir: wordpress
   args:
   - -exc
-  - make -j4 clean app/build
-
-- id: Verify Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - Initialized
-  - Build Wordpress
-  - Fetch Wordpress Reporting Secret
-  env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
-                   }
-  args:
-  - -exc
-  - |
-    /scripts/driver_internal.sh \
-        --deployer="$$APP_DEPLOYER" \
-        --parameters="$$APP_PARAMETERS"
+  - make -j4 clean app/verify
 
 # NGINX Verification
 
-- id: Build NGINX
+- id: Verify NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
   - Initialized
   dir: nginx
   args:
   - -exc
-  - make -j4 clean app/build
-
-- id: Verify NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - Initialized
-  - Build NGINX
-  env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
-                   }
-  args:
-  - -exc
-  - |
-    /scripts/driver_internal.sh \
-        --deployer="$$APP_DEPLOYER" \
-        --parameters="$$APP_PARAMETERS"
+  - make -j4 clean app/verify
