@@ -21,9 +21,9 @@ steps:
   - -exc
   - |
     cp -r /builder/home/.kube $$HOME/kube/
-    find $$HOME/kube
+    ls -la $$HOME/kube
     cp -r /builder/home/.config $$HOME/config/
-    find $$HOME/config
+    ls -la $$HOME/config
     find wordpress
     docker run \
         --volume "$$HOME/kube:/kube:ro" \
