@@ -53,7 +53,8 @@ steps:
   args:
   - -exc
   - |
-    find /builder/home/.kube
+    cat /builder/home/.kube/config
+    find /builder/home/.config/gcloud
 
 # Wordpress Verification
 
