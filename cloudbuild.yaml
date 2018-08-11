@@ -84,4 +84,4 @@ steps:
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
-        "source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
+        "find /root/mount/ ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
