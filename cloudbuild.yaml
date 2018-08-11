@@ -26,9 +26,9 @@ steps:
     find config
     find wordpress
     docker run \
-        --volume "kube:/kube:ro" \
-        --volume "config:/config:ro" \
-        --volume "./wordpress:/wordpress:ro" \
+        --volume "$$PWD/kube:/kube:ro" \
+        --volume "$$PWD/config:/config:ro" \
+        --volume "$$PWD/wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
