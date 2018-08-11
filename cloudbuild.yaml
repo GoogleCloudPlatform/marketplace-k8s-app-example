@@ -71,12 +71,12 @@ steps:
   args:
   - -exc
   - |
-    cp -r /builder/home/.kube $$HOME/kube/
-    cp -r /builder/home/.config $$HOME/config/
+    cp -r /builder/home/.kube /workspace/kube/
+    cp -r /builder/home/.config /workspace/config/
     find $$HOME/config/
     docker run \
-        --volume "$$HOME/kube:/root/mount/.kube:ro" \
-        --volume "$$HOME/config:/root/mount/.config:ro" \
+        --volume "/workspace/kube:/root/mount/.kube:ro" \
+        --volume "/workspace/config:/root/mount/.config:ro" \
         --volume "/workspace/wordpress:/wordpress:ro" \
         --link metadata:metadata.google.internal \
         --rm \
