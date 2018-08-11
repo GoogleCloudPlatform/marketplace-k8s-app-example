@@ -26,12 +26,12 @@ steps:
     docker --version
     docker run \
         --volume "/var/run/docker.sock:/var/run/docker.sock:ro" \
-        --volume "/builder/home/.kube:/root/mount/.kube:ro" \
-        --volume "/builder/home/.config:/root/mount/.config:ro" \
-        --volume "/workspace/:/workspace/.config:ro" \
+        --volume "/builder/home/.kube:/root/mount2/.kube:ro" \
+        --volume "/builder/home/.config:/root/mount2/.config:ro" \
+        --volume "/workspace/:/workspace/:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
         -exc \
         -- \
-        "find /root/mount/ ; find /workspace/"
+        "find /root/mount2/ ; find /workspace/"
