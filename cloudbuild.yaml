@@ -28,12 +28,12 @@ steps:
     ls -Rla config
     ls -Rla wordpress
     docker run \
-        --volume "/workspace/kube:/kube:ro" \
-        --volume "/workspace/config:/config:ro" \
+        --volume "/workspace/kube:/mount/.kube:ro" \
+        --volume "/workspace/config:/mount/.config:ro" \
         --volume "/workspace/wordpress:/wordpress:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
-        "find /kube/ ; find /config/ ; find /wordpress/ ; kubectl get namespace"
+        "source setup_kubeconfig.sh ; find /mount/.kube/ ; find /mount/.config/ ;  kubectl get namespace"
