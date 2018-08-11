@@ -39,6 +39,8 @@ APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
 
+MARKETPLACE_TOOLS_TAG = latest
+
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
 app/build:: .build/marketplace/dev \
