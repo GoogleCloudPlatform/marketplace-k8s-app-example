@@ -1,5 +1,4 @@
 TAG ?= latest
-MARKETPLACE_TOOLS_TAG = latest
 
 # crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile

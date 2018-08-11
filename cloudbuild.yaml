@@ -55,6 +55,8 @@ steps:
 
 - id: Fetch Wordpress Reporting Secret
   name: gcr.io/cloud-builders/gsutil
+  env:
+  - MARKETPLACE_TOOLS_TAG=latest
   args:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
@@ -73,6 +75,8 @@ steps:
 
 - id: Verify NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  env:
+  - MARKETPLACE_TOOLS_TAG=latest
   waitFor:
   - Initialized
   dir: nginx
