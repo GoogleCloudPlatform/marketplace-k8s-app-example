@@ -28,6 +28,8 @@ steps:
         --volume "/builder/home/.config:/root/mount/.config:ro" \
         --rm \
         gcr.io/cloud-builders/docker \
+        --entrypoint=bash \
+        -- \
         -x \
         -c \
         "find /root/mount/"
