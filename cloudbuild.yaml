@@ -73,7 +73,7 @@ steps:
   - |
     cp -r /builder/home/.kube /workspace/kube/
     cp -r /builder/home/.config /workspace/config/
-    find $$HOME/config/
+    find /workspace/config/
     docker run \
         --volume "/workspace/kube:/root/mount/.kube:ro" \
         --volume "/workspace/config:/root/mount/.config:ro" \
