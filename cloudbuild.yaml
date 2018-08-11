@@ -17,25 +17,6 @@ steps:
     git submodule sync --recursive
     git submodule update --init --recursive
 
-#- id: Fetch Service Account Key File
-#  name: gcr.io/cloud-builders/gsutil
-#  env:
-#  - MARKETPLACE_TOOLS_TAG=latest
-#  args:
-#  - cp
-#  - gs://cloud-marketplace-ops-test-kokoro/cloud-marketplace-ops-test-5cb3e979a3ae.json
-#  - cloud-marketplace-ops-test-5cb3e979a3ae.json
-#
-#- id: Authenticate as Service Account
-#  name: gcr.io/cloud-builders/gcloud
-#  waitFor:
-#  - Fetch Service Account Key File
-#  args:
-#  - auth
-#  - activate-service-account
-#  - --key-file
-#  - cloud-marketplace-ops-test-5cb3e979a3ae.json
-
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
   args:
@@ -66,7 +47,6 @@ steps:
   entrypoint: /bin/bash
   waitFor:
   - Get Kubernetes Credentials
-#  - Authenticate as Service Account
   - Build dev
   args:
   - -exc
@@ -84,4 +64,4 @@ steps:
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
-        "find /root/mount/ ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
+        "find /root/mount/ ; df -h ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
