@@ -60,7 +60,7 @@ app/verify: .build/wordpress/verify
 	    --volume "$(HOME)/.kube:/root/mount/.kube:ro" \
 	    --volume "$(HOME)/.config/gcloud:/root/mount/.config/gcloud:ro" \
 	    --rm \
-	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
+	    "gcr.io/cloud-marketplace-tools/k8s/dev:latest" \
 	    -- \
 	    -x \
 	    /scripts/verify \
