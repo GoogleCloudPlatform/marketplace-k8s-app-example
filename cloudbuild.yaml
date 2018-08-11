@@ -20,13 +20,13 @@ steps:
   args:
   - -exc
   - |
-    cp -r /builder/home/.kube /kube/
+    cp -r /builder/home/.kube kube/
     find /kube
-    cp -r /builder/home/.config /config/
+    cp -r /builder/home/.config config/
     find /config
     docker run \
-        --volume "/kube:/kube:ro" \
-        --volume "/config:/config:ro" \
+        --volume "kube:/kube:ro" \
+        --volume "config:/config:ro" \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-builders/docker \
