@@ -51,16 +51,16 @@ steps:
   args:
   - -exc
   - |
-    cp -r /builder/home/.kube /workspace/kube/
-    cp -r /builder/home/.config /workspace/config/
+    cp -r /builder/home/.kube /tmp/kube/
+    cp -r /builder/home/.config /tmp/config/
     df -h
     docker run \
-        --volume "/workspace/kube:/root/mount/.kube:ro" \
-        --volume "/workspace/config:/root/mount/.config:ro" \
+        --volume "/tmp/kube:/root/mount/.kube:ro" \
+        --volume "/tmp/config:/root/mount/.config:ro" \
         --link metadata:metadata.google.internal \
         --rm \
         --entrypoint=bash \
         gcr.io/cloud-marketplace-tools/k8s/dev:latest \
         -exc \
         -- \
-        "find /root/mount/ ; ls -l / ; df -h ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
+        "find /root/mount/ ; ls -l /root/ ; df -h ; source setup_kubeconfig.sh ; gcloud auth list ; kubectl get namespace"
