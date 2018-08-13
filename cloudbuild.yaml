@@ -5,6 +5,8 @@ steps:
   volumes:
   - name: kubeconfig
     path: /builder/home/.kube
+  - name: config
+    path: /builder/home/.config
   entrypoint: /bin/bash
   args:
   - -exc
@@ -25,6 +27,8 @@ steps:
   volumes:
   - name: kubeconfig
     path: /builder/home/.kube
+  - name: config
+    path: /builder/home/.config
   args:
   - container
   - clusters
@@ -57,6 +61,8 @@ steps:
   volumes:
   - name: kubeconfig
     path: /builder/home/.kube
+  - name: config
+    path: /builder/home/.config
   args:
   - -exc
   - |
