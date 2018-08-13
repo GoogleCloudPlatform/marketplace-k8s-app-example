@@ -3,8 +3,8 @@ steps:
 - id: Initialize git
   name: gcr.io/cloud-builders/git
   volumes:
-  - name: home
-    path: /builder/home
+  - name: kubeconfig
+    path: /builder/home/.kube
   entrypoint: /bin/bash
   args:
   - -exc
@@ -23,8 +23,8 @@ steps:
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
   volumes:
-  - name: home
-    path: /builder/home
+  - name: kubeconfig
+    path: /builder/home/.kube
   args:
   - container
   - clusters
@@ -55,8 +55,8 @@ steps:
   - Get Kubernetes Credentials
   - Build dev
   volumes:
-  - name: home
-    path: /builder/home
+  - name: kubeconfig
+    path: /builder/home/.kube
   args:
   - -exc
   - |
