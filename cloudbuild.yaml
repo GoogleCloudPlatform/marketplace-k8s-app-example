@@ -55,8 +55,8 @@ steps:
     cp -r /builder/home/.config /workspace/config/
     df -h
     docker run \
-        --volume "/workspace/kube:/root/mount/.kube:ro" \
-        --volume "/workspace/config:/root/mount/.config:ro" \
+        --mount "type=bind,source=/builder/home/.kube,target=/root/mount/.kube,readonly" \
+        --mount "type=bind,source=/builder/home/.config,target=/root/mount/.config,readonly" \
         --link metadata:metadata.google.internal \
         --rm \
         --entrypoint=bash \
