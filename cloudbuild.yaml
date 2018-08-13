@@ -60,6 +60,7 @@ steps:
   args:
   - -exc
   - |
+    ls -la /builder/home/
     cp -r /builder/home/.kube /workspace/kube/
     cp -r /builder/home/.config /workspace/config/
     df -h
