@@ -2,6 +2,9 @@ steps:
 
 - id: Initialize git
   name: gcr.io/cloud-builders/git
+  volumes:
+  - name: home
+    path: /builder/home
   entrypoint: /bin/bash
   args:
   - -exc
@@ -19,6 +22,9 @@ steps:
 
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
+  volumes:
+  - name: home
+    path: /builder/home
   args:
   - container
   - clusters
@@ -48,6 +54,9 @@ steps:
   waitFor:
   - Get Kubernetes Credentials
   - Build dev
+  volumes:
+  - name: home
+    path: /builder/home
   args:
   - -exc
   - |
@@ -55,8 +64,8 @@ steps:
     cp -r /builder/home/.config /workspace/config/
     df -h
     docker run \
-        --mount "type=tmpfs,source=/builder/home/.kube,target=/root/mount/.kube,readonly" \
-        --mount "type=tmpfs,source=/builder/home/.config,target=/root/mount/.config,readonly" \
+        --mount "type=bind,source=/builder/home/.kube,target=/root/mount/.kube,readonly" \
+        --mount "type=bind,source=/builder/home/.config,target=/root/mount/.config,readonly" \
         --link metadata:metadata.google.internal \
         --rm \
         --entrypoint=bash \
