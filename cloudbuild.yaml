@@ -142,11 +142,11 @@ steps:
 - id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local
   env:
-  - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/wordpress/deployer:local
+  - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID
   - |
     APP_PARAMETERS={
                      "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "gcr.io/$PROJECT_ID/example/wordpress/tester:local"
+                     "imageTester": "gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID"
                    }
   args:
   - -exc
