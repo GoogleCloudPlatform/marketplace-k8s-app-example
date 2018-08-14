@@ -118,15 +118,13 @@ steps:
   waitFor:
   - '-'
 
-# TODO: Replace with wellknown ubbagent image, once available.
 - id: Build Wordpress Ubbagent
   name: gcr.io/cloud-builders/docker
   dir: vendor/marketplace-tools/vendor/ubbagent
+  entrypoint: ubbagent/build
   args:
-  - build
-  - --tag
-  - gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID
-  - .
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
   waitFor:
   - Initialize git
 
