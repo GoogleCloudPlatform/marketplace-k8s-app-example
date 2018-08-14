@@ -9,6 +9,8 @@ steps:
   args:
   - -exc
   - |
+    [[ -e '.git' ]] && exit 0
+
     # Cloud Build x GitHub integration uses source archives to fetch
     # the source, rather than Git source fetching, and as a consequence
     # does not include the .git/ directory. As a workaround, we clone
