@@ -55,7 +55,7 @@ steps:
   entrypoint: deployer/build
   args:
   - --project_id=$PROJECT_ID
-  - --tag=$_TAG
+  - --tag=$BUILD_ID
   waitFor:
   - Pull cloud-marketplace-tools deployer_envsubst Image
 
@@ -65,7 +65,7 @@ steps:
   entrypoint: tester/build
   args:
   - --project_id=$PROJECT_ID
-  - --tag=$_TAG
+  - --tag=$BUILD_ID
   waitFor:
   - '-'
 
@@ -75,7 +75,7 @@ steps:
   entrypoint: wordpress/build
   args:
   - --project_id=$PROJECT_ID
-  - --tag=$_TAG
+  - --tag=$BUILD_ID
   waitFor:
   - '-'
 
@@ -85,7 +85,7 @@ steps:
   entrypoint: init/build
   args:
   - --project_id=$PROJECT_ID
-  - --tag=$_TAG
+  - --tag=$BUILD_ID
   waitFor:
   - '-'
 
@@ -95,7 +95,7 @@ steps:
   entrypoint: init/build
   args:
   - --project_id=$PROJECT_ID
-  - --tag=$_TAG
+  - --tag=$BUILD_ID
   waitFor:
   - '-'
 
@@ -145,6 +145,65 @@ steps:
   - Build Wordpress Mysql
   - Build Wordpress Ubbagent
   - Fetch Wordpress Reporting Secret
+
+- id: Publish Wordpress
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    [[ -z "$COMMIT_SHA" ]] && exit 0
+    [[ -z "$SHORT_SHA" ]] && exit 0
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/init:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/init:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/mysql:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/mysql:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
+  waitFor:
+  - Verify Wordpress
 
 # ######################
 # # NGINX Verification #
