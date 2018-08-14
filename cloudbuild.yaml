@@ -111,7 +111,7 @@ steps:
 - id: Build Wordpress Mysql
   name: gcr.io/cloud-builders/docker
   dir: wordpress
-  entrypoint: init/build
+  entrypoint: mysql/build
   args:
   - --project_id=$PROJECT_ID
   - --tag=$BUILD_ID
