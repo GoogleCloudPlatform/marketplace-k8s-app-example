@@ -125,7 +125,7 @@ steps:
   args:
   - build
   - --tag
-  - gcr.io/$PROJECT_ID/example/wordpress/ubbagent:local
+  - gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID
   - .
   waitFor:
   - Initialize git
