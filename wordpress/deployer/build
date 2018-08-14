@@ -38,8 +38,10 @@ done
 [[ -z "$tag" ]] && >&2 echo "--tag required" && exit 1
 
 docker build \
-  --build-arg "REGISTRY=gcr.io/$project_id/" \
-  --build-arg TAG=latest \
+  --build-arg "REGISTRY=gcr.io/$project_id/example/wordpress" \
+  --build-arg "TAG=$tag" \
   --tag "gcr.io/$project_id/example/wordpress/deployer:$tag" \
   --file deployer/Dockerfile \
   .
+
+docker push "gcr.io/$project_id/example/wordpress/deployer:$tag"

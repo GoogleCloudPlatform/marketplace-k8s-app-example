@@ -41,3 +41,5 @@ docker build \
   --tag "gcr.io/$project_id/example/wordpress/tester:$tag" \
   --file tester/Dockerfile \
   .
+
+docker push "gcr.io/$project_id/example/wordpress/tester:$tag"

@@ -41,3 +41,6 @@ docker build \
   --tag "gcr.io/$project_id/example/wordpress/mysql:$tag" \
   --file mysql/Dockerfile \
   .
+
+
+docker push "gcr.io/$project_id/example/wordpress/mysql:$tag"

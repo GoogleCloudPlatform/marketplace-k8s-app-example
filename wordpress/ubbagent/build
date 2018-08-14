@@ -41,3 +41,5 @@ docker build \
   --tag "gcr.io/$project_id/example/wordpress/ubbagent:$tag" \
   --file ubbagent/Dockerfile \
   .
+
+docker push "gcr.io/$project_id/example/wordpress/ubbagent:$tag"
