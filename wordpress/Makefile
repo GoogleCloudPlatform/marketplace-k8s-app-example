@@ -1,4 +1,4 @@
-TAG ?= local
+TAG ?= local-$(USER)
 
 # crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile
@@ -59,6 +59,7 @@ app/build:: .build/wordpress/deployer \
                            manifest/* \
                            schema.yaml \
                            .build/var/PROJECT_ID \
+                           .build/var/TAG \
                            | .build/wordpress
 	$(call print_target, $@)
 	deployer/build \
@@ -69,6 +70,7 @@ app/build:: .build/wordpress/deployer \
 
 .build/wordpress/tester: tester/* \
                          .build/var/PROJECT_ID \
+                         .build/var/TAG \
                          | .build/wordpress
 	$(call print_target, $@)
 	tester/build \
@@ -78,6 +80,7 @@ app/build:: .build/wordpress/deployer \
 
 .build/wordpress/wordpress: wordpress/* \
                             .build/var/PROJECT_ID \
+                            .build/var/TAG \
                             | .build/wordpress
 	$(call print_target, $@)
 	wordpress/build \
@@ -88,6 +91,7 @@ app/build:: .build/wordpress/deployer \
 # Build secondary app image.
 .build/wordpress/init: init/* \
                        .build/var/PROJECT_ID \
+                       .build/var/TAG \
                        | .build/wordpress
 	$(call print_target, $@)
 	init/build \
@@ -97,6 +101,7 @@ app/build:: .build/wordpress/deployer \
 
 .build/wordpress/mysql: mysql/* \
                         .build/var/PROJECT_ID \
+                        .build/var/TAG \
                         | .build/wordpress
 	$(call print_target, $@)
 	mysql/build \
@@ -106,6 +111,7 @@ app/build:: .build/wordpress/deployer \
 
 .build/wordpress/ubbagent: .build/ubbagent/ubbagent \
                            .build/var/PROJECT_ID \
+                           .build/var/TAG \
                            ubbagent/* \
                            | .build/wordpress
 	$(call print_target, $@)
