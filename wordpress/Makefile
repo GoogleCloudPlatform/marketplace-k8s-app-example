@@ -61,7 +61,9 @@ app/build:: .build/wordpress/deployer \
                            .build/var/PROJECT_ID \
                            | .build/wordpress
 	$(call print_target, $@)
-	PROJECT_ID="$(PROJECT_ID)" MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" deployer/build
+	deployer/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 
@@ -69,14 +71,18 @@ app/build:: .build/wordpress/deployer \
                          .build/var/PROJECT_ID \
                          | .build/wordpress
 	$(call print_target, $@)
-	PROJECT_ID="$(PROJECT_ID)" tester/build
+	tester/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 .build/wordpress/wordpress: wordpress/* \
                             .build/var/PROJECT_ID \
                             | .build/wordpress
 	$(call print_target, $@)
-	PROJECT_ID="$(PROJECT_ID)" wordpress/build
+	wordpress/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 # Build secondary app image.
@@ -84,14 +90,18 @@ app/build:: .build/wordpress/deployer \
                        .build/var/PROJECT_ID \
                        | .build/wordpress
 	$(call print_target, $@)
-	PROJECT_ID="$(PROJECT_ID)" init/build
+	init/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 .build/wordpress/mysql: mysql/* \
                         .build/var/PROJECT_ID \
                         | .build/wordpress
 	$(call print_target, $@)
-	PROJECT_ID="$(PROJECT_ID)" mysql/build
+	mysql/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 .build/wordpress/ubbagent: .build/ubbagent/ubbagent \
@@ -99,5 +109,7 @@ app/build:: .build/wordpress/deployer \
                            ubbagent/* \
                            | .build/wordpress
 	$(call print_target, $@)
-	PROJECT_ID="$(PROJECT_ID)" ubbagent/build
+	ubbagent/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
