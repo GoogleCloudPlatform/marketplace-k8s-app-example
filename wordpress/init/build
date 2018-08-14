@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+docker build \
+  --tag "gcr.io/$PROJECT_ID/example/wordpress/init:local" \
+  --file init/Dockerfile \
+  init/

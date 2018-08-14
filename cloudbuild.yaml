@@ -1,23 +1,26 @@
+options:
+ machineType: 'N1_HIGHCPU_8'
+
 steps:
 
-# Initializations
-
-- id: Initialize git
-  name: gcr.io/cloud-builders/git
-  entrypoint: /bin/bash
-  args:
-  - -exc
-  - |
-    # Cloud Build x GitHub integration uses source archives to fetch
-    # the source, rather than Git source fetching, and as a consequence
-    # does not include the .git/ directory. As a workaround, we clone
-    # the repository and reset it to this build's commit sha.
-    git clone 'https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example.git' tmp
-    mv tmp/.git .git
-    rm -rf tmp
-    git reset "$COMMIT_SHA"
-    git submodule sync --recursive
-    git submodule update --init --recursive
+# # Initializations
+# 
+# - id: Initialize git
+#   name: gcr.io/cloud-builders/git
+#   entrypoint: /bin/bash
+#   args:
+#   - -exc
+#   - |
+#     # Cloud Build x GitHub integration uses source archives to fetch
+#     # the source, rather than Git source fetching, and as a consequence
+#     # does not include the .git/ directory. As a workaround, we clone
+#     # the repository and reset it to this build's commit sha.
+#     git clone 'https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example.git' tmp
+#     mv tmp/.git .git
+#     rm -rf tmp
+#     git reset "$COMMIT_SHA"
+#     git submodule sync --recursive
+#     git submodule update --init --recursive
 
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
@@ -25,19 +28,102 @@ steps:
   - container
   - clusters
   - get-credentials
-  - "limani-integ"
+  - cluster-1
   - --region
-  - "us-central1"
+  - us-west1-a
   - --project
-  - "$PROJECT_ID"
-
-- id: Initialized
-  name: bash
+  - $PROJECT_ID
   waitFor:
-  - Initialize git
-  - Get Kubernetes Credentials
+  - '-'
 
-# Wordpress Verification
+- id: Pull cloud-marketplace-tools deployer_envsubst Image
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    MARKETPLACE_TOOLS_TAG=sha_52378efdad5b9da6885f37ae53959c73464c4ffd
+
+    docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$MARKETPLACE_TOOLS_TAG
+    docker tag gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$MARKETPLACE_TOOLS_TAG \
+        gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:local
+  waitFor:
+  - '-'
+
+- id: Pull cloud-marketplace-tools dev Image
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    MARKETPLACE_TOOLS_TAG=sha_52378efdad5b9da6885f37ae53959c73464c4ffd
+
+    docker pull gcr.io/cloud-marketplace-tools/k8s/dev:$$MARKETPLACE_TOOLS_TAG
+    docker tag gcr.io/cloud-marketplace-tools/k8s/dev:$$MARKETPLACE_TOOLS_TAG \
+        gcr.io/cloud-marketplace-tools/k8s/dev:local
+  waitFor:
+  - '-'
+
+#############
+# Wordpress #
+#############
+
+- id: Build Wordpress Deployer
+  name: gcr.io/cloud-builders/docker
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  dir: wordpress
+  entrypoint: deployer/build
+  waitFor:
+  - Pull cloud-marketplace-tools deployer_envsubst Image
+
+- id: Build Wordpress Tester
+  name: gcr.io/cloud-builders/docker
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  dir: wordpress
+  entrypoint: tester/build
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Image
+  name: gcr.io/cloud-builders/docker
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  dir: wordpress
+  entrypoint: wordpress/build
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Init
+  name: gcr.io/cloud-builders/docker
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  dir: wordpress
+  entrypoint: init/build
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Mysql
+  name: gcr.io/cloud-builders/docker
+  env:
+  - PROJECT_ID=$PROJECT_ID
+  dir: wordpress
+  entrypoint: init/build
+  waitFor:
+  - '-'
+
+# TODO: Replace with wellknown ubbagent image, once available.
+- id: Build Wordpress Ubbagent
+  name: gcr.io/cloud-builders/docker
+  dir: vendor/marketplace-tools/vendor/ubbagent
+  args:
+  - build
+  - --tag
+  - gcr.io/$PROJECT_ID/example/wordpress/ubbagent:local
+  - .
+  waitFor:
+  - '-'
 
 - id: Fetch Wordpress Reporting Secret
   name: gcr.io/cloud-builders/gsutil
@@ -45,28 +131,17 @@ steps:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
   - reporting-secret.json
-
-- id: Build Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - Initialized
-  dir: wordpress
-  args:
-  - -exc
-  - make -j4 clean app/build
+  - '-'
 
 - id: Verify Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - Initialized
-  - Build Wordpress
-  - Fetch Wordpress Reporting Secret
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
   env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
+  - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/wordpress/deployer:local
   - |
     APP_PARAMETERS={
                      "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
+                     "imageTester": "gcr.io/$PROJECT_ID/example/wordpress/tester:local"
                    }
   args:
   - -exc
@@ -74,32 +149,26 @@ steps:
     /scripts/driver_internal.sh \
         --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
-
-# NGINX Verification
-
-- id: Build NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - Initialized
-  dir: nginx
-  args:
-  - -exc
-  - make -j4 clean app/build
+  - Pull cloud-marketplace-tools dev Image
+  - Get Kubernetes Credentials
+  - Build Wordpress Deployer
+  - Build Wordpress Tester
+  - Build Wordpress Image
+  - Build Wordpress Init
+  - Build Wordpress Mysql
+  - Build Wordpress Ubbagent
+  - Fetch Wordpress Reporting Secret
 
-- id: Verify NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
-  waitFor:
-  - Initialized
-  - Build NGINX
-  env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
-                   }
-  args:
-  - -exc
-  - |
-    /scripts/driver_internal.sh \
-        --deployer="$$APP_DEPLOYER" \
-        --parameters="$$APP_PARAMETERS"
+# ######################
+# # NGINX Verification #
+# ######################
+# 
+# - id: Verify NGINX
+#   name: gcr.io/cloud-marketplace-tools/k8s/dev:sha_8f95946d0f7df2bdaad674a226e73df4aceeccc1
+#   waitFor:
+#   - Get Kubernetes Credentials
+#   dir: nginx
+#   args:
+#   - -exc
+#   - make -j4 clean app/verify

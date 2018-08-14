@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+docker build \
+  --build-arg "REGISTRY=gcr.io/$PROJECT_ID/" \
+  --build-arg TAG=latest \
+  --tag "gcr.io/$PROJECT_ID/example/wordpress/deployer:local" \
+  --file deployer/Dockerfile \
+  .

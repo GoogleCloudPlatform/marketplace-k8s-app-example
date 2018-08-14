@@ -52,7 +52,6 @@ app/build:: .build/nginx/deployer \
                        nginx/* \
                        nginx/templates/* \
                        schema.yaml \
-                       .build/marketplace/deployer/helm \
                        .build/var/APP_DEPLOYER_IMAGE \
                        .build/var/REGISTRY \
                        .build/var/TAG \
