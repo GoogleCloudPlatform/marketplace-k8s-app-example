@@ -120,7 +120,7 @@ steps:
 
 - id: Build Wordpress Ubbagent
   name: gcr.io/cloud-builders/docker
-  dir: vendor/marketplace-tools/vendor/ubbagent
+  dir: wordpress
   entrypoint: ubbagent/build
   args:
   - --project_id=$PROJECT_ID
