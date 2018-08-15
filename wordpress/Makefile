@@ -44,23 +44,26 @@ MARKETPLACE_TOOLS_TAG ?= sha_52378efdad5b9da6885f37ae53959c73464c4ffd
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/wordpress/deployer \
-            .build/wordpress/init \
-            .build/wordpress/mysql \
-            .build/wordpress/tester \
-            .build/wordpress/ubbagent \
-            .build/wordpress/wordpress
+app/build:: \
+		.build/wordpress/deployer \
+		.build/wordpress/init \
+		.build/wordpress/mysql \
+		.build/wordpress/tester \
+		.build/wordpress/ubbagent \
+		.build/wordpress/wordpress
 
 
-.build/wordpress: | .build
+.build/wordpress: \
+		| .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: deployer/* \
-                           manifest/* \
-                           schema.yaml \
-                           .build/var/PROJECT_ID \
-                           .build/var/TAG \
-                           | .build/wordpress
+.build/wordpress/deployer: \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		deployer/* \
+		manifest/* \
+		schema.yaml \
+		| .build/wordpress
 	$(call print_target, $@)
 	deployer/build \
 	  --project_id=$(PROJECT_ID) \
@@ -68,20 +71,22 @@ app/build:: .build/wordpress/deployer \
 	@touch "$@"
 
 
-.build/wordpress/tester: tester/* \
-                         .build/var/PROJECT_ID \
-                         .build/var/TAG \
-                         | .build/wordpress
+.build/wordpress/tester: \
+		tester/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
 	tester/build \
 	  --project_id=$(PROJECT_ID) \
 	  --tag=$(TAG)
 	@touch "$@"
 
-.build/wordpress/wordpress: wordpress/* \
-                            .build/var/PROJECT_ID \
-                            .build/var/TAG \
-                            | .build/wordpress
+.build/wordpress/wordpress: \
+		wordpress/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
 	wordpress/build \
 	  --project_id=$(PROJECT_ID) \
@@ -89,31 +94,34 @@ app/build:: .build/wordpress/deployer \
 	@touch "$@"
 
 # Build secondary app image.
-.build/wordpress/init: init/* \
-                       .build/var/PROJECT_ID \
-                       .build/var/TAG \
-                       | .build/wordpress
+.build/wordpress/init: \
+		init/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
 	init/build \
 	  --project_id=$(PROJECT_ID) \
 	  --tag=$(TAG)
 	@touch "$@"
 
-.build/wordpress/mysql: mysql/* \
-                        .build/var/PROJECT_ID \
-                        .build/var/TAG \
-                        | .build/wordpress
+.build/wordpress/mysql: \
+		mysql/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
 	mysql/build \
 	  --project_id=$(PROJECT_ID) \
 	  --tag=$(TAG)
 	@touch "$@"
 
-.build/wordpress/ubbagent: .build/ubbagent/ubbagent \
-                           .build/var/PROJECT_ID \
-                           .build/var/TAG \
-                           ubbagent/* \
-                           | .build/wordpress
+.build/wordpress/ubbagent: \
+		.build/ubbagent/ubbagent \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		ubbagent/* \
+		| .build/wordpress
 	$(call print_target, $@)
 	ubbagent/build \
 	  --project_id=$(PROJECT_ID) \
