@@ -1,4 +1,4 @@
-TAG ?= latest
+TAG ?= local-$(USER)
 
 # crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile
@@ -35,54 +35,59 @@ APP_TEST_PARAMETERS ?= { \
   "tester.image": "$(TESTER_IMAGE)" \
 }
 
+PROJECT_ID ?= $(shell gcloud config get-value project)
+MARKETPLACE_TOOLS_TAG ?= sha_52378efdad5b9da6885f37ae53959c73464c4ffd
+
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/nginx/deployer \
-            .build/nginx/nginx \
-            .build/nginx/tester
+app/build:: \
+		.build/nginx/deployer \
+		.build/nginx/nginx \
+		.build/nginx/tester
 
 
-.build/nginx: | .build
+.build/nginx: \
+		| .build
 	mkdir -p "$@"
 
-.build/nginx/deployer: apptest/deployer/* \
-                       apptest/deployer/nginx/* \
-                       apptest/deployer/nginx/templates/* \
-                       deployer/* \
-                       nginx/* \
-                       nginx/templates/* \
-                       schema.yaml \
-                       .build/var/APP_DEPLOYER_IMAGE \
-                       .build/var/REGISTRY \
-                       .build/var/TAG \
-                       | .build/nginx
+.build/nginx/deployer: \
+		deployer/* \
+		deployer/apptest/deployer/* \
+		deployer/apptest/deployer/nginx/* \
+		deployer/apptest/deployer/nginx/templates/* \
+		deployer/nginx/* \
+		deployer/nginx/templates/* \
+		schema.yaml \
+		.build/var/APP_DEPLOYER_IMAGE \
+		.build/var/REGISTRY \
+		.build/var/TAG \
+		| .build/nginx
 	$(call print_target, $@)
-	docker build \
-	    --build-arg REGISTRY="$(REGISTRY)" \
-	    --build-arg TAG="$(TAG)" \
-	    --tag "$(APP_DEPLOYER_IMAGE)" \
-	    -f deployer/Dockerfile \
-	    .
-	docker push "$(APP_DEPLOYER_IMAGE)"
+	deployer/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 
-.build/nginx/tester: .build/var/TESTER_IMAGE \
-                     | .build/nginx
+.build/nginx/tester: \
+		tester/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/nginx
 	$(call print_target, $@)
-	docker pull cosmintitei/bash-curl
-	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
-	docker push "$(TESTER_IMAGE)"
+	tester/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 
-# Simulate building of primary app image. Actually just copying public image to
-# local registry.
-.build/nginx/nginx: .build/var/REGISTRY \
-                    .build/var/TAG \
-                    | .build/nginx
+.build/nginx/nginx: \
+		nginx/* \
+		.build/var/REGISTRY \
+		.build/var/TAG \
+		| .build/nginx
 	$(call print_target, $@)
-	docker pull launcher.gcr.io/google/nginx1
-	docker tag launcher.gcr.io/google/nginx1 "$(REGISTRY)/example/nginx:$(TAG)"
-	docker push "$(REGISTRY)/example/nginx:$(TAG)"
+	nginx/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
