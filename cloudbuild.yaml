@@ -157,7 +157,7 @@ steps:
   - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID
   - |
     APP_PARAMETERS={
-                     "reportingSecret": "file://reporting-secret.json",
+                     "reportingSecret": "file://reporting-secret.json"
                    }
   args:
   - -exc
