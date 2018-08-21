@@ -162,7 +162,7 @@ steps:
   args:
   - -exc
   - |
-    /scripts/driver_internal.sh \
+    /scripts/verify \
         --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
   waitFor:
@@ -274,7 +274,7 @@ steps:
   args:
   - -exc
   - |
-    /scripts/driver_internal.sh \
+    /scripts/verify \
         --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
   waitFor:
