@@ -36,7 +36,6 @@ APP_TEST_PARAMETERS ?= { \
 }
 
 PROJECT_ID ?= $(shell gcloud config get-value project)
-MARKETPLACE_TOOLS_TAG ?= sha_52378efdad5b9da6885f37ae53959c73464c4ffd
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.

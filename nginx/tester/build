@@ -38,8 +38,8 @@ done
 [[ -z "$tag" ]] && >&2 echo "--tag required" && exit 1
 
 docker build \
-  --tag "gcr.io/$project_id/example/wordpress/tester:$tag" \
+  --tag "gcr.io/$project_id/example/nginx/tester:$tag" \
   --file tester/Dockerfile \
   .
 
-docker push "gcr.io/$project_id/example/wordpress/tester:$tag"
+docker push "gcr.io/$project_id/example/nginx/tester:$tag"
