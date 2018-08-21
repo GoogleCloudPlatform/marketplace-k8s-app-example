@@ -187,51 +187,39 @@ steps:
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/init:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/init:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/mysql:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/mysql:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
   waitFor:
   - Verify Wordpress
 
@@ -299,26 +287,40 @@ steps:
 
     docker tag gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/nginx/tester:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/nginx/tester:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/nginx:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
-    docker push gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
 
     docker tag gcr.io/$PROJECT_ID/example/nginx:$BUILD_ID \
                gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA
-    docker push gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA
   waitFor:
   - Verify Nginx
+
+images:
+- gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA
