@@ -42,11 +42,25 @@ steps:
   args:
   - -exc
   - |
-    MARKETPLACE_TOOLS_TAG=sha_52378efdad5b9da6885f37ae53959c73464c4ffd
+    MARKETPLACE_TOOLS_TAG=sha_7c70bcd83a8c490a11f93abfc4ec7a5f39c61ab6
 
     docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$MARKETPLACE_TOOLS_TAG
     docker tag gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$MARKETPLACE_TOOLS_TAG \
         gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:local
+  waitFor:
+  - '-'
+
+- id: Pull cloud-marketplace-tools deployer_helm Image
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    MARKETPLACE_TOOLS_TAG=sha_7c70bcd83a8c490a11f93abfc4ec7a5f39c61ab6
+
+    docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_helm:$$MARKETPLACE_TOOLS_TAG
+    docker tag gcr.io/cloud-marketplace-tools/k8s/deployer_helm:$$MARKETPLACE_TOOLS_TAG \
+        gcr.io/cloud-marketplace-tools/k8s/deployer_helm:local
   waitFor:
   - '-'
 
@@ -56,7 +70,7 @@ steps:
   args:
   - -exc
   - |
-    MARKETPLACE_TOOLS_TAG=sha_52378efdad5b9da6885f37ae53959c73464c4ffd
+    MARKETPLACE_TOOLS_TAG=sha_7c70bcd83a8c490a11f93abfc4ec7a5f39c61ab6
 
     docker pull gcr.io/cloud-marketplace-tools/k8s/dev:$$MARKETPLACE_TOOLS_TAG
     docker tag gcr.io/cloud-marketplace-tools/k8s/dev:$$MARKETPLACE_TOOLS_TAG \
@@ -144,7 +158,6 @@ steps:
   - |
     APP_PARAMETERS={
                      "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID"
                    }
   args:
   - -exc
@@ -222,15 +235,86 @@ steps:
   waitFor:
   - Verify Wordpress
 
-# ######################
-# # NGINX Verification #
-# ######################
-# 
-# - id: Verify NGINX
-#   name: gcr.io/cloud-marketplace-tools/k8s/dev:sha_8f95946d0f7df2bdaad674a226e73df4aceeccc1
-#   waitFor:
-#   - Get Kubernetes Credentials
-#   dir: nginx
-#   args:
-#   - -exc
-#   - make -j4 clean app/verify
+######################
+# NGINX Verification #
+######################
+
+- id: Build Nginx Deployer
+  name: gcr.io/cloud-builders/docker
+  dir: nginx
+  entrypoint: deployer/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - Pull cloud-marketplace-tools deployer_helm Image
+
+- id: Build Nginx Tester
+  name: gcr.io/cloud-builders/docker
+  dir: nginx
+  entrypoint: tester/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+
+- id: Build Nginx Image
+  name: gcr.io/cloud-builders/docker
+  dir: nginx
+  entrypoint: nginx/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+
+- id: Verify Nginx
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
+  env:
+  - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID
+  - |
+    APP_PARAMETERS={}
+  args:
+  - -exc
+  - |
+    /scripts/driver_internal.sh \
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"
+  waitFor:
+  - Pull cloud-marketplace-tools dev Image
+  - Get Kubernetes Credentials
+  - Build Nginx Deployer
+  - Build Nginx Tester
+  - Build Nginx Image
+
+- id: Publish Nginx
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    [[ -z "$COMMIT_SHA" ]] && exit 0
+    [[ -z "$SHORT_SHA" ]] && exit 0
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
+    docker push gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA
+    docker push gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA
+  waitFor:
+  - Verify Nginx
