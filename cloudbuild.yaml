@@ -256,6 +256,8 @@ steps:
   args:
   - --project_id=$PROJECT_ID
   - --tag=$BUILD_ID
+  waitFor:
+  - '-'
 
 - id: Build Nginx Image
   name: gcr.io/cloud-builders/docker
@@ -264,6 +266,8 @@ steps:
   args:
   - --project_id=$PROJECT_ID
   - --tag=$BUILD_ID
+  waitFor:
+  - '-'
 
 - id: Verify Nginx
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local
