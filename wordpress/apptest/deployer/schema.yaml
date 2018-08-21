@@ -1,3 +1,6 @@
 properties:
   imageTester:
     type: string
+    default: $REGISTRY/example/wordpress/tester:$TAG
+    x-google-marketplace:
+      type: IMAGE
