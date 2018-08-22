@@ -1,11 +1,6 @@
 properties:
   tester.image:
     type: string
-    default: $REGISTRY/example/nginx/tester:$TAG
+    default: $REGISTRY/tester:$TAG
     x-google-marketplace:
       type: IMAGE
-      image:
-        generatedProperties:
-          splitByColon:
-            before: imageNginx.repo
-            after: imageNginx.tag
