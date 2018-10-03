@@ -85,7 +85,7 @@ steps:
   args:
   - -exc
   - |
-    /scripts/verify
+    /scripts/verify \
         --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
 
@@ -114,6 +114,6 @@ steps:
   args:
   - -exc
   - |
-    /scripts/verify
+    /scripts/verify \
         --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
