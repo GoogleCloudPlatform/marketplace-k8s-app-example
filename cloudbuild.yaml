@@ -35,7 +35,7 @@ steps:
   name: gcr.io/cloud-builders/docker
   waitFor:
   - Initialize git
-  dir: k8s/vendor/marketplace-tools
+  dir: vendor/marketplace-tools
   entrypoint: bash
   args:
   - -exc
