@@ -76,7 +76,7 @@ steps:
   - Build Wordpress
   - Fetch Wordpress Reporting Secret
   env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:local
+  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
   - |
     APP_PARAMETERS={
                      "reportingSecret": "file://reporting-secret.json",
