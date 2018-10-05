@@ -1,3 +1,4 @@
+ARG MARKETPLACE_TOOLS_TAG
 FROM launcher.gcr.io/google/debian9 AS build
 
 RUN apt-get update \
@@ -13,8 +14,7 @@ RUN cat /tmp/schema.yaml \
     > /tmp/schema.yaml.new \
     && mv /tmp/schema.yaml.new /tmp/schema.yaml
 
-
-FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst
+FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$MARKETPLACE_TOOLS_TAG
 
 COPY manifest /data/manifest
 COPY apptest/deployer /data-test/

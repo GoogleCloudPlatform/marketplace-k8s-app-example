@@ -55,6 +55,7 @@ app/build:: .build/marketplace/dev \
 
 .build/wordpress/deployer: .build/marketplace/deployer/envsubst \
                            .build/var/APP_DEPLOYER_IMAGE \
+                           .build/var/MARKETPLACE_TOOLS_TAG \
                            .build/var/REGISTRY \
                            .build/var/TAG \
                            apptest/deployer/* \
@@ -67,6 +68,7 @@ app/build:: .build/marketplace/dev \
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)/example/wordpress" \
 	    --build-arg TAG="$(TAG)" \
+	    --build-arg MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .

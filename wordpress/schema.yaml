@@ -60,6 +60,10 @@ properties:
     type: string
     x-google-marketplace:
       type: REPORTING_SECRET
+  applicationUid:
+    type: string
+    x-google-marketplace:
+      type: APPLICATION_UID
 required:
 - name
 - namespace
