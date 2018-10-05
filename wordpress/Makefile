@@ -1,4 +1,4 @@
-TAG ?= latest
+TAG ?= local-$(USER)
 
 # crd.Makefile provides targets to install Application CRD.
 include ../vendor/marketplace-tools/crd.Makefile
@@ -32,93 +32,97 @@ APP_PARAMETERS ?= { \
   "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
   "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
   "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
-  "reportingSecret": "$(NAME)-reporting-secret" \
+  "reportingSecret": "gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
 
+PROJECT_ID ?= $(shell gcloud config get-value project)
+
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/marketplace/dev \
-            .build/wordpress/deployer \
-            .build/wordpress/init \
-            .build/wordpress/mysql \
-            .build/wordpress/tester \
-            .build/wordpress/ubbagent \
-            .build/wordpress/wordpress
+app/build:: \
+		.build/wordpress/deployer \
+		.build/wordpress/init \
+		.build/wordpress/mysql \
+		.build/wordpress/tester \
+		.build/wordpress/ubbagent \
+		.build/wordpress/wordpress
 
 
-.build/wordpress: | .build
+.build/wordpress: \
+		| .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: .build/marketplace/deployer/envsubst \
-                           .build/var/APP_DEPLOYER_IMAGE \
-                           .build/var/REGISTRY \
-                           .build/var/TAG \
-                           apptest/deployer/* \
-                           apptest/deployer/manifest/* \
-                           deployer/* \
-                           manifest/* \
-                           schema.yaml \
-                           | .build/wordpress
+.build/wordpress/deployer: \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		deployer/* \
+		manifest/* \
+		schema.yaml \
+		| .build/wordpress
 	$(call print_target, $@)
-	docker build \
-	    --build-arg REGISTRY="$(REGISTRY)/example/wordpress" \
-	    --build-arg TAG="$(TAG)" \
-	    --tag "$(APP_DEPLOYER_IMAGE)" \
-	    -f deployer/Dockerfile \
-	    .
-	docker push "$(APP_DEPLOYER_IMAGE)"
+	deployer/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 
-.build/wordpress/tester: .build/var/TESTER_IMAGE
+.build/wordpress/tester: \
+		tester/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
-	docker pull cosmintitei/bash-curl
-	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
-	docker push "$(TESTER_IMAGE)"
+	tester/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
-# Simulate building of primary app image. Actually just copying public image to
-# local registry.
-.build/wordpress/wordpress: .build/var/REGISTRY \
-                            .build/var/TAG \
-                            | .build/wordpress
+.build/wordpress/wordpress: \
+		wordpress/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
-	docker pull launcher.gcr.io/google/wordpress4-php5-apache
-	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/example/wordpress:$(TAG)"
-	docker push "$(REGISTRY)/example/wordpress:$(TAG)"
+	wordpress/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
 # Build secondary app image.
-.build/wordpress/init: init/* \
-                       .build/var/REGISTRY \
-                       .build/var/TAG \
-                       | .build/wordpress
+.build/wordpress/init: \
+		init/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
-	cd init \
-	&& docker build --tag "$(REGISTRY)/example/wordpress/init:$(TAG)" .
-	docker push "$(REGISTRY)/example/wordpress/init:$(TAG)"
+	init/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
-# Relocate public mysql image to $REGISTRY.
-.build/wordpress/mysql: .build/var/REGISTRY \
-                        .build/var/TAG \
-                        | .build/wordpress
+.build/wordpress/mysql: \
+		mysql/* \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		| .build/wordpress
 	$(call print_target, $@)
-	docker pull launcher.gcr.io/google/mysql5
-	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/example/wordpress/mysql:$(TAG)"
-	docker push "$(REGISTRY)/example/wordpress/mysql:$(TAG)"
+	mysql/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"
 
-# Relocate ubbagent image to $REGISTRY.
-.build/wordpress/ubbagent: .build/ubbagent/ubbagent \
-                           .build/var/REGISTRY \
-                           .build/var/TAG \
-                           | .build/wordpress
+.build/wordpress/ubbagent: \
+		.build/ubbagent/ubbagent \
+		.build/var/PROJECT_ID \
+		.build/var/TAG \
+		ubbagent/* \
+		| .build/wordpress
 	$(call print_target, $@)
-	docker tag "gcr.io/cloud-marketplace-tools/ubbagent" "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
-	docker push "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
+	ubbagent/build \
+	  --project_id=$(PROJECT_ID) \
+	  --tag=$(TAG)
 	@touch "$@"

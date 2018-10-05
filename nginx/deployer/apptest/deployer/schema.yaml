@@ -1,5 +1,5 @@
 properties:
-  imageTester:
+  tester.image:
     type: string
     default: $REGISTRY/tester:$TAG
     x-google-marketplace:

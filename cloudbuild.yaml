@@ -1,6 +1,7 @@
-steps:
+options:
+ machineType: 'N1_HIGHCPU_8'
 
-# Initializations
+steps:
 
 - id: Initialize git
   name: gcr.io/cloud-builders/git
@@ -8,6 +9,8 @@ steps:
   args:
   - -exc
   - |
+    [[ -e '.git' ]] && exit 0
+
     # Cloud Build x GitHub integration uses source archives to fetch
     # the source, rather than Git source fetching, and as a consequence
     # does not include the .git/ directory. As a workaround, we clone
@@ -25,19 +28,119 @@ steps:
   - container
   - clusters
   - get-credentials
-  - "limani-integ"
+  - cluster-1
   - --region
-  - "us-central1"
+  - us-west1-a
   - --project
-  - "$PROJECT_ID"
+  - $PROJECT_ID
+  waitFor:
+  - '-'
 
-- id: Initialized
-  name: bash
+- id: Pull cloud-marketplace-tools deployer_envsubst Image
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    MARKETPLACE_TOOLS_TAG=sha_7c70bcd83a8c490a11f93abfc4ec7a5f39c61ab6
+
+    docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$MARKETPLACE_TOOLS_TAG
+    docker tag gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$MARKETPLACE_TOOLS_TAG \
+        gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:local
+  waitFor:
+  - '-'
+
+- id: Pull cloud-marketplace-tools deployer_helm Image
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    MARKETPLACE_TOOLS_TAG=sha_7c70bcd83a8c490a11f93abfc4ec7a5f39c61ab6
+
+    docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_helm:$$MARKETPLACE_TOOLS_TAG
+    docker tag gcr.io/cloud-marketplace-tools/k8s/deployer_helm:$$MARKETPLACE_TOOLS_TAG \
+        gcr.io/cloud-marketplace-tools/k8s/deployer_helm:local
+  waitFor:
+  - '-'
+
+- id: Pull cloud-marketplace-tools dev Image
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    MARKETPLACE_TOOLS_TAG=sha_7c70bcd83a8c490a11f93abfc4ec7a5f39c61ab6
+
+    docker pull gcr.io/cloud-marketplace-tools/k8s/dev:$$MARKETPLACE_TOOLS_TAG
+    docker tag gcr.io/cloud-marketplace-tools/k8s/dev:$$MARKETPLACE_TOOLS_TAG \
+        gcr.io/cloud-marketplace-tools/k8s/dev:local
+  waitFor:
+  - '-'
+
+#############
+# Wordpress #
+#############
+
+- id: Build Wordpress Deployer
+  name: gcr.io/cloud-builders/docker
+  dir: wordpress
+  entrypoint: deployer/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - Pull cloud-marketplace-tools deployer_envsubst Image
+
+- id: Build Wordpress Tester
+  name: gcr.io/cloud-builders/docker
+  dir: wordpress
+  entrypoint: tester/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Image
+  name: gcr.io/cloud-builders/docker
+  dir: wordpress
+  entrypoint: wordpress/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Init
+  name: gcr.io/cloud-builders/docker
+  dir: wordpress
+  entrypoint: init/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Mysql
+  name: gcr.io/cloud-builders/docker
+  dir: wordpress
+  entrypoint: mysql/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - '-'
+
+- id: Build Wordpress Ubbagent
+  name: gcr.io/cloud-builders/docker
+  dir: wordpress
+  entrypoint: ubbagent/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
   waitFor:
   - Initialize git
-  - Get Kubernetes Credentials
-
-# Wordpress Verification
 
 - id: Fetch Wordpress Reporting Secret
   name: gcr.io/cloud-builders/gsutil
@@ -45,61 +148,179 @@ steps:
   - cp
   - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
   - reporting-secret.json
-
-- id: Build Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
   waitFor:
-  - Initialized
-  dir: wordpress
-  args:
-  - -exc
-  - make -j4 clean app/build
+  - '-'
 
 - id: Verify Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
+  env:
+  - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID
+  - |
+    APP_PARAMETERS={
+                     "reportingSecret": "file://reporting-secret.json"
+                   }
+  args:
+  - -exc
+  - |
+    /scripts/verify \
+        --deployer="$$APP_DEPLOYER" \
+        --parameters="$$APP_PARAMETERS"
   waitFor:
-  - Initialized
-  - Build Wordpress
+  - Pull cloud-marketplace-tools dev Image
+  - Get Kubernetes Credentials
+  - Build Wordpress Deployer
+  - Build Wordpress Tester
+  - Build Wordpress Image
+  - Build Wordpress Init
+  - Build Wordpress Mysql
+  - Build Wordpress Ubbagent
   - Fetch Wordpress Reporting Secret
-  env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
-                   }
+
+- id: Publish Wordpress
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
   args:
   - -exc
   - |
-    /scripts/driver_internal.sh \
-        --deployer="$$APP_DEPLOYER" \
-        --parameters="$$APP_PARAMETERS"
+    [[ -z "$COMMIT_SHA" ]] && exit 0
+    [[ -z "$SHORT_SHA" ]] && exit 0
 
-# NGINX Verification
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
 
-- id: Build NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/init:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/init:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/mysql:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/mysql:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/wordpress/ubbagent:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
   waitFor:
-  - Initialized
+  - Verify Wordpress
+
+######################
+# NGINX Verification #
+######################
+
+- id: Build Nginx Deployer
+  name: gcr.io/cloud-builders/docker
   dir: nginx
+  entrypoint: deployer/build
   args:
-  - -exc
-  - make -j4 clean app/build
-
-- id: Verify NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:latest
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
   waitFor:
-  - Initialized
-  - Build NGINX
+  - Pull cloud-marketplace-tools deployer_helm Image
+
+- id: Build Nginx Tester
+  name: gcr.io/cloud-builders/docker
+  dir: nginx
+  entrypoint: tester/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - '-'
+
+- id: Build Nginx Image
+  name: gcr.io/cloud-builders/docker
+  dir: nginx
+  entrypoint: nginx/build
+  args:
+  - --project_id=$PROJECT_ID
+  - --tag=$BUILD_ID
+  waitFor:
+  - '-'
+
+- id: Verify Nginx
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
   env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
+  - APP_DEPLOYER=gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID
   - |
-    APP_PARAMETERS={
-                     "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
-                   }
+    APP_PARAMETERS={}
   args:
   - -exc
   - |
-    /scripts/driver_internal.sh \
+    /scripts/verify \
         --deployer="$$APP_DEPLOYER" \
         --parameters="$$APP_PARAMETERS"
+  waitFor:
+  - Pull cloud-marketplace-tools dev Image
+  - Get Kubernetes Credentials
+  - Build Nginx Deployer
+  - Build Nginx Tester
+  - Build Nginx Image
+
+- id: Publish Nginx
+  name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -exc
+  - |
+    [[ -z "$COMMIT_SHA" ]] && exit 0
+    [[ -z "$SHORT_SHA" ]] && exit 0
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/deployer:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx/tester:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
+
+    docker tag gcr.io/$PROJECT_ID/example/nginx:$BUILD_ID \
+               gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA
+  waitFor:
+  - Verify Nginx
+
+images:
+- gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/deployer:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/tester:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/init:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/init:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/mysql:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/wordpress/ubbagent:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/deployer:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/tester:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/nginx/tester:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/example/nginx:sha_$COMMIT_SHA
+- gcr.io/$PROJECT_ID/example/nginx:sha_$SHORT_SHA

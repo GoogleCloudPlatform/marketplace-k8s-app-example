@@ -1,0 +1,1 @@
+FROM cosmintitei/bash-curl
