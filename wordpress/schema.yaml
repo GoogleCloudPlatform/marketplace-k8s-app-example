@@ -73,5 +73,5 @@ required:
 - customBoolean
 - reportingSecret
 form:
-- widget: helper
+- widget: help
   description: My arbitrary <i>description</i>
