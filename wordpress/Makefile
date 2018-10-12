@@ -8,14 +8,11 @@ include ../vendor/marketplace-tools/crd.Makefile
 # gcloud and kubectl environments.
 include ../vendor/marketplace-tools/gcloud.Makefile
 
-# marketplace.Makefile provides targets such as
-# ".build/marketplace/deployer/envsubst" to build the base
-# deployer images locally.
-include ../vendor/marketplace-tools/marketplace.Makefile
-
 # ubbagent.Makefile provides ".build/ubbagent/ubbagent"
 # target to build the ubbagent image locally.
 include ../vendor/marketplace-tools/ubbagent.Makefile
+
+# var.Makefile provides .build/var/* targets.
 include ../vendor/marketplace-tools/var.Makefile
 
 # app.Makefile provides the main targets for installing the
@@ -53,7 +50,7 @@ app/build:: .build/marketplace/dev \
 .build/wordpress: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: .build/marketplace/deployer/envsubst \
+.build/wordpress/deployer: .build/app/base_deployer/envsubst \
                            .build/var/APP_DEPLOYER_IMAGE \
                            .build/var/REGISTRY \
                            .build/var/TAG \
