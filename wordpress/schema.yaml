@@ -72,3 +72,6 @@ required:
 - customInteger
 - customBoolean
 - reportingSecret
+form:
+- widget: help
+  description: My arbitrary <i>description</i>

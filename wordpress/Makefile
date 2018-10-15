@@ -32,7 +32,7 @@ APP_PARAMETERS ?= { \
   "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
   "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
   "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
-  "reportingSecret": "$(NAME)-reporting-secret" \
+  "reportingSecret": "gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
@@ -67,6 +67,7 @@ app/build:: .build/marketplace/dev \
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)/example/wordpress" \
 	    --build-arg TAG="$(TAG)" \
+	    --build-arg MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
