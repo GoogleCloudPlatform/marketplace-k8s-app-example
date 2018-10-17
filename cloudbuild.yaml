@@ -1,0 +1,9 @@
+steps:
+- id: Build helm/
+  name: gcr.io/cloud-builders/docker
+  dir: helm/
+  args:
+  - build
+  - --build-arg=HELM_DEPENDENCY_BUILD=true
+  - --tag=gcr.io/marketplace-k8s-app-example/helm/deployer:latest
+  - .
