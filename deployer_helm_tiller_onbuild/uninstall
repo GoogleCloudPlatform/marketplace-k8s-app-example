@@ -1,3 +1,0 @@
-#!/bin/bash -x
-
-kubectl delete applications/chartmuseum-1 --namespace default

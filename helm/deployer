@@ -1,0 +1,76 @@
+#!/bin/bash
+
+cd $(dirname "$0")
+
+export MARKETPLACE_TOOLS_TAG="sha_7209a962383653c0972f1ecf9b7ae09566157ac6"
+export DEPLOYER_IMAGE="gcr.io/marketplace-k8s-app-example/helm/deployer:latest"
+export NAME="application-1"
+export NAMESPACE="default"
+export PARAMETERS="{
+              \"name\": \"$NAME\",
+              \"namespace\": \"$NAMESPACE\",
+              \"marketplace-integration.image\": \"$DEPLOYER_IMAGE\"
+            }"
+
+function _setup_dev() {
+  export temp="$(mktemp -d)"
+  trap 'rm -rf "$temp"' EXIT
+  docker run "gcr.io/cloud-marketplace-tools/k8s/dev:$MARKETPLACE_TOOLS_TAG" cat /scripts/dev > "$temp/dev"
+  chmod +x "$temp/dev"
+}
+
+function build() {
+  docker build \
+      --build-arg="HELM_DEPENDENCY_BUILD=true" \
+      --tag="$DEPLOYER_IMAGE" \
+      .
+  
+  docker push "$DEPLOYER_IMAGE"
+}
+
+function install() {
+	_setup_dev
+
+  "$temp/dev" \
+    /scripts/install \
+        --deployer="$DEPLOYER_IMAGE" \
+        --parameters="$PARAMETERS"
+}
+
+function uninstall() {
+  kubectl delete "applications/$NAME" --namespace "$NAMESPACE"
+}
+
+function verify() {
+	_setup_dev
+
+  "$temp/dev" \
+    /scripts/verify \
+        --deployer="$DEPLOYER_IMAGE" \
+        --parameters="$PARAMETERS"
+}
+
+function helm_list() {
+  helm tiller run "$NAMESPACE" -- \
+    helm list
+}
+
+function helm_status() {
+  helm tiller run "$NAMESPACE" -- \
+    helm status "$NAME"
+}
+
+function helm_upgrade() {
+  export temp="$(mktemp -d)"
+  trap 'rm -rf "$temp"' EXIT
+  docker run --entrypoint bash "$DEPLOYER_IMAGE" -exc 'cat /data/chart/*' > "$temp/chart.tgz"
+  helm tiller run "$NAMESPACE" -- \
+    helm upgrade "$NAME" "$temp/chart.tgz"
+}
+
+function helm_delete() {
+  helm tiller run "$NAMESPACE" -- \
+    helm delete --purge "$NAME"
+}
+
+$@
