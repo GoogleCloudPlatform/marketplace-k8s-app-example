@@ -8,6 +8,10 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
+  deployerImage:
+    type: string
+    x-google-marketplace:
+      type: DEPLOYER_IMAGE
   imageWordpress:
     type: string
     default: $REGISTRY:$TAG
@@ -63,6 +67,7 @@ properties:
 required:
 - name
 - namespace
+- deployerImage
 - imageWordpress
 - imageInit
 - imageMysql

@@ -60,6 +60,13 @@ spec:
 
       After accessing the WordPress main page, you will see the installation wizard.
       Follow the instructions presented on the screen to finish the process.
+
+      # Notes
+
+      After accessing the WordPress main page, you will see the installation wizard.
+      Follow the instructions presented on the screen to finish the process.
+
+      Deployer image: ${deployerImage}
   selector:
     matchLabels:
       app.kubernetes.io/name: "$name"
