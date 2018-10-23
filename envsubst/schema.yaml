@@ -20,8 +20,6 @@ properties:
             after: imageWordpressTag
   imageInit:
     type: string
-    # TODO: Reference a different image.
-    default: gcr.io/marketplace-k8s-app-example/example/wordpress/init@sha256:3fc5a3267c43f47fc7282cdc3fb2417945ff0f41618c1402867bd755d031124d
     x-google-marketplace:
       type: IMAGE
   imageMysql:

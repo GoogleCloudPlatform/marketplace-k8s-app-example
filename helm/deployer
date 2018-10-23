@@ -21,6 +21,7 @@ function _setup_dev() {
 
 function build() {
   docker build \
+      --build-arg "MARKETPLACE_TOOLS_TAG=$MARKETPLACE_TOOLS_TAG" \
       --build-arg="HELM_DEPENDENCY_BUILD=true" \
       --tag="$DEPLOYER_IMAGE" \
       .
@@ -29,7 +30,7 @@ function build() {
 }
 
 function install() {
-	_setup_dev
+  _setup_dev
 
   "$temp/dev" \
     /scripts/install \
@@ -42,7 +43,7 @@ function uninstall() {
 }
 
 function verify() {
-	_setup_dev
+  _setup_dev
 
   "$temp/dev" \
     /scripts/verify \
@@ -73,4 +74,4 @@ function helm_delete() {
     helm delete --purge "$NAME"
 }
 
-$@
+"$@"

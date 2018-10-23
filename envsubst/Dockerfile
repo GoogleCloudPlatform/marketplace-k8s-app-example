@@ -1,4 +1,5 @@
-FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:sha_7209a962383653c0972f1ecf9b7ae09566157ac6
+ARG MARKETPLACE_TOOLS_TAG
+FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$MARKETPLACE_TOOLS_TAG
 
 COPY manifest /data/manifest
 COPY schema.yaml /data/

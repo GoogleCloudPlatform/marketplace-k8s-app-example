@@ -6,9 +6,11 @@ export MARKETPLACE_TOOLS_TAG="sha_7209a962383653c0972f1ecf9b7ae09566157ac6"
 export DEPLOYER_IMAGE="gcr.io/marketplace-k8s-app-example/envsubst/deployer:latest"
 export NAME="application-1"
 export NAMESPACE="default"
+export INIT_IMAGE="gcr.io/marketplace-k8s-app-example/envsubst/init:latest"
 export PARAMETERS="{
               \"name\": \"$NAME\",
               \"namespace\": \"$NAMESPACE\",
+              \"imageInit\": \"$INIT_IMAGE\",
               \"reportingSecret\": \"gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml\"
             }"
 
@@ -21,10 +23,18 @@ function _setup_dev() {
 
 function build() {
   docker build \
+      --build-arg "MARKETPLACE_TOOLS_TAG=$MARKETPLACE_TOOLS_TAG" \
       --tag="$DEPLOYER_IMAGE" \
       .
 
   docker push "$DEPLOYER_IMAGE"
+
+  docker build \
+      --tag="$INIT_IMAGE" \
+			--file init/Dockerfile \
+      init/
+
+  docker push "$INIT_IMAGE"
 }
 
 function install() {
@@ -50,4 +60,4 @@ function verify() {
 }
 
 
-$@
+"$@"

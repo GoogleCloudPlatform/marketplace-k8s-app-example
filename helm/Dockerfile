@@ -1,1 +1,2 @@
-FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm_tiller/onbuild:sha_7209a962383653c0972f1ecf9b7ae09566157ac6
+ARG MARKETPLACE_TOOLS_TAG
+FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm_tiller/onbuild:$MARKETPLACE_TOOLS_TAG
