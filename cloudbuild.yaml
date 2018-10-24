@@ -5,14 +5,16 @@ steps:
   dir: helm/
   args:
   - build
+  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_7209a962383653c0972f1ecf9b7ae09566157ac6
   - --build-arg=HELM_DEPENDENCY_BUILD=true
   - --tag=gcr.io/marketplace-k8s-app-example/helm/deployer:latest
   - .
 
 - id: Build envsubst/
   name: gcr.io/cloud-builders/docker
-  dir: helm/
+  dir: envsubst/
   args:
   - build
+  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_7209a962383653c0972f1ecf9b7ae09566157ac6
   - --tag=gcr.io/marketplace-k8s-app-example/envsubst/deployer:latest
   - .
