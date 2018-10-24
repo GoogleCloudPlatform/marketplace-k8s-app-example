@@ -2,7 +2,7 @@
 
 cd $(dirname "$0")
 
-export MARKETPLACE_TOOLS_TAG="sha_7209a962383653c0972f1ecf9b7ae09566157ac6"
+export MARKETPLACE_TOOLS_TAG="sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28"
 export DEPLOYER_IMAGE="gcr.io/marketplace-k8s-app-example/helm/deployer:latest"
 export NAME="application-1"
 export NAMESPACE="default"

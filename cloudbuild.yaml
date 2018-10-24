@@ -5,7 +5,7 @@ steps:
   dir: helm/
   args:
   - build
-  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_7209a962383653c0972f1ecf9b7ae09566157ac6
+  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28
   - --build-arg=HELM_DEPENDENCY_BUILD=true
   - --tag=gcr.io/marketplace-k8s-app-example/helm/deployer:latest
   - .
@@ -15,6 +15,6 @@ steps:
   dir: envsubst/
   args:
   - build
-  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_7209a962383653c0972f1ecf9b7ae09566157ac6
+  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28
   - --tag=gcr.io/marketplace-k8s-app-example/envsubst/deployer:latest
   - .
