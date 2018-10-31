@@ -35,12 +35,11 @@ steps:
   name: gcr.io/cloud-builders/docker
   waitFor:
   - Initialize git
-  dir: vendor/marketplace-tools
   entrypoint: bash
   args:
   - -exc
   - |
-    TAG="$$(./scripts/derive_tag.sh)"
+    TAG="$$(cat MARKETPLACE_TOOLS_TAG)"
     docker pull "gcr.io/cloud-marketplace-tools/k8s/dev:$$TAG"
     docker tag "gcr.io/cloud-marketplace-tools/k8s/dev:$$TAG" "gcr.io/cloud-marketplace-tools/k8s/dev:local"
 
@@ -66,8 +65,8 @@ steps:
   - Initialized
   dir: wordpress
   args:
-  - -exc
-  - make -j4 clean app/build
+  - make
+  - app/build
 
 - id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local
@@ -97,8 +96,8 @@ steps:
   - Initialized
   dir: nginx
   args:
-  - -exc
-  - make -j4 clean app/build
+  - make
+  - app/build
 
 - id: Verify NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local

@@ -1,27 +1,13 @@
 TAG ?= latest
 
-# crd.Makefile provides targets to install Application CRD.
-include ../vendor/marketplace-tools/crd.Makefile
-
-# gcloud.Makefile provides default values for
-# REGISTRY and NAMESPACE derived from local
-# gcloud and kubectl environments.
-include ../vendor/marketplace-tools/gcloud.Makefile
-
-# marketplace.Makefile provides targets such as
-# ".build/marketplace/deployer/envsubst" to build the base
-# deployer images locally.
-include ../vendor/marketplace-tools/marketplace.Makefile
-
-# ubbagent.Makefile provides ".build/ubbagent/ubbagent"
-# target to build the ubbagent image locally.
-include ../vendor/marketplace-tools/ubbagent.Makefile
-include ../vendor/marketplace-tools/var.Makefile
+# Convenience makefiles.
+include ../gcloud.Makefile
+include ../var.Makefile
 
 # app.Makefile provides the main targets for installing the
 # application.
 # It requires several APP_* variables defined as followed.
-include ../vendor/marketplace-tools/app.Makefile
+include ../app.Makefile
 
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
 NAME ?= wordpress-1
@@ -41,8 +27,7 @@ APP_TEST_PARAMETERS ?= { \
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/marketplace/dev \
-            .build/wordpress/deployer \
+app/build:: .build/wordpress/deployer \
             .build/wordpress/init \
             .build/wordpress/mysql \
             .build/wordpress/tester \
@@ -53,8 +38,8 @@ app/build:: .build/marketplace/dev \
 .build/wordpress: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: .build/marketplace/deployer/envsubst \
-                           .build/var/APP_DEPLOYER_IMAGE \
+.build/wordpress/deployer: .build/var/APP_DEPLOYER_IMAGE \
+                           .build/var/MARKETPLACE_TOOLS_TAG \
                            .build/var/REGISTRY \
                            .build/var/TAG \
                            apptest/deployer/* \
@@ -115,11 +100,10 @@ app/build:: .build/marketplace/dev \
 	@touch "$@"
 
 # Relocate ubbagent image to $REGISTRY.
-.build/wordpress/ubbagent: .build/ubbagent/ubbagent \
-                           .build/var/REGISTRY \
+.build/wordpress/ubbagent: .build/var/REGISTRY \
                            .build/var/TAG \
                            | .build/wordpress
 	$(call print_target, $@)
-	docker tag "gcr.io/cloud-marketplace-tools/ubbagent" "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
+	docker tag "gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607" "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
 	docker push "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
 	@touch "$@"
