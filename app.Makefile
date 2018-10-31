@@ -11,14 +11,14 @@ include $(makefile_dir)/var.Makefile
 # Extracts the name property from APP_PARAMETERS.
 define name_parameter
 $(shell echo '$(APP_PARAMETERS)' \
-    | docker run -i --entrypoint=/bin/print_config.py --rm $(APP_DEPLOYER_IMAGE) --values_file=- --param '{"x-google-marketplace": {"type": "NAME"}}')
+    | docker run -i --entrypoint=/bin/print_config.py --rm $(APP_DEPLOYER_IMAGE) --values_mode stdin --xtype NAME)
 endef
 
 
 # Extracts the namespace property from APP_PARAMETERS.
 define namespace_parameter
 $(shell echo '$(APP_PARAMETERS)' \
-    | docker run -i --entrypoint=/bin/print_config.py --rm $(APP_DEPLOYER_IMAGE) --values_file=- --param '{"x-google-marketplace": {"type": "NAMESPACE"}}')
+    | docker run -i --entrypoint=/bin/print_config.py --rm $(APP_DEPLOYER_IMAGE) --values_mode stdin --xtype NAMESPACE)
 endef
 
 
@@ -28,16 +28,26 @@ $(shell echo '$(APP_PARAMETERS)' '$(APP_TEST_PARAMETERS)' \
     | docker run -i --entrypoint=/usr/bin/jq --rm $(APP_DEPLOYER_IMAGE) -s '.[0] * .[1]')
 endef
 
-KUBE_CONFIG ?= $(HOME)/.kube
-GCLOUD_CONFIG ?= $(HOME)/.config/gcloud
-EXTRA_DOCKER_PARAMS ?=
+
+##### Helper targets #####
+
 
 .build/app: | .build
 	mkdir -p "$@"
 
 
-.PHONY: app/phony
-app/phony: ;
+# Always update the dev script to make sure it's up to date.
+# There isn't currently a way to detect if the dev container has changed.
+.PHONY: .build/app/dev
+.build/app/dev: .build/var/MARKETPLACE_TOOLS_TAG \
+              | .build/app
+	docker run \
+	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
+	    cat /scripts/dev > "$@"
+	chmod a+x "$@"
+
+
+########### Main  targets ###########
 
 
 # Builds the application containers and push them to the registry.
@@ -52,21 +62,14 @@ app/build:: ;
 app/install:: app/build \
               .build/var/APP_DEPLOYER_IMAGE \
               .build/var/APP_PARAMETERS \
-              .build/var/HOME \
-              .build/var/MARKETPLACE_TOOLS_TAG
+              .build/var/MARKETPLACE_TOOLS_TAG \
+              | .build/app/dev
 	$(call print_target)
-	docker run \
-	    --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock,readonly" \
-	    --mount "type=bind,source=$(KUBE_CONFIG),target=/root/mount/.kube,readonly" \
-	    --mount "type=bind,source=$(GCLOUD_CONFIG),target=/root/mount/.config/gcloud,readonly" \
-	    $(EXTRA_DOCKER_PARAMS) \
-	    --rm \
-	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
-	    -- \
+	.build/app/dev \
 	    /scripts/install \
-	          --deployer='$(APP_DEPLOYER_IMAGE)' \
-	          --parameters='$(APP_PARAMETERS)' \
-	          --entrypoint="/bin/deploy.sh"
+	        --deployer='$(APP_DEPLOYER_IMAGE)' \
+	        --parameters='$(APP_PARAMETERS)' \
+	        --entrypoint="/bin/deploy.sh"
 
 
 # Installs the application into target namespace on the cluster.
@@ -75,21 +78,14 @@ app/install-test:: app/build \
                    .build/var/APP_DEPLOYER_IMAGE \
                    .build/var/APP_PARAMETERS \
                    .build/var/APP_TEST_PARAMETERS \
-                   .build/var/HOME \
-                   .build/var/MARKETPLACE_TOOLS_TAG
+                   .build/var/MARKETPLACE_TOOLS_TAG \
+	           | .build/app/dev
 	$(call print_target)
-	docker run \
-	    --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock,readonly" \
-	    --mount "type=bind,source=$(KUBE_CONFIG),target=/root/mount/.kube,readonly" \
-	    --mount "type=bind,source=$(GCLOUD_CONFIG),target=/root/mount/.config/gcloud,readonly" \
-	    $(EXTRA_DOCKER_PARAMS) \
-	    --rm \
-	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
-	    -- \
+	.build/app/dev \
 	    /scripts/install \
-	          --deployer='$(APP_DEPLOYER_IMAGE)' \
-	          --parameters='$(call combined_parameters)' \
-	          --entrypoint="/bin/deploy_with_tests.sh"
+	        --deployer='$(APP_DEPLOYER_IMAGE)' \
+	        --parameters='$(call combined_parameters)' \
+	        --entrypoint="/bin/deploy_with_tests.sh"
 
 
 # Uninstalls the application from the target namespace on the cluster.
@@ -108,20 +104,19 @@ app/verify: app/build \
             .build/var/APP_DEPLOYER_IMAGE \
             .build/var/APP_PARAMETERS \
             .build/var/APP_TEST_PARAMETERS \
-            .build/var/HOME \
-            .build/var/MARKETPLACE_TOOLS_TAG
+            .build/var/MARKETPLACE_TOOLS_TAG \
+            | .build/app/dev
 	$(call print_target)
-	docker run \
-	    --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock,readonly" \
-	    --mount "type=bind,source=$(KUBE_CONFIG),target=/root/mount/.kube,readonly" \
-	    --mount "type=bind,source=$(GCLOUD_CONFIG),target=/root/mount/.config/gcloud,readonly" \
-	    $(EXTRA_DOCKER_PARAMS) \
-	    --rm \
-	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
-	    -- \
+	.build/app/dev \
 	    /scripts/verify \
 	          --deployer='$(APP_DEPLOYER_IMAGE)' \
 	          --parameters='$(call combined_parameters)'
+
+
+# Runs diagnostic tool to make sure your environment is properly setup.
+app/doctor: | .build/app/dev
+	$(call print_target)
+	.build/app/dev /scripts/doctor.py
 
 
 endif
