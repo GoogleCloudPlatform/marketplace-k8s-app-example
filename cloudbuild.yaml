@@ -31,16 +31,37 @@ steps:
   - --project
   - "$PROJECT_ID"
 
-- id: Pull Dev Image
-  name: gcr.io/cloud-builders/docker
-  waitFor:
-  - Initialize git
-  dir: vendor/marketplace-tools
+- id: Copy Kubernetes Credentials
+  name: gcr.io/google-appengine/debian9
   entrypoint: bash
   args:
   - -exc
   - |
-    TAG="$$(./scripts/derive_tag.sh)"
+    mkdir -p /workspace/.kube/
+    cp -r $$HOME/.kube/ /workspace/
+  waitFor:
+  - Get Kubernetes Credentials
+
+- id: Copy gcloud Credentials
+  name: gcr.io/google-appengine/debian9
+  waitFor:
+  - Get Kubernetes Credentials
+  entrypoint: bash
+  args:
+  - -exc
+  - |
+    mkdir -p /workspace/.config/gcloud/
+    cp -r $$HOME/.config/gcloud/ /workspace/.config/
+
+- id: Pull Dev Image
+  name: gcr.io/cloud-builders/docker
+  waitFor:
+  - Initialize git
+  entrypoint: bash
+  args:
+  - -exc
+  - |
+    TAG="$$(cat MARKETPLACE_TOOLS_TAG)"
     docker pull "gcr.io/cloud-marketplace-tools/k8s/dev:$$TAG"
     docker tag "gcr.io/cloud-marketplace-tools/k8s/dev:$$TAG" "gcr.io/cloud-marketplace-tools/k8s/dev:local"
 
@@ -49,6 +70,8 @@ steps:
   waitFor:
   - Initialize git
   - Get Kubernetes Credentials
+  - Copy Kubernetes Credentials
+  - Copy gcloud Credentials
   - Pull Dev Image
 
 # Wordpress Verification
@@ -60,60 +83,34 @@ steps:
   - gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
   - reporting-secret.json
 
-- id: Build Wordpress
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
-  waitFor:
-  - Initialized
-  dir: wordpress
-  args:
-  - -exc
-  - make -j4 clean app/build
-
 - id: Verify Wordpress
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local
   waitFor:
   - Initialized
-  - Build Wordpress
-  - Fetch Wordpress Reporting Secret
+  dir: wordpress
   env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "reportingSecret": "file://reporting-secret.json",
-                     "imageTester": "gcr.io/cloud-marketplace-ops-test/example/wordpress/tester:latest"
-                   }
+  - 'KUBE_CONFIG=/workspace/.kube'
+  - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
+  # Use local Docker network named cloudbuild as described here:
+  # https://cloud.google.com/cloud-build/docs/overview#build_configuration_and_build_steps
+  - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
   args:
-  - -exc
-  - |
-    /scripts/verify \
-        --deployer="$$APP_DEPLOYER" \
-        --parameters="$$APP_PARAMETERS"
+  - make
+  - app/verify
 
 # NGINX Verification
-
-- id: Build NGINX
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
-  waitFor:
-  - Initialized
-  dir: nginx
-  args:
-  - -exc
-  - make -j4 clean app/build
 
 - id: Verify NGINX
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local
   waitFor:
   - Initialized
-  - Build NGINX
+  dir: nginx
   env:
-  - APP_DEPLOYER=gcr.io/cloud-marketplace-ops-test/example/nginx/deployer:latest
-  - |
-    APP_PARAMETERS={
-                     "tester.image": "gcr.io/cloud-marketplace-ops-test/example/nginx/tester:latest"
-                   }
+  - 'KUBE_CONFIG=/workspace/.kube'
+  - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
+  - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
+  # Use local Docker network named cloudbuild as described here:
+  # https://cloud.google.com/cloud-build/docs/overview#build_configuration_and_build_steps
   args:
-  - -exc
-  - |
-    /scripts/verify \
-        --deployer="$$APP_DEPLOYER" \
-        --parameters="$$APP_PARAMETERS"
+  - make
+  - app/verify
