@@ -8,6 +8,10 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
+  deployerImage:
+    type: string
+    x-google-marketplace:
+      type: DEPLOYER_IMAGE
   imageWordpress:
     type: string
     default: $REGISTRY:$TAG
@@ -63,6 +67,7 @@ properties:
 required:
 - name
 - namespace
+- deployerImage
 - imageWordpress
 - imageInit
 - imageMysql
@@ -75,3 +80,12 @@ required:
 form:
 - widget: help
   description: My arbitrary <i>description</i>
+x-google-marketplace:
+  clusterConstraints:
+    resources:
+    - replicas: 3
+      requests:
+        cpu: 1
+      affinity:
+        simpleNodeAffinity:
+          type: REQUIRE_ONE_NODE_PER_REPLICA
