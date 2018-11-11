@@ -1,81 +1,35 @@
 application_api_version: v1beta1
 properties:
-  name:
+  APP_INSTANCE_NAME:
     type: string
     x-google-marketplace:
       type: NAME
-  namespace:
+  NAMESPACE:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  imageDeployer:
-    type: string
-    x-google-marketplace:
-      type: DEPLOYER_IMAGE
-  imageWordpress:
-    type: string
-    default: launcher.gcr.io/google/wordpress4-php5-apache:latest
-    x-google-marketplace:
-      type: IMAGE
-      image:
-        generatedProperties:
-          splitByColon:
-            before: imageWordpressRepo
-            after: imageWordpressTag
-  imageInit:
+  IMAGE_MYSQL:
     type: string
     x-google-marketplace:
       type: IMAGE
-  imageMysql:
+  IMAGE_WORDPRESS:
     type: string
-    default: launcher.gcr.io/google/mysql5:latest
     x-google-marketplace:
       type: IMAGE
-  imageUbbagent:
-    type: string
-    default: gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607
-    x-google-marketplace:
-      type: IMAGE
-  dbPassword:
+  ROOT_DB_PASSWORD:
     type: string
     x-google-marketplace:
       type: GENERATED_PASSWORD
       generatedPassword:
-        length: 16
-  customString:
-    title: Blog title
-    description: WordPress requires a blog title for setup. This can be changed later.
-    type: string
-    default: 'My blog'
-    maxLength: 128
-    pattern: '[A-Za-z0-9 -]+'
-  customInteger:
-    title: Server replicas
-    type: integer
-    default: 1
-    minimum: 1
-    maximum: 128
-  customBoolean:
-    title: A custom boolean parameter.
-    type: boolean
-    default: false
-  reportingSecret:
+        length: 12
+  WORDPRESS_DB_PASSWORD:
     type: string
     x-google-marketplace:
-      type: REPORTING_SECRET
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 12
 required:
-- name
-- namespace
-- imageDeployer
-- imageWordpress
-- imageInit
-- imageMysql
-- imageUbbagent
-- dbPassword
-- customString
-- customInteger
-- customBoolean
-- reportingSecret
-form:
-- widget: help
-  description: My arbitrary <i>description</i>
+- APP_INSTANCE_NAME
+- NAMESPACE
+- ROOT_DB_PASSWORD
+- WORDPRESS_DB_PASSWORD
