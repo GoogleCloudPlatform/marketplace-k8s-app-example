@@ -31,14 +31,21 @@ function build() {
 
   docker build \
       --tag="$INIT_IMAGE" \
-			--file init/Dockerfile \
+      --file init/Dockerfile \
       init/
-
   docker push "$INIT_IMAGE"
+
+  docker pull launcher.gcr.io/google/mysql5
+  docker tag launcher.gcr.io/google/mysql5 "$IMAGE_MYSQL"
+  docker push "$IMAGE_MYSQL"
+
+  docker pull launcher.gcr.io/google/wordpress4-php7-apache:latest
+  docker tag launcher.gcr.io/google/wordpress4-php7-apache:latest "$IMAGE_WORDPRESS"
+  docker push "$IMAGE_WORDPRESS"
 }
 
 function install() {
-	_setup_dev
+  _setup_dev
 
   "$temp/dev" \
     /scripts/install \
@@ -51,7 +58,7 @@ function uninstall() {
 }
 
 function verify() {
-	_setup_dev
+  _setup_dev
 
   "$temp/dev" \
     /scripts/verify \
