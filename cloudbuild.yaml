@@ -61,8 +61,8 @@ steps:
   - 'KUBE_CONFIG=/workspace/.kube'
   - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
   - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
-  entrypoint: bash
   args:
+  - bash
   - -exc
   - |
     helm/deployer build
@@ -79,8 +79,8 @@ steps:
   - 'KUBE_CONFIG=/workspace/.kube'
   - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
   - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
-  entrypoint: bash
   args:
+  - bash
   - -exc
   - |
     envsubst/deployer build
