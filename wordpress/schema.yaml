@@ -8,13 +8,9 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  imageDeployer:
-    type: string
-    x-google-marketplace:
-      type: DEPLOYER_IMAGE
   imageWordpress:
     type: string
-    default: launcher.gcr.io/google/wordpress4-php5-apache:latest
+    default: $REGISTRY:$TAG
     x-google-marketplace:
       type: IMAGE
       image:
@@ -24,16 +20,17 @@ properties:
             after: imageWordpressTag
   imageInit:
     type: string
+    default: $REGISTRY/init:$TAG
     x-google-marketplace:
       type: IMAGE
   imageMysql:
     type: string
-    default: launcher.gcr.io/google/mysql5:latest
+    default: $REGISTRY/mysql:$TAG
     x-google-marketplace:
       type: IMAGE
   imageUbbagent:
     type: string
-    default: gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607
+    default: $REGISTRY/ubbagent:$TAG
     x-google-marketplace:
       type: IMAGE
   dbPassword:
@@ -66,7 +63,6 @@ properties:
 required:
 - name
 - namespace
-- imageDeployer
 - imageWordpress
 - imageInit
 - imageMysql

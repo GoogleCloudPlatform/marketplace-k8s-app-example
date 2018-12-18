@@ -2,14 +2,14 @@
 
 cd $(dirname "$0")
 
-export REGISTRY="${REGISTRY:-gcr.io/$(gcloud config get-value project)}"
-export MARKETPLACE_TOOLS_TAG="${MARKETPLACE_TOOLS_TAG:-$(cat ../MARKETPLACE_TOOLS_TAG)}"
-export DEPLOYER_IMAGE="$REGISTRY/helm/deployer:$MARKETPLACE_TOOLS_TAG"
+export MARKETPLACE_TOOLS_TAG="sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28"
+export DEPLOYER_IMAGE="gcr.io/marketplace-k8s-app-example/helm/deployer:latest"
 export NAME="application-1"
 export NAMESPACE="default"
 export PARAMETERS="{
               \"name\": \"$NAME\",
-              \"namespace\": \"$NAMESPACE\"
+              \"namespace\": \"$NAMESPACE\",
+              \"marketplace-integration.image\": \"$DEPLOYER_IMAGE\"
             }"
 
 function _setup_dev() {

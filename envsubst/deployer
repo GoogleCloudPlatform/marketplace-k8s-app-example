@@ -2,18 +2,16 @@
 
 cd $(dirname "$0")
 
-export REGISTRY="${REGISTRY:-gcr.io/$(gcloud config get-value project)}"
-export MARKETPLACE_TOOLS_TAG="${MARKETPLACE_TOOLS_TAG:-$(cat ../MARKETPLACE_TOOLS_TAG)}"
-export DEPLOYER_IMAGE="$REGISTRY/envsubst/deployer:$MARKETPLACE_TOOLS_TAG"
+export MARKETPLACE_TOOLS_TAG="sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28"
+export DEPLOYER_IMAGE="gcr.io/marketplace-k8s-app-example/envsubst/deployer:latest"
 export NAME="application-1"
 export NAMESPACE="default"
-export IMAGE_MYSQL="$REGISTRY/envsubst/mysql:$MARKETPLACE_TOOLS_TAG"
-export IMAGE_WORDPRESS="$REGISTRY/envsubst/wordpress:$MARKETPLACE_TOOLS_TAG"
+export INIT_IMAGE="gcr.io/marketplace-k8s-app-example/envsubst/init:latest"
 export PARAMETERS="{
-              \"APP_INSTANCE_NAME\": \"$NAME\",
-              \"NAMESPACE\": \"$NAMESPACE\",
-              \"IMAGE_MYSQL\": \"$IMAGE_MYSQL\",
-              \"IMAGE_WORDPRESS\": \"$IMAGE_WORDPRESS\"
+              \"name\": \"$NAME\",
+              \"namespace\": \"$NAMESPACE\",
+              \"imageInit\": \"$INIT_IMAGE\",
+              \"reportingSecret\": \"gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml\"
             }"
 
 function _setup_dev() {
@@ -31,13 +29,12 @@ function build() {
 
   docker push "$DEPLOYER_IMAGE"
 
-	docker pull launcher.gcr.io/google/mysql5
-	docker tag launcher.gcr.io/google/mysql5 "$IMAGE_MYSQL"
-	docker push "$IMAGE_MYSQL"
+  docker build \
+      --tag="$INIT_IMAGE" \
+			--file init/Dockerfile \
+      init/
 
-	docker pull launcher.gcr.io/google/wordpress4-php7-apache:latest
-	docker tag launcher.gcr.io/google/wordpress4-php7-apache:latest "$IMAGE_WORDPRESS"
-	docker push "$IMAGE_WORDPRESS"
+  docker push "$INIT_IMAGE"
 }
 
 function install() {

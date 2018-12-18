@@ -1,87 +1,20 @@
 steps:
 
-- id: &PullDevImage Pull Dev Image
+- id: Build helm/
   name: gcr.io/cloud-builders/docker
-  waitFor:
-  - '-'
-  entrypoint: bash
+  dir: helm/
   args:
-  - -exc
-  - |
-    TAG="$$(cat MARKETPLACE_TOOLS_TAG)"
-    docker pull "gcr.io/cloud-marketplace-tools/k8s/dev:$$TAG"
-    docker tag "gcr.io/cloud-marketplace-tools/k8s/dev:$$TAG" "gcr.io/cloud-marketplace-tools/k8s/dev:build-$BUILD_ID"
+  - build
+  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28
+  - --build-arg=HELM_DEPENDENCY_BUILD=true
+  - --tag=gcr.io/marketplace-k8s-app-example/helm/deployer:latest
+  - .
 
-- id: &PullEnvsubstImage Pull Envsubst Image
+- id: Build envsubst/
   name: gcr.io/cloud-builders/docker
-  waitFor:
-  - '-'
-  entrypoint: bash
+  dir: envsubst/
   args:
-  - -exc
-  - |
-    TAG="$$(cat MARKETPLACE_TOOLS_TAG)"
-    docker pull "gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$TAG"
-    docker tag "gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$$TAG" "gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:build-$BUILD_ID"
-
-- id: &PullHelmTillerImage Pull Helm Tiller Image
-  name: gcr.io/cloud-builders/docker
-  waitFor:
-  - '-'
-  entrypoint: bash
-  args:
-  - -exc
-  - |
-    TAG="$$(cat MARKETPLACE_TOOLS_TAG)"
-    docker pull "gcr.io/cloud-marketplace-tools/k8s/deployer_helm_tiller/onbuild:$$TAG"
-    docker tag "gcr.io/cloud-marketplace-tools/k8s/deployer_helm_tiller/onbuild:$$TAG" "gcr.io/cloud-marketplace-tools/k8s/deployer_helm_tiller/onbuild:build-$BUILD_ID"
-
-- id: &InitializeCredentials Initialize Credentials
-  name: gcr.io/cloud-builders/gcloud
-  waitFor:
-  - '-'
-  entrypoint: bash
-  args:
-  - -exc
-  - |
-    gcloud container clusters get-credentials 'limani-integ' --region 'us-central1' --project '$PROJECT_ID'
-    mkdir -p /workspace/.kube/
-    cp -r $$HOME/.kube/ /workspace/
-    mkdir -p /workspace/.config/gcloud/
-    cp -r $$HOME/.config/gcloud/ /workspace/.config/
-
-- id: Build and Verify helm/
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:build-$BUILD_ID
-  waitFor:
-  - *PullDevImage
-  - *PullHelmTillerImage
-  - *InitializeCredentials
-  env:
-  - 'MARKETPLACE_TOOLS_TAG=build-$BUILD_ID'
-  - 'KUBE_CONFIG=/workspace/.kube'
-  - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
-  - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
-  entrypoint: bash
-  args:
-  - -exc
-  - |
-    helm/deployer build
-    helm/deployer verify
-
-- id: Build and Verify envsubst/
-  name: gcr.io/cloud-marketplace-tools/k8s/dev:build-$BUILD_ID
-  waitFor:
-  - *PullDevImage
-  - *PullEnvsubstImage
-  - *InitializeCredentials
-  env:
-  - 'MARKETPLACE_TOOLS_TAG=build-$BUILD_ID'
-  - 'KUBE_CONFIG=/workspace/.kube'
-  - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
-  - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
-  entrypoint: bash
-  args:
-  - -exc
-  - |
-    envsubst/deployer build
-    envsubst/deployer verify
+  - build
+  - --build-arg=MARKETPLACE_TOOLS_TAG=sha_9423c06cbc7fc5a74421fe5f582577bdc640fa28
+  - --tag=gcr.io/marketplace-k8s-app-example/envsubst/deployer:latest
+  - .
