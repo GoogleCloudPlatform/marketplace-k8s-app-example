@@ -64,6 +64,14 @@ properties:
     type: string
     x-google-marketplace:
       type: REPORTING_SECRET
+  istioEnabled:
+    type: boolean
+    x-google-marketplace:
+      type: ISTIO_ENABLED
+  ingressAvailable:
+    type: boolean
+    x-google-marketplace:
+      type: INGRESS_AVAILABLE
 required:
 - name
 - namespace
@@ -89,3 +97,5 @@ x-google-marketplace:
       affinity:
         simpleNodeAffinity:
           type: REQUIRE_ONE_NODE_PER_REPLICA
+    istio:
+      type: OPTIONAL
