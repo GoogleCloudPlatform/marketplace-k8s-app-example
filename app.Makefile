@@ -65,11 +65,10 @@ app/install:: app/build \
               .build/var/MARKETPLACE_TOOLS_TAG \
               | .build/app/dev
 	$(call print_target)
-	.build/app/dev \
-	    /scripts/install \
-	        --deployer='$(APP_DEPLOYER_IMAGE)' \
-	        --parameters='$(APP_PARAMETERS)' \
-	        --entrypoint="/bin/deploy.sh"
+	.build/app/dev install \
+	    --deployer='$(APP_DEPLOYER_IMAGE)' \
+	    --parameters='$(APP_PARAMETERS)' \
+	    --entrypoint="/bin/deploy.sh"
 
 
 # Installs the application into target namespace on the cluster.
@@ -81,11 +80,10 @@ app/install-test:: app/build \
                    .build/var/MARKETPLACE_TOOLS_TAG \
 	           | .build/app/dev
 	$(call print_target)
-	.build/app/dev \
-	    /scripts/install \
-	        --deployer='$(APP_DEPLOYER_IMAGE)' \
-	        --parameters='$(call combined_parameters)' \
-	        --entrypoint="/bin/deploy_with_tests.sh"
+	.build/app/dev install \
+	    --deployer='$(APP_DEPLOYER_IMAGE)' \
+	    --parameters='$(call combined_parameters)' \
+	    --entrypoint="/bin/deploy_with_tests.sh"
 
 
 # Uninstalls the application from the target namespace on the cluster.
@@ -107,16 +105,15 @@ app/verify: app/build \
             .build/var/MARKETPLACE_TOOLS_TAG \
             | .build/app/dev
 	$(call print_target)
-	.build/app/dev \
-	    /scripts/verify \
-	          --deployer='$(APP_DEPLOYER_IMAGE)' \
-	          --parameters='$(call combined_parameters)'
+	.build/app/dev verify \
+	    --deployer='$(APP_DEPLOYER_IMAGE)' \
+	    --parameters='$(call combined_parameters)'
 
 
 # Runs diagnostic tool to make sure your environment is properly setup.
 app/doctor: | .build/app/dev
 	$(call print_target)
-	.build/app/dev /scripts/doctor.py
+	.build/app/dev doctor
 
 
 endif
