@@ -72,6 +72,14 @@ properties:
     type: boolean
     x-google-marketplace:
       type: INGRESS_AVAILABLE
+  certificate:
+    type: string
+    x-google-marketplace:
+      type: CERTIFICATE
+      certificate:
+        generatedProperties:
+          base64EncodedKey: base64EncodedKey
+          base64EncodedCrt: base64EncodedCrt
 required:
 - name
 - namespace
@@ -85,6 +93,7 @@ required:
 - customInteger
 - customBoolean
 - reportingSecret
+- certificate
 form:
 - widget: help
   description: My arbitrary <i>description</i>

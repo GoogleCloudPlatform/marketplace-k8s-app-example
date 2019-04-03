@@ -10,6 +10,18 @@ type: Opaque
 data:
   password: "$dbPassword"
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: $name-tls-secret
+  labels:
+    app.kubernetes.io/name: "$name"
+    app.kubernetes.io/component: tls-secret
+data:
+  tls.key: "$base64EncodedKey"
+  tls.crt: "$base64EncodedCrt"
+type: kubernetes.io/tls
+---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
