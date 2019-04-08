@@ -93,7 +93,6 @@ required:
 - customInteger
 - customBoolean
 - reportingSecret
-- certificate
 form:
 - widget: help
   description: My arbitrary <i>description</i>
