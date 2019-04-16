@@ -18,8 +18,8 @@ metadata:
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: tls-secret
 data:
-  tls.key: "$base64EncodedKey"
-  tls.crt: "$base64EncodedCrt"
+  tls.key: "$base64EncodedPrivateKey"
+  tls.crt: "$base64EncodedCertificate"
 type: kubernetes.io/tls
 ---
 apiVersion: apps/v1beta2
