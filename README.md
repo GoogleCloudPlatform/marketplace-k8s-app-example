@@ -26,7 +26,7 @@ git submodule update --recursive --init --force
 
 See [Getting Started](https://github.com/GoogleCloudPlatform/marketplace-k8s-app-tools/blob/master/README.md#getting-started)
 
-## Installing Wordpress
+## Installing WordPress
 
 Run the following commands from within `wordpress` folder.
 
@@ -36,7 +36,7 @@ Do a one time setup for application CRD:
 make crd/install
 ```
 
-Build and install Wordpress onto your cluster:
+Build and install WordPress onto your cluster:
 
 ```shell
 make app/install
