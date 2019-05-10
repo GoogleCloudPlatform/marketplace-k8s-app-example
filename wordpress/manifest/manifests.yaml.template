@@ -196,4 +196,4 @@ spec:
   selector:
     app.kubernetes.io/name: "$name"
     app.kubernetes.io/component: wordpress-webserver
-  type: ClusterIP
+  type: "$serviceType"
