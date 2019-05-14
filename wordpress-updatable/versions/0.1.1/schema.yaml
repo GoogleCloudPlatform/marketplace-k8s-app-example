@@ -26,6 +26,12 @@ x-google-marketplace:
       type: OPTIONAL
 
   images:
+    '':
+      properties:
+        imageWordpressRepo:
+          type: REPO_WITH_REGISTRY
+        imageWordpressTag:
+          type: TAG
     init:
       properties:
         imageInit:
@@ -38,12 +44,6 @@ x-google-marketplace:
       properties:
         imageUbbagent:
           type: FULL
-    wordpress:
-      properties:
-        imageWordpressRepo:
-          type: REPO_WITH_REGISTRY
-        imageWordpressTag:
-          type: TAG
 
 properties:
   name:

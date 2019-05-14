@@ -6,7 +6,7 @@ ifneq ($(shell [[ -d "versions/$(RELEASE)" ]] && echo "OK"),OK)
   $(error "Release version $(RELEASE) doesn't exist. Check versions/ directory.")
 endif
 
-APP_ID ?= example/wordpress-updatable-1
+APP_ID ?= example/wordpress-updatable
 
 
 # Convenience makefiles.
@@ -89,10 +89,10 @@ app/build:: .build/wordpress-updatable/deployer \
                                       | .build/wordpress-updatable
 	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/wordpress4-php5-apache
-	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/$(APP_ID)/wordpress:$(TAG)"
-	docker tag "$(REGISTRY)/$(APP_ID)/wordpress:$(TAG)" "$(REGISTRY)/$(APP_ID)/wordpress:$(RELEASE)"
-	docker push "$(REGISTRY)/$(APP_ID)/wordpress:$(TAG)"
-	docker push "$(REGISTRY)/$(APP_ID)/wordpress:$(RELEASE)"
+	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/$(APP_ID):$(TAG)"
+	docker tag "$(REGISTRY)/$(APP_ID):$(TAG)" "$(REGISTRY)/$(APP_ID):$(RELEASE)"
+	docker push "$(REGISTRY)/$(APP_ID):$(TAG)"
+	docker push "$(REGISTRY)/$(APP_ID):$(RELEASE)"
 	@touch "$@"
 
 # Build secondary app image.
