@@ -39,12 +39,16 @@ make crd/install
 Build and install Wordpress onto your cluster:
 
 ```shell
+export REPORTING_SECRET=gs://cloud-marketplace-tools/reporting_secrets/fake_reporting_secret.yaml
 make app/install
 ```
 
-This will build the containers and install the application. You can
-watch the kubernetes resources being created directly from your CLI
-by running:
+This will build the containers and install the application. Note that the
+reporting secret installed for usage reporting is structurally correct, but
+the keys are fake. Usage reports will fail.
+
+You can watch the kubernetes resources being created directly
+from your CLI by running:
 
 ```shell
 make app/watch
