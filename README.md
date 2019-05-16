@@ -33,7 +33,7 @@ Run the following commands from within `wordpress` folder.
 Do a one time setup for application CRD:
 
 ```shell
-make crd/install
+kubectl apply -f "https://raw.githubusercontent.com/GoogleCloudPlatform/marketplace-k8s-app-tools/master/crd/app-crd.yaml"
 ```
 
 Build and install WordPress onto your cluster:
@@ -47,12 +47,6 @@ This will build the containers and install the application. Note that the
 reporting secret installed for usage reporting is structurally correct, but
 the keys are fake. Usage reports will fail.
 
-You can watch the kubernetes resources being created directly
-from your CLI by running:
-
-```shell
-make app/watch
-```
 
 To delete the installation, run:
 
