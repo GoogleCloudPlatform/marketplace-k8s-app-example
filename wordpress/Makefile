@@ -11,6 +11,7 @@ include ../app.Makefile
 
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
 NAME ?= wordpress-1
+REPORTING_SECRET ?= gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)", \
@@ -18,7 +19,7 @@ APP_PARAMETERS ?= { \
   "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
   "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
   "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
-  "reportingSecret": "gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml" \
+  "reportingSecret": "$(REPORTING_SECRET)" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
