@@ -30,10 +30,10 @@ See [Getting Started](https://github.com/GoogleCloudPlatform/marketplace-k8s-app
 
 Run the following commands from within `wordpress` folder.
 
-Do a one time setup for application CRD:
+Run app/doctor to determine any necessary setup steps for the cluster:
 
 ```shell
-kubectl apply -f "https://raw.githubusercontent.com/GoogleCloudPlatform/marketplace-k8s-app-tools/master/crd/app-crd.yaml"
+make app/doctor
 ```
 
 Build and install WordPress onto your cluster:
