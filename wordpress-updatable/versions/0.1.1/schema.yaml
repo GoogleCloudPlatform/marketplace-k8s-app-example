@@ -101,6 +101,13 @@ properties:
         generatedProperties:
           base64EncodedPrivateKey: base64EncodedPrivateKey
           base64EncodedCertificate: base64EncodedCertificate
+  serviceType:
+    type: string
+    enum:
+    - LoadBalancer
+    - ClusterIP
+    default: ClusterIP
+    title: Service type of WordPress
 
 required:
 - name
@@ -111,6 +118,7 @@ required:
 - customInteger
 - customBoolean
 - reportingSecret
+- serviceType
 
 form:
 - widget: help
