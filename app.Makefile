@@ -8,6 +8,19 @@ include $(makefile_dir)/common.Makefile
 include $(makefile_dir)/var.Makefile
 
 
+##### Validations and Information #####
+
+
+ifndef APP_DEPLOYER_IMAGE
+$(error APP_DEPLOYER_IMAGE must be defined)
+endif
+
+$(info ---- APP_DEPLOYER_IMAGE = $(APP_DEPLOYER_IMAGE))
+
+
+##### Helper functions #####
+
+
 # Extracts the name property from APP_PARAMETERS.
 define name_parameter
 $(shell echo '$(APP_PARAMETERS)' \
@@ -41,10 +54,10 @@ endef
 .PHONY: .build/app/dev
 .build/app/dev: .build/var/MARKETPLACE_TOOLS_TAG \
               | .build/app
-	docker run \
+	@docker run \
 	    "gcr.io/cloud-marketplace-tools/k8s/dev:$(MARKETPLACE_TOOLS_TAG)" \
 	    cat /scripts/dev > "$@"
-	chmod a+x "$@"
+	@chmod a+x "$@"
 
 
 ########### Main  targets ###########
@@ -111,6 +124,7 @@ app/verify: app/build \
 
 
 # Runs diagnostic tool to make sure your environment is properly setup.
+.PHONY: app/doctor
 app/doctor: | .build/app/dev
 	$(call print_target)
 	.build/app/dev doctor

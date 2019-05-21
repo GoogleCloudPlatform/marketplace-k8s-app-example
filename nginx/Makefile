@@ -4,11 +4,6 @@ TAG ?= latest
 include ../gcloud.Makefile
 include ../var.Makefile
 
-# app.Makefile provides the main targets for installing the
-# application.
-# It requires several APP_* variables defined as followed.
-include ../app.Makefile
-
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/nginx/deployer:$(TAG)
 NAME ?= nginx-1
 APP_PARAMETERS ?= { \
@@ -20,6 +15,13 @@ TESTER_IMAGE ?= $(REGISTRY)/example/nginx/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "tester.image": "$(TESTER_IMAGE)" \
 }
+
+# app.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined above, and thus
+# must be included after.
+include ../app.Makefile
+
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.

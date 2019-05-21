@@ -31,15 +31,5 @@ spec:
   componentKinds:
   - group: apps/v1beta2
     kind: Deployment
-  - group: batch/v1
-    kind: Job
-  - group: v1
-    kind: PersistentVolumeClaim
-  - group: rbac.authorization.k8s.io/v1
-    kind: Role
-  - group: rbac.authorization.k8s.io/v1
-    kind: RoleBinding
   - group: v1
     kind: Service
-  - group: v1
-    kind: ServiceAccount
