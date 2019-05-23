@@ -100,10 +100,8 @@ app/install:: app/publish \
               | .build/app/dev
 	$(call print_target)
 	.build/app/dev install \
-	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(APP_PARAMETERS)' \
-	    --gcs_repo='$(APP_GCS_PATH)' \
-	    --entrypoint="/bin/deploy.sh"
+	    --version_meta_file='$(APP_GCS_PATH)/$(RELEASE).yaml' \
+	    --parameters='$(APP_PARAMETERS)'
 
 
 # Installs the application into target namespace on the cluster.

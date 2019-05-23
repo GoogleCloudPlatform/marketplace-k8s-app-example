@@ -47,13 +47,6 @@ This will build the containers and install the application. Note that the
 reporting secret installed for usage reporting is structurally correct, but
 the keys are fake. Usage reports will fail.
 
-You can watch the kubernetes resources being created directly
-from your CLI by running:
-
-```shell
-make app/watch
-```
-
 To delete the installation, run:
 
 ```shell
@@ -63,7 +56,7 @@ make app/uninstall
 ## Overriding context values (Optional)
 
 By default `make` derives docker registry and k8s namespace
-from your local configurations of `gcloud` and `kubectl`. 
+from your local configurations of `gcloud` and `kubectl`.
 
 You can see these values using
 
