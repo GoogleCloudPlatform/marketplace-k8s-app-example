@@ -1,67 +1,80 @@
-TAG ?= latest
+TAG ?= 0.1
+
+# Check directory versions/ for all available release values.
+RELEASE ?= 0.1.1
+ifneq ($(shell [[ -d "versions/$(RELEASE)" ]] && echo "OK"),OK)
+  $(error "Release version $(RELEASE) doesn't exist. Check versions/ directory.")
+endif
+
+APP_ID ?= example/wordpress-updatable
+
 
 # Convenience makefiles.
 include ../gcloud.Makefile
 include ../var.Makefile
 
-# app.Makefile provides the main targets for installing the
-# application.
-# It requires several APP_* variables defined as followed.
-include ../app.Makefile
-
-APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
-NAME ?= wordpress-1
+APP_DEPLOYER_IMAGE ?= $(REGISTRY)/$(APP_ID)/deployer:$(RELEASE)
+APP_DEPLOYER_IMAGE_TRACK_TAG ?= $(REGISTRY)/$(APP_ID)/deployer:$(TAG)
+APP_GCS_PATH ?= $(GCS_URL)/$(APP_ID)/$(TAG)
+NAME ?= wordpress-updatable-1
 REPORTING_SECRET ?= gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)", \
-  "imageWordpress": "$(REGISTRY)/example/wordpress:$(TAG)", \
-  "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
-  "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
-  "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
   "reportingSecret": "$(REPORTING_SECRET)" \
 }
-TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
+# TODO(huyhg): Fix tester image.
+TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
 
+
+# app_v2.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined above, and thus
+# must be included after.
+include ../app_v2.Makefile
+
+
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
-app/build:: .build/wordpress/deployer \
-            .build/wordpress/init \
-            .build/wordpress/mysql \
-            .build/wordpress/tester \
-            .build/wordpress/ubbagent \
-            .build/wordpress/wordpress
+app/build:: .build/wordpress-updatable/deployer \
+            .build/wordpress-updatable/init \
+            .build/wordpress-updatable/mysql \
+            .build/wordpress-updatable/tester \
+            .build/wordpress-updatable/ubbagent \
+            .build/wordpress-updatable/wordpress
 
 
-.build/wordpress: | .build
+.build/wordpress-updatable: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: .build/var/APP_DEPLOYER_IMAGE \
-                           .build/var/MARKETPLACE_TOOLS_TAG \
-                           .build/var/REGISTRY \
-                           .build/var/TAG \
-                           apptest/deployer/* \
-                           apptest/deployer/manifest/* \
-                           deployer/* \
-                           manifest/* \
-                           schema.yaml \
-                           | .build/wordpress
+.build/wordpress-updatable/deployer: .build/var/APP_DEPLOYER_IMAGE \
+                                     .build/var/MARKETPLACE_TOOLS_TAG \
+                                     .build/var/REGISTRY \
+                                     .build/var/TAG \
+                                     .build/var/RELEASE \
+                                     $(shell find apptest/deployer -type f) \
+                                     $(shell find apptest/deployer/manifest -type f) \
+                                     $(shell find deployer -type f) \
+                                     $(shell find manifest -type f) \
+                                     $(shell find versions -type f) \
+                                     | .build/wordpress-updatable
 	$(call print_target, $@)
 	docker build \
-	    --build-arg REGISTRY="$(REGISTRY)/example/wordpress" \
-	    --build-arg TAG="$(TAG)" \
+	    --build-arg RELEASE="$(RELEASE)" \
 	    --build-arg MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
+	docker tag "$(APP_DEPLOYER_IMAGE)" "$(APP_DEPLOYER_IMAGE_TRACK_TAG)"
+	docker push "$(APP_DEPLOYER_IMAGE_TRACK_TAG)"
 	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
 
-.build/wordpress/tester: .build/var/TESTER_IMAGE
+.build/wordpress-updatable/tester: .build/var/TESTER_IMAGE
 	$(call print_target, $@)
 	docker pull cosmintitei/bash-curl
 	docker tag cosmintitei/bash-curl "$(TESTER_IMAGE)"
@@ -70,42 +83,54 @@ app/build:: .build/wordpress/deployer \
 
 # Simulate building of primary app image. Actually just copying public image to
 # local registry.
-.build/wordpress/wordpress: .build/var/REGISTRY \
-                            .build/var/TAG \
-                            | .build/wordpress
+.build/wordpress-updatable/wordpress: .build/var/REGISTRY \
+                                      .build/var/TAG \
+                                      .build/var/RELEASE \
+                                      | .build/wordpress-updatable
 	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/wordpress4-php5-apache
-	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/example/wordpress:$(TAG)"
-	docker push "$(REGISTRY)/example/wordpress:$(TAG)"
+	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/$(APP_ID):$(TAG)"
+	docker tag "$(REGISTRY)/$(APP_ID):$(TAG)" "$(REGISTRY)/$(APP_ID):$(RELEASE)"
+	docker push "$(REGISTRY)/$(APP_ID):$(TAG)"
+	docker push "$(REGISTRY)/$(APP_ID):$(RELEASE)"
 	@touch "$@"
 
 # Build secondary app image.
-.build/wordpress/init: init/* \
-                       .build/var/REGISTRY \
-                       .build/var/TAG \
-                       | .build/wordpress
+.build/wordpress-updatable/init: init/* \
+                                 .build/var/REGISTRY \
+                                 .build/var/TAG \
+                                 .build/var/RELEASE \
+                                 | .build/wordpress-updatable
 	$(call print_target, $@)
 	cd init \
-	&& docker build --tag "$(REGISTRY)/example/wordpress/init:$(TAG)" .
-	docker push "$(REGISTRY)/example/wordpress/init:$(TAG)"
+	&& docker build --tag "$(REGISTRY)/$(APP_ID)/init:$(TAG)" .
+	docker tag "$(REGISTRY)/$(APP_ID)/init:$(TAG)" "$(REGISTRY)/$(APP_ID)/init:$(RELEASE)"
+	docker push "$(REGISTRY)/$(APP_ID)/init:$(TAG)"
+	docker push "$(REGISTRY)/$(APP_ID)/init:$(RELEASE)"
 	@touch "$@"
 
 # Relocate public mysql image to $REGISTRY.
-.build/wordpress/mysql: .build/var/REGISTRY \
-                        .build/var/TAG \
-                        | .build/wordpress
+.build/wordpress-updatable/mysql: .build/var/REGISTRY \
+                                  .build/var/TAG \
+                                  .build/var/RELEASE \
+                                  | .build/wordpress-updatable
 	$(call print_target, $@)
 	docker pull launcher.gcr.io/google/mysql5
-	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/example/wordpress/mysql:$(TAG)"
-	docker push "$(REGISTRY)/example/wordpress/mysql:$(TAG)"
+	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/$(APP_ID)/mysql:$(TAG)"
+	docker tag "$(REGISTRY)/$(APP_ID)/mysql:$(TAG)" "$(REGISTRY)/$(APP_ID)/mysql:$(RELEASE)"
+	docker push "$(REGISTRY)/$(APP_ID)/mysql:$(TAG)"
+	docker push "$(REGISTRY)/$(APP_ID)/mysql:$(RELEASE)"
 	@touch "$@"
 
 # Relocate ubbagent image to $REGISTRY.
-.build/wordpress/ubbagent: .build/var/REGISTRY \
-                           .build/var/TAG \
-                           | .build/wordpress
+.build/wordpress-updatable/ubbagent: .build/var/REGISTRY \
+                                     .build/var/TAG \
+                                     .build/var/RELEASE \
+                                     | .build/wordpress-updatable
 	$(call print_target, $@)
-	docker pull "gcr.io/cloud-marketplace-tools/metering/ubbagent"
-	docker tag "gcr.io/cloud-marketplace-tools/metering/ubbagent" "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
-	docker push "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)"
+	docker pull "gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607"
+	docker tag "gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607" "$(REGISTRY)/$(APP_ID)/ubbagent:$(TAG)"
+	docker tag "$(REGISTRY)/$(APP_ID)/ubbagent:$(TAG)" "$(REGISTRY)/$(APP_ID)/ubbagent:$(RELEASE)"
+	docker push "$(REGISTRY)/$(APP_ID)/ubbagent:$(TAG)"
+	docker push "$(REGISTRY)/$(APP_ID)/ubbagent:$(RELEASE)"
 	@touch "$@"

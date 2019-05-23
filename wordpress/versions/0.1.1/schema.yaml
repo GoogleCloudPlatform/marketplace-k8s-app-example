@@ -1,4 +1,50 @@
-application_api_version: v1beta1
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: '0.1.1'
+  publishedVersionMetadata:
+    releaseNote: >-
+      Initial release.
+    releaseTypes:
+    - Feature
+    recommended: true
+
+  managedUpdates:
+    kalmSupported: true
+
+  clusterConstraints:
+    resources:
+    - replicas: 3
+      requests:
+        cpu: 1
+      affinity:
+        simpleNodeAffinity:
+          type: REQUIRE_ONE_NODE_PER_REPLICA
+    istio:
+      type: OPTIONAL
+
+  images:
+    '':
+      properties:
+        imageWordpressRepo:
+          type: REPO_WITH_REGISTRY
+        imageWordpressTag:
+          type: TAG
+    init:
+      properties:
+        imageInit:
+          type: FULL
+    mysql:
+      properties:
+        imageMysql:
+          type: FULL
+    ubbagent:
+      properties:
+        imageUbbagent:
+          type: FULL
+
 properties:
   name:
     type: string
@@ -12,31 +58,6 @@ properties:
     type: string
     x-google-marketplace:
       type: DEPLOYER_IMAGE
-  imageWordpress:
-    type: string
-    default: $REGISTRY:$TAG
-    x-google-marketplace:
-      type: IMAGE
-      image:
-        generatedProperties:
-          splitByColon:
-            before: imageWordpressRepo
-            after: imageWordpressTag
-  imageInit:
-    type: string
-    default: $REGISTRY/init:$TAG
-    x-google-marketplace:
-      type: IMAGE
-  imageMysql:
-    type: string
-    default: $REGISTRY/mysql:$TAG
-    x-google-marketplace:
-      type: IMAGE
-  imageUbbagent:
-    type: string
-    default: $REGISTRY/ubbagent:$TAG
-    x-google-marketplace:
-      type: IMAGE
   dbPassword:
     type: string
     x-google-marketplace:
@@ -87,31 +108,18 @@ properties:
     - ClusterIP
     default: ClusterIP
     title: Service type of WordPress
+
 required:
 - name
 - namespace
 - deployerImage
-- imageWordpress
-- imageInit
-- imageMysql
-- imageUbbagent
 - dbPassword
 - customString
 - customInteger
 - customBoolean
 - reportingSecret
 - serviceType
+
 form:
 - widget: help
   description: My arbitrary <i>description</i>
-x-google-marketplace:
-  clusterConstraints:
-    resources:
-    - replicas: 3
-      requests:
-        cpu: 1
-      affinity:
-        simpleNodeAffinity:
-          type: REQUIRE_ONE_NODE_PER_REPLICA
-    istio:
-      type: OPTIONAL
