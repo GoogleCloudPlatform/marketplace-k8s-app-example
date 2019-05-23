@@ -1,0 +1,125 @@
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: '0.1.2'
+  publishedVersionMetadata:
+    releaseNote: >-
+      A new and improved release.
+    releaseTypes:
+    - Feature
+    recommended: true
+
+  managedUpdates:
+    kalmSupported: true
+
+  clusterConstraints:
+    resources:
+    - replicas: 3
+      requests:
+        cpu: 1
+      affinity:
+        simpleNodeAffinity:
+          type: REQUIRE_ONE_NODE_PER_REPLICA
+    istio:
+      type: OPTIONAL
+
+  images:
+    '':
+      properties:
+        imageWordpressRepo:
+          type: REPO_WITH_REGISTRY
+        imageWordpressTag:
+          type: TAG
+    init:
+      properties:
+        imageInit:
+          type: FULL
+    mysql:
+      properties:
+        imageMysql:
+          type: FULL
+    ubbagent:
+      properties:
+        imageUbbagent:
+          type: FULL
+
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  deployerImage:
+    type: string
+    x-google-marketplace:
+      type: DEPLOYER_IMAGE
+  dbPassword:
+    type: string
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 16
+  customString:
+    title: Blog title
+    description: WordPress requires a blog title for setup. This can be changed later.
+    type: string
+    default: 'My blog'
+    maxLength: 128
+    pattern: '[A-Za-z0-9 -]+'
+  customInteger:
+    title: Server replicas
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 128
+  customBoolean:
+    title: A custom boolean parameter.
+    type: boolean
+    default: false
+  reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
+  istioEnabled:
+    type: boolean
+    x-google-marketplace:
+      type: ISTIO_ENABLED
+  ingressAvailable:
+    type: boolean
+    x-google-marketplace:
+      type: INGRESS_AVAILABLE
+  certificate:
+    type: string
+    x-google-marketplace:
+      type: TLS_CERTIFICATE
+      tlsCertificate:
+        generatedProperties:
+          base64EncodedPrivateKey: base64EncodedPrivateKey
+          base64EncodedCertificate: base64EncodedCertificate
+  serviceType:
+    type: string
+    enum:
+    - LoadBalancer
+    - ClusterIP
+    default: ClusterIP
+    title: Service type of WordPress
+
+required:
+- name
+- namespace
+- deployerImage
+- dbPassword
+- customString
+- customInteger
+- customBoolean
+- reportingSecret
+- serviceType
+
+form:
+- widget: help
+  description: My arbitrary <i>description</i>
