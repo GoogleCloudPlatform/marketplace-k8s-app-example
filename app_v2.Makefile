@@ -48,7 +48,7 @@ endef
 # Combines APP_PARAMETERS and APP_TEST_PARAMETERS.
 define combined_parameters
 $(shell echo '$(APP_PARAMETERS)' '$(APP_TEST_PARAMETERS)' \
-    | docker run -i --entrypoint=/usr/bin/jq --rm $(APP_DEPLOYER_IMAGE) -s '.[0] * .[p1]')
+    | docker run -i --entrypoint=/usr/bin/jq --rm $(APP_DEPLOYER_IMAGE) -s '.[0] * .[1]')
 endef
 
 
