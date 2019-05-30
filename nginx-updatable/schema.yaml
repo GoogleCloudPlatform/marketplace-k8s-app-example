@@ -1,0 +1,24 @@
+application_api_version: v1beta1
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  imageNginx.image:
+    type: string
+    default: $REGISTRY/example/nginx:$TAG
+    x-google-marketplace:
+      type: IMAGE
+      image:
+        generatedProperties:
+          splitByColon:
+            before: imageNginx.repo
+            after: imageNginx.tag
+required:
+- name
+- namespace
+- imageNginx.image
