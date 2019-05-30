@@ -1,0 +1,59 @@
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: '0.1.2'
+  publishedVersionMetadata:
+    releaseNote: >-
+      Update.
+    releaseTypes:
+    - Feature
+    recommended: true
+
+  managedUpdates:
+    kalmSupported: true
+
+  images:
+    '':
+      properties:
+        imageNginx.repo:
+          type: REPO_WITH_REGISTRY
+        imageNginx.tag:
+          type: TAG
+
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+
+  # Required by marketplace-integration chart.
+  marketplace-integration.image:
+    type: string
+    x-google-marketplace:
+      type: DEPLOYER_IMAGE
+  marketplace-integration.service_account:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: Role
+          rulesType: PREDEFINED
+          rulesFromRoleName: cluster-admin
+  application_uid:
+    type: string
+    x-google-marketplace:
+      type: APPLICATION_UID
+      applicationUid:
+        generatedProperties:
+          createApplicationBoolean: global.application.create
+
+required:
+- name
+- namespace
