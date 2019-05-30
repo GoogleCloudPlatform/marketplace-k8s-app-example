@@ -1,4 +1,27 @@
-application_api_version: v1beta1
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: '0.1.1'
+  publishedVersionMetadata:
+    releaseNote: >-
+      Initial release.
+    releaseTypes:
+    - Feature
+    recommended: true
+
+  managedUpdates:
+    kalmSupported: true
+
+  images:
+    '':
+      properties:
+        imageNginx.repo:
+          type: REPO_WITH_REGISTRY
+        imageNginx.tag:
+          type: TAG
+
 properties:
   name:
     type: string
@@ -8,17 +31,29 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  imageNginx.image:
+
+  # Required by marketplace-integration chart.
+  marketplace-integration.image:
     type: string
-    default: $REGISTRY/example/nginx:$TAG
     x-google-marketplace:
-      type: IMAGE
-      image:
+      type: DEPLOYER_IMAGE
+  marketplace-integration.service_account:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+        - type: Role
+          rulesType: PREDEFINED
+          rulesFromRoleName: cluster-admin
+  application_uid:
+    type: string
+    x-google-marketplace:
+      type: APPLICATION_UID
+      applicationUid:
         generatedProperties:
-          splitByColon:
-            before: imageNginx.repo
-            after: imageNginx.tag
+          createApplicationBoolean: global.application.create
+
 required:
 - name
 - namespace
-- imageNginx.image

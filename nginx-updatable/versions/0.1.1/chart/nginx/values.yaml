@@ -2,6 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+global:
+  application:
+    # Whether to create the apps.k8s.io/Application resource.
+    create: true
+
+
 replicaCount: 1
 
 imageNginx:

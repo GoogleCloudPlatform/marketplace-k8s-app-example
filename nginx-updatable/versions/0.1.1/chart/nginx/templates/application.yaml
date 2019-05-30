@@ -1,4 +1,5 @@
----
+{{- if .Values.global.application.create }}
+
 apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
@@ -13,7 +14,7 @@ metadata:
 spec:
   descriptor:
     type: Nginx
-    versions: '0.1'
+    version: '0.1.1'
     description: |-
       An HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.
 
@@ -33,3 +34,5 @@ spec:
     kind: Deployment
   - group: v1
     kind: Service
+
+{{- end }}
