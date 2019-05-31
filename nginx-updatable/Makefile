@@ -17,7 +17,7 @@ include ../var.Makefile
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/$(APP_ID)/deployer:$(RELEASE)
 APP_DEPLOYER_IMAGE_TRACK_TAG ?= $(REGISTRY)/$(APP_ID)/deployer:$(TRACK)
 APP_GCS_PATH ?= $(GCS_URL)/$(APP_ID)/$(TRACK)
-NAME ?= nginx-1
+NAME ?= nginx-updatable-1
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)" \

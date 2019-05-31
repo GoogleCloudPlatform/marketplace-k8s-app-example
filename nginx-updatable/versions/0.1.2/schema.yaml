@@ -6,9 +6,9 @@ x-google-marketplace:
   publishedVersion: '0.1.2'
   publishedVersionMetadata:
     releaseNote: >-
-      Update.
+      Security update.
     releaseTypes:
-    - Feature
+    - Security
     recommended: true
 
   managedUpdates:
