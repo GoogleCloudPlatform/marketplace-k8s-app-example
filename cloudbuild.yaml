@@ -87,7 +87,24 @@ steps:
   name: gcr.io/cloud-marketplace-tools/k8s/dev:local
   waitFor:
   - Initialized
+  - Fetch Wordpress Reporting Secret
   dir: wordpress
+  env:
+  - 'KUBE_CONFIG=/workspace/.kube'
+  - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
+  # Use local Docker network named cloudbuild as described here:
+  # https://cloud.google.com/cloud-build/docs/overview#build_configuration_and_build_steps
+  - 'EXTRA_DOCKER_PARAMS=--net cloudbuild'
+  args:
+  - make
+  - app/verify
+
+- id: Verify Wordpress Updatable
+  name: gcr.io/cloud-marketplace-tools/k8s/dev:local
+  waitFor:
+  - Initialized
+  - Fetch Wordpress Reporting Secret
+  dir: wordpress-updatable
   env:
   - 'KUBE_CONFIG=/workspace/.kube'
   - 'GCLOUD_CONFIG=/workspace/.config/gcloud'
