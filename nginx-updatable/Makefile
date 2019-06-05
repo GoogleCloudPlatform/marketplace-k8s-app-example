@@ -22,6 +22,8 @@ APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)" \
 }
+APP_TEST_PARAMETERS ?= {}
+
 
 # app.Makefile provides the main targets for installing the
 # application.
