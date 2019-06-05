@@ -5,7 +5,7 @@ TRACK ?= 0.1
 
 # Check directory versions/ for all available release values.
 RELEASE ?= 0.1.1
-ifneq ($(shell [[ -d "versions/$(RELEASE)" ]] && echo "OK"),OK)
+ifneq ($(shell [ -d "versions/$(RELEASE)" ] && echo "OK"),OK)
   $(error "Release version $(RELEASE) doesn't exist. Check versions/ directory.")
 endif
 
