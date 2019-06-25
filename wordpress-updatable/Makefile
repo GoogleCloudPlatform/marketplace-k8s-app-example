@@ -24,7 +24,7 @@ APP_PARAMETERS ?= { \
   "reportingSecret": "$(REPORTING_SECRET)" \
 }
 # TODO(huyhg): Fix tester image.
-TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(TRACK)
+TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(RELEASE)
 APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
