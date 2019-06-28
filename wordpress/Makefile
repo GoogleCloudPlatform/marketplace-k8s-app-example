@@ -4,11 +4,6 @@ TAG ?= latest
 include ../gcloud.Makefile
 include ../var.Makefile
 
-# app.Makefile provides the main targets for installing the
-# application.
-# It requires several APP_* variables defined as followed.
-include ../app.Makefile
-
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
 NAME ?= wordpress-1
 REPORTING_SECRET ?= gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
@@ -25,6 +20,13 @@ TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 APP_TEST_PARAMETERS ?= { \
   "imageTester": "$(TESTER_IMAGE)" \
 }
+
+# app.Makefile provides the main targets for installing the
+# application.
+# It requires several APP_* variables defined above, and thus
+# must be included after.
+include ../app.Makefile
+
 
 # Extend the target as defined in app.Makefile to
 # include real dependencies.
