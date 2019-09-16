@@ -87,6 +87,10 @@ properties:
     - ClusterIP
     default: ClusterIP
     title: Service type of WordPress
+  maskedField:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
 required:
 - name
 - namespace
@@ -101,6 +105,7 @@ required:
 - customBoolean
 - reportingSecret
 - serviceType
+- maskedField
 form:
 - widget: help
   description: My arbitrary <i>description</i>
