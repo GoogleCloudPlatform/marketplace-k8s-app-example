@@ -60,6 +60,12 @@ properties:
     title: A custom boolean parameter.
     type: boolean
     default: false
+  customSecret:
+    title: Secret needed by the app.
+    description: User-entered text to be masked in the UI.
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
   reportingSecret:
     type: string
     x-google-marketplace:
@@ -99,6 +105,7 @@ required:
 - customString
 - customInteger
 - customBoolean
+- customSecret
 - reportingSecret
 - serviceType
 form:
