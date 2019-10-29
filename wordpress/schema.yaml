@@ -122,3 +122,7 @@ x-google-marketplace:
           type: REQUIRE_ONE_NODE_PER_REPLICA
     istio:
       type: OPTIONAL
+    gcp:
+      nodes:
+        requiredOauthScopes:
+          - https://www.googleapis.com/auth/cloud-platform
