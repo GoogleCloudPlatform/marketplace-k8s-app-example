@@ -64,6 +64,7 @@ properties:
     title: Secret needed by the app.
     description: User-entered text to be masked in the UI.
     type: string
+    default: 'some-secret'
     x-google-marketplace:
       type: MASKED_FIELD
   reportingSecret:
