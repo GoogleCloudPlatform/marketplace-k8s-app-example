@@ -126,4 +126,4 @@ x-google-marketplace:
     gcp:
       nodes:
         requiredOauthScopes:
-          - https://www.googleapis.com/auth/cloud-platform
+        - https://www.googleapis.com/auth/cloud-platform
