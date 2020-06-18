@@ -11,6 +11,9 @@ x-google-marketplace:
     - Feature
     recommended: true
 
+  managedUpdates:
+    kalmSupported: true
+
   clusterConstraints:
     resources:
     - replicas: 3
