@@ -29,7 +29,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: "{{ .Release.Name }}"
   componentKinds:
-  - group: apps/v1beta2
+  - group: apps
     kind: Deployment
-  - group: v1
+  - group: ''
     kind: Service
