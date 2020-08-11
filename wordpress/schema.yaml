@@ -94,6 +94,32 @@ properties:
     - ClusterIP
     default: ClusterIP
     title: Service type of WordPress
+  storageClass:
+    type: string
+    title: Test StorageClass
+    description: For testing the STORAGE_CLASS property. Optional since unused.
+    x-google-marketplace:
+      type: STORAGE_CLASS
+      storageClass:
+        type: SSD
+  serviceAccount:
+    type: string
+    title: Test ServiceAccount
+    description: For testing the SERVICE_ACCOUNT property. Optional since unused.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Manages the CRDs used by the app.
+        roles:
+        - type: ClusterRole
+          rulesType: CUSTOM
+          rules:
+            - apiGroups:
+              - apiextensions.k8s.io
+              resources:
+              - customresourcedefinitions
+              verbs:
+              - '*'
 required:
 - name
 - namespace
