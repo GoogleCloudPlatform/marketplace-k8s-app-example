@@ -5,6 +5,8 @@ Google Cloud Marketplace. **Not intended for actual use!***
 *Content below is intended as a template for end-user documentation. Work in
 progress.*
 
+*Testing updated CloudBuild trigger*.
+
 # Overview
 
 WordPress is a free and open-source content management system (CMS) based on PHP
