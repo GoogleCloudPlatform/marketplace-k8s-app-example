@@ -37,12 +37,12 @@ Follow these instructions to install WordPress from the command line.
 
 Set environment variables (modify if necessary):
 ```
-export APP_INSTANCE_NAME=wordpress-1
-export NAMESPACE=default
-export IMAGE_WORDPRESS=launcher.gcr.io/google/wordpress:4
-export IMAGE_INIT=launcher.gcr.io/google/wordpress/init:4
-export IMAGE_MYSQL=launcher.gcr.io/google/mysql:5
-export IMAGE_UBBAGENT=launcher.gcr.io/google/ubbagent
+export name=wordpress-1
+export namespace=default
+export imageWordpress=launcher.gcr.io/google/wordpress:4
+export imageInit=launcher.gcr.io/google/wordpress/init:4
+export imageMysql=launcher.gcr.io/google/mysql:5
+export imageUbbagent=launcher.gcr.io/google/ubbagent
 
 # Use the name of the secret created for the license key
 export reportingSecret=<license-key-secret-name>
