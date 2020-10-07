@@ -88,8 +88,8 @@ app/build:: .build/wordpress-updatable/deployer \
                                       .build/var/RELEASE \
                                       | .build/wordpress-updatable
 	$(call print_target, $@)
-	docker pull launcher.gcr.io/google/wordpress4-php5-apache
-	docker tag launcher.gcr.io/google/wordpress4-php5-apache "$(REGISTRY)/$(APP_ID):$(TRACK)"
+	docker pull marketplace.gcr.io/google/wordpress5-php7-apache
+	docker tag marketplace.gcr.io/google/wordpress5-php7-apache "$(REGISTRY)/$(APP_ID):$(TRACK)"
 	docker tag "$(REGISTRY)/$(APP_ID):$(TRACK)" "$(REGISTRY)/$(APP_ID):$(RELEASE)"
 	docker push "$(REGISTRY)/$(APP_ID):$(TRACK)"
 	docker push "$(REGISTRY)/$(APP_ID):$(RELEASE)"
@@ -115,8 +115,8 @@ app/build:: .build/wordpress-updatable/deployer \
                                   .build/var/RELEASE \
                                   | .build/wordpress-updatable
 	$(call print_target, $@)
-	docker pull launcher.gcr.io/google/mysql5
-	docker tag launcher.gcr.io/google/mysql5 "$(REGISTRY)/$(APP_ID)/mysql:$(TRACK)"
+	docker pull marketplace.gcr.io/google/mysql5
+	docker tag marketplace.gcr.io/google/mysql5 "$(REGISTRY)/$(APP_ID)/mysql:$(TRACK)"
 	docker tag "$(REGISTRY)/$(APP_ID)/mysql:$(TRACK)" "$(REGISTRY)/$(APP_ID)/mysql:$(RELEASE)"
 	docker push "$(REGISTRY)/$(APP_ID)/mysql:$(TRACK)"
 	docker push "$(REGISTRY)/$(APP_ID)/mysql:$(RELEASE)"
