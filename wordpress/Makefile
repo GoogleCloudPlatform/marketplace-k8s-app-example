@@ -17,9 +17,6 @@ APP_PARAMETERS ?= { \
   "reportingSecret": "$(REPORTING_SECRET)" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
-APP_TEST_PARAMETERS ?= { \
-  "imageTester": "$(TESTER_IMAGE)" \
-}
 
 # app.Makefile provides the main targets for installing the
 # application.
