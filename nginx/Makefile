@@ -12,9 +12,6 @@ APP_PARAMETERS ?= { \
   "imageNginx.image": "$(REGISTRY)/example/nginx:$(TAG)" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/nginx/tester:$(TAG)
-APP_TEST_PARAMETERS ?= { \
-  "tester.image": "$(TESTER_IMAGE)" \
-}
 
 # app.Makefile provides the main targets for installing the
 # application.
