@@ -35,6 +35,13 @@ $(shell echo '$(APP_PARAMETERS)' \
 endef
 
 
+# Combines APP_PARAMETERS and APP_TEST_PARAMETERS.
+define combined_parameters
+$(shell echo '$(APP_PARAMETERS)' '$(APP_TEST_PARAMETERS)' \
+    | docker run -i --entrypoint=/usr/bin/jq --rm $(APP_DEPLOYER_IMAGE) -s '.[0] * .[1]')
+endef
+
+
 ##### Helper targets #####
 
 
@@ -87,7 +94,7 @@ app/install-test:: app/build \
 	$(call print_target)
 	.build/app/dev install \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(APP_PARAMETERS)' \
+	    --parameters='$(call combined_parameters)' \
 	    --entrypoint="/bin/deploy_with_tests.sh"
 
 
@@ -111,7 +118,7 @@ app/verify: app/build \
 	$(call print_target)
 	.build/app/dev verify \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(APP_PARAMETERS)'
+	    --parameters='$(call combined_parameters)'
 
 
 # Runs diagnostic tool to make sure your environment is properly setup.
