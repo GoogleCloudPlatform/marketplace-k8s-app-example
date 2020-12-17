@@ -4,20 +4,7 @@ steps:
 
 - id: Initialize git
   name: gcr.io/cloud-builders/git
-  entrypoint: /bin/bash
-  args:
-  - -exc
-  - |
-    # Cloud Build x GitHub integration uses source archives to fetch
-    # the source, rather than Git source fetching, and as a consequence
-    # does not include the .git/ directory. As a workaround, we clone
-    # the repository and reset it to this build's commit sha.
-    git clone 'https://github.com/GoogleCloudPlatform/marketplace-k8s-app-example.git' tmp
-    mv tmp/.git .git
-    rm -rf tmp
-    git reset "$COMMIT_SHA"
-    git submodule sync --recursive
-    git submodule update --init --recursive
+  args: ['submodule', 'update', '--init', '--recursive']
 
 - id: Get Kubernetes Credentials
   name: gcr.io/cloud-builders/gcloud
