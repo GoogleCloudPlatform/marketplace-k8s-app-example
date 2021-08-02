@@ -2,9 +2,9 @@ x-google-marketplace:
   schemaVersion: v2
   applicationApiVersion: v1beta1
 
-  publishedVersion: '0.1.1'
+  publishedVersion: '1.1.0'
   publishedVersionMetadata:
-    releaseNote: Release note for 0.1.1
+    releaseNote: Upgrade to schema v2
 
   clusterConstraints:
     resources:
