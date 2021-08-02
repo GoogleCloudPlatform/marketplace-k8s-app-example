@@ -4,25 +4,24 @@ TAG ?= latest
 include ../gcloud.Makefile
 include ../var.Makefile
 
+RELEASE ?= 0.1.1
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/example/wordpress/deployer:$(TAG)
+APP_DEPLOYER_IMAGE_TRACK_TAG ?= $(REGISTRY)/$(APP_ID)/deployer:$(TRACK)
+APP_GCS_PATH ?= $(GCS_URL)/$(APP_ID)/$(TRACK)
 NAME ?= wordpress-1
 REPORTING_SECRET ?= gs://cloud-marketplace-ops-test-kokoro/reporting_secrets/wordpress.yaml
 APP_PARAMETERS ?= { \
   "name": "$(NAME)", \
   "namespace": "$(NAMESPACE)", \
-  "imageWordpress": "$(REGISTRY)/example/wordpress:$(TAG)", \
-  "imageInit": "$(REGISTRY)/example/wordpress/init:$(TAG)", \
-  "imageMysql": "$(REGISTRY)/example/wordpress/mysql:$(TAG)", \
-  "imageUbbagent": "$(REGISTRY)/example/wordpress/ubbagent:$(TAG)", \
   "reportingSecret": "$(REPORTING_SECRET)" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/wordpress/tester:$(TAG)
 
-# app.Makefile provides the main targets for installing the
+# app_v2.Makefile provides the main targets for installing the
 # application.
 # It requires several APP_* variables defined above, and thus
 # must be included after.
-include ../app.Makefile
+include ../app_v2.Makefile
 
 
 # Extend the target as defined in app.Makefile to
