@@ -5,6 +5,8 @@ x-google-marketplace:
   publishedVersion: '1.1.0'
   publishedVersionMetadata:
     releaseNote: Upgrade to schema v2
+    releaseTypes:
+    - BugFix
 
   clusterConstraints:
     resources:
