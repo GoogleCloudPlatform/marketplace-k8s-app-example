@@ -14,6 +14,13 @@ include $(makefile_dir)/var.Makefile
 
 ##### Validations and Information #####
 
+
+ifndef APP_GCS_PATH
+$(error APP_GCS_PATH must be defined)
+endif
+
+$(info ---- APP_GCS_PATH = $(APP_GCS_PATH))
+
 ifndef APP_DEPLOYER_IMAGE
 $(error APP_DEPLOYER_IMAGE must be defined)
 endif
@@ -72,20 +79,35 @@ endef
 .PHONY: app/build
 app/build:: ;
 
+
+.PHONY: app/publish
+app/publish:: app/build \
+              .build/var/APP_DEPLOYER_IMAGE \
+              .build/var/APP_GCS_PATH \
+              .build/var/MARKETPLACE_TOOLS_TAG \
+              | .build/app/dev
+	$(call print_target)
+	.build/app/dev publish \
+	    --deployer_image='$(APP_DEPLOYER_IMAGE)' \
+	    --gcs_repo='$(APP_GCS_PATH)'
+
 # Installs the application into target namespace on the cluster.
 .PHONY: app/install
-app/install:: .build/var/APP_DEPLOYER_IMAGE \
+app/install:: app/publish \
+              .build/var/APP_DEPLOYER_IMAGE \
               .build/var/APP_PARAMETERS \
               .build/var/MARKETPLACE_TOOLS_TAG \
               | .build/app/dev
 	$(call print_target)
 	.build/app/dev install \
+	    --version_meta_file='$(APP_GCS_PATH)/$(RELEASE).yaml' \
 	    --parameters='$(APP_PARAMETERS)'
 
 
 # Installs the application into target namespace on the cluster.
 .PHONY: app/install-test
-app/install-test:: .build/var/APP_DEPLOYER_IMAGE \
+app/install-test:: app/publish \
+                   .build/var/APP_DEPLOYER_IMAGE \
                    .build/var/APP_PARAMETERS \
                    .build/var/MARKETPLACE_TOOLS_TAG \
 	           | .build/app/dev
@@ -108,7 +130,8 @@ app/uninstall: .build/var/APP_DEPLOYER_IMAGE \
 
 # Runs the verification pipeline.
 .PHONY: app/verify
-app/verify: .build/var/APP_DEPLOYER_IMAGE \
+app/verify: app/publish \
+            .build/var/APP_DEPLOYER_IMAGE \
             .build/var/APP_PARAMETERS \
             .build/var/MARKETPLACE_TOOLS_TAG \
             | .build/app/dev
