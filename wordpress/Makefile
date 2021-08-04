@@ -59,6 +59,7 @@ app/build:: .build/wordpress/deployer \
                                      $(shell find deployer -type f) \
                                      $(shell find manifest -type f) \
                                      $(shell find versions -type f) \
+																		 | .build/wordpress
 	$(call print_target, $@)
 	docker build \
 	    --build-arg RELEASE="$(RELEASE)" \
