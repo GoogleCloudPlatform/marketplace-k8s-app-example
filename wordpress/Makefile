@@ -50,8 +50,15 @@ app/build:: .build/wordpress/deployer \
 .build/wordpress: | .build
 	mkdir -p "$@"
 
-.build/wordpress/deployer: $(shell find . -mindepth 2 -type f) \
-                               | .build/wordpress
+.build/wordpress/deployer: .build/var/APP_DEPLOYER_IMAGE \
+                                     .build/var/MARKETPLACE_TOOLS_TAG \
+                                     .build/var/REGISTRY \
+                                     .build/var/TRACK \
+                                     .build/var/RELEASE \
+                                     $(shell find apptest/deployer -type f) \
+                                     $(shell find deployer -type f) \
+                                     $(shell find manifest -type f) \
+                                     $(shell find versions -type f) \
 	$(call print_target, $@)
 	docker build \
 	    --build-arg RELEASE="$(RELEASE)" \
