@@ -1,18 +1,12 @@
 x-google-marketplace:
   schemaVersion: v2
-
   applicationApiVersion: v1beta1
 
-  publishedVersion: '0.1.1'
+  publishedVersion: '1.1.0'
   publishedVersionMetadata:
-    releaseNote: >-
-      Initial release.
+    releaseNote: Upgrade to schema v2
     releaseTypes:
-    - Feature
-    recommended: true
-
-  managedUpdates:
-    kalmSupported: true
+    - BugFix
 
   clusterConstraints:
     resources:
@@ -24,6 +18,10 @@ x-google-marketplace:
           type: REQUIRE_ONE_NODE_PER_REPLICA
     istio:
       type: OPTIONAL
+    gcp:
+      nodes:
+        requiredOauthScopes:
+        - https://www.googleapis.com/auth/cloud-platform
 
   images:
     '':
@@ -44,6 +42,7 @@ x-google-marketplace:
       properties:
         imageUbbagent:
           type: FULL
+
 
 properties:
   name:
@@ -81,6 +80,13 @@ properties:
     title: A custom boolean parameter.
     type: boolean
     default: false
+  customSecret:
+    title: Secret needed by the app.
+    description: User-entered text to be masked in the UI.
+    type: string
+    default: 'some-secret'
+    x-google-marketplace:
+      type: MASKED_FIELD
   reportingSecret:
     type: string
     x-google-marketplace:
@@ -108,7 +114,32 @@ properties:
     - ClusterIP
     default: ClusterIP
     title: Service type of WordPress
-
+  storageClass:
+    type: string
+    title: Test StorageClass
+    description: For testing the STORAGE_CLASS property. Optional since unused.
+    x-google-marketplace:
+      type: STORAGE_CLASS
+      storageClass:
+        type: SSD
+  serviceAccount:
+    type: string
+    title: Test ServiceAccount
+    description: For testing the SERVICE_ACCOUNT property. Optional since unused.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Manages the CRDs used by the app.
+        roles:
+        - type: ClusterRole
+          rulesType: CUSTOM
+          rules:
+            - apiGroups:
+              - apiextensions.k8s.io
+              resources:
+              - customresourcedefinitions
+              verbs:
+              - '*'
 required:
 - name
 - namespace
@@ -117,6 +148,7 @@ required:
 - customString
 - customInteger
 - customBoolean
+- customSecret
 - reportingSecret
 - serviceType
 
