@@ -17,4 +17,4 @@ ARG RELEASE
 COPY versions/$RELEASE/manifest /data/manifest
 
 COPY apptest/deployer /data-test/
-#COPY --from=build /tmp/apptest/schema.yaml /data-test/
+COPY --from=build /tmp/apptest/schema.yaml /data-test/
