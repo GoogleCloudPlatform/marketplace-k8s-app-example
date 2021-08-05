@@ -1,4 +1,4 @@
 properties:
   imageTester:
     type: string
-    default: $REGISTRY/tester:$TAG
+    default: gcr.io/cloud-marketplace-ops/e2e-testing/k8s-app/example/wordpress/tester:1.1.0
