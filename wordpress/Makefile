@@ -51,6 +51,7 @@ app/build:: .build/wordpress/deployer \
                                      .build/var/REGISTRY \
                                      .build/var/TRACK \
                                      .build/var/RELEASE \
+                                     .build/var/TESTER_IMAGE \
                                      $(shell find apptest/deployer -type f) \
                                      $(shell find deployer -type f) \
                                      $(shell find manifest -type f) \
