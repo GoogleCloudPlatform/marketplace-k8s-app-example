@@ -25,9 +25,7 @@ APP_PARAMETERS ?= { \
 }
 TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(RELEASE)
 $(info ---- TESTER_IMAGE = $(TESTER_IMAGE))
-APP_TEST_PARAMETERS ?= { \
-  "imageTester": "$(TESTER_IMAGE)" \
-}
+
 
 
 # app_v2.Makefile provides the main targets for installing the

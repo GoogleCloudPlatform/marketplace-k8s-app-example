@@ -38,13 +38,6 @@ $(shell echo '$(APP_PARAMETERS)' \
 endef
 
 
-# Combines APP_PARAMETERS and APP_TEST_PARAMETERS.
-define combined_parameters
-$(shell echo '$(APP_PARAMETERS)' '$(APP_TEST_PARAMETERS)' \
-    | docker run -i --entrypoint=/usr/bin/jq --rm $(APP_DEPLOYER_IMAGE) -s '.[0] * .[1]')
-endef
-
-
 ##### Helper targets #####
 
 
@@ -93,7 +86,7 @@ app/install-test:: .build/var/APP_DEPLOYER_IMAGE \
 	$(call print_target)
 	.build/app/dev install \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(call combined_parameters)' \
+	    --parameters='$(APP_PARAMETERS)' \
 	    --entrypoint="/bin/deploy_with_tests.sh"
 
 
@@ -103,7 +96,7 @@ app/uninstall: .build/var/APP_DEPLOYER_IMAGE \
                .build/var/APP_PARAMETERS
 	$(call print_target)
 	kubectl delete 'application/$(call name_parameter)' \
-	    --namespace='$(call namespace_parameter)' \
+	    --namespace='$(APP_PARAMETERS)' \
 	    --ignore-not-found
 
 
@@ -117,7 +110,7 @@ app/verify: .build/var/APP_DEPLOYER_IMAGE \
 	$(call print_target)
 	.build/app/dev verify \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(call combined_parameters)'
+	    --parameters='$(APP_PARAMETERS)'
 
 
 # Runs diagnostic tool to make sure your environment is properly setup.
