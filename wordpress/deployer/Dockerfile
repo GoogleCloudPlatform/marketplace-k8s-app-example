@@ -1,11 +1,10 @@
 ARG MARKETPLACE_TOOLS_TAG
-ARG TESTER_IMAGE
 FROM marketplace.gcr.io/google/debian10 AS build
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
 
-
+ARG TESTER_IMAGE
 ADD apptest/deployer/schema.yaml /tmp/apptest/schema.yaml
 RUN cat /tmp/apptest/schema.yaml \
     | env -i "TESTER_IMAGE=$TESTER_IMAGE" envsubst \
