@@ -87,7 +87,7 @@ app/install:: .build/var/APP_DEPLOYER_IMAGE \
 .PHONY: app/install-test
 app/install-test:: .build/var/APP_DEPLOYER_IMAGE \
                    .build/var/APP_PARAMETERS \
-                   .build/var/APP_TEST_PARAMETERS \
+                   .build/var/TESTER_IMAGE \
                    .build/var/MARKETPLACE_TOOLS_TAG \
 	           | .build/app/dev
 	$(call print_target)
@@ -111,7 +111,7 @@ app/uninstall: .build/var/APP_DEPLOYER_IMAGE \
 .PHONY: app/verify
 app/verify: .build/var/APP_DEPLOYER_IMAGE \
             .build/var/APP_PARAMETERS \
-            .build/var/APP_TEST_PARAMETERS \
+            .build/var/TESTER_IMAGE \
             .build/var/MARKETPLACE_TOOLS_TAG \
             | .build/app/dev
 	$(call print_target)
