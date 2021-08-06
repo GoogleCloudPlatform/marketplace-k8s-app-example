@@ -64,6 +64,7 @@ app/build:: .build/wordpress/deployer \
 	docker build \
 	    --build-arg RELEASE="$(RELEASE)" \
 	    --build-arg MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" \
+	    --build-arg TESTER_IMAGE="$(TESTER_IMAGE)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
