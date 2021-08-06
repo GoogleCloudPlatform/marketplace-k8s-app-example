@@ -25,7 +25,7 @@ APP_PARAMETERS ?= { \
 }
 TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(RELEASE)
 APP_TEST_PARAMETERS ?= { \
-  # "imageTester": "$(TESTER_IMAGE)" \
+  "imageTester": "$(TESTER_IMAGE)" \
 }
 
 
