@@ -7,7 +7,7 @@ RUN apt-get update \
 ARG TESTER_IMAGE
 ADD apptest/deployer/schema.yaml /tmp/apptest/schema.yaml
 RUN cat /tmp/apptest/schema.yaml \
-    | env -i "TESTER_IMAGE=gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:1.1.0" envsubst \
+    | env -i "TESTER_IMAGE=$TESTER_IMAGE" envsubst \
     > /tmp/apptest/schema.yaml.new \
     && mv /tmp/apptest/schema.yaml.new /tmp/apptest/schema.yaml
 

@@ -24,8 +24,6 @@ APP_PARAMETERS ?= { \
   "reportingSecret": "$(REPORTING_SECRET)" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(RELEASE)
-$(info ---- TESTER_IMAGE = $(TESTER_IMAGE))
-
 
 
 # app_v2.Makefile provides the main targets for installing the

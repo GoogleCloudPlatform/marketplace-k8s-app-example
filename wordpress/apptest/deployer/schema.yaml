@@ -1,4 +1,4 @@
 properties:
   imageTester:
     type: string
-    default: gcr.io/cloud-marketplace-ops-test/example/wordpress/deployer:1.1.0
+    default: $TESTER_IMAGE
