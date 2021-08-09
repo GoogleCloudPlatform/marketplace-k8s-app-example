@@ -49,6 +49,7 @@ app/build:: .build/nginx/deployer \
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --build-arg TAG="$(TAG)" \
+	    --build-arg TESTER_IMAGE="$(TESTER_IMAGE)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
