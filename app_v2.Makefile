@@ -96,7 +96,7 @@ app/uninstall: .build/var/APP_DEPLOYER_IMAGE \
                .build/var/APP_PARAMETERS
 	$(call print_target)
 	kubectl delete 'application/$(call name_parameter)' \
-	    --namespace='$(APP_PARAMETERS)' \
+	    --namespace='$(call namespace_parameter)' \
 	    --ignore-not-found
 
 
