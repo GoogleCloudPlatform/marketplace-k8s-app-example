@@ -23,11 +23,7 @@ APP_PARAMETERS ?= { \
   "namespace": "$(NAMESPACE)", \
   "reportingSecret": "$(REPORTING_SECRET)" \
 }
-# TODO(huyhg): Fix tester image.
 TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(RELEASE)
-APP_TEST_PARAMETERS ?= { \
-  "imageTester": "$(TESTER_IMAGE)" \
-}
 
 
 # app_v2.Makefile provides the main targets for installing the
@@ -55,6 +51,7 @@ app/build:: .build/wordpress/deployer \
                                      .build/var/REGISTRY \
                                      .build/var/TRACK \
                                      .build/var/RELEASE \
+                                     .build/var/TESTER_IMAGE \
                                      $(shell find apptest/deployer -type f) \
                                      $(shell find deployer -type f) \
                                      $(shell find manifest -type f) \
@@ -64,6 +61,7 @@ app/build:: .build/wordpress/deployer \
 	docker build \
 	    --build-arg RELEASE="$(RELEASE)" \
 	    --build-arg MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" \
+	    --build-arg TESTER_IMAGE="$(TESTER_IMAGE)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
