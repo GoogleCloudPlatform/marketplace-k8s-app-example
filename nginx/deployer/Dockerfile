@@ -33,4 +33,5 @@ FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm
 COPY --from=build /tmp/nginx.tar.gz /data/chart/
 COPY --from=build /tmp/test/nginx.tar.gz /data-test/chart/
 COPY apptest/deployer/schema.yaml /data-test/
+COPY --from=build /tmp/apptest/schema.yaml /data-test/
 COPY --from=build /tmp/schema.yaml /data/
