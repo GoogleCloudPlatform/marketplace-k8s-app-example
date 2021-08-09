@@ -102,7 +102,7 @@ app/uninstall: .build/var/APP_DEPLOYER_IMAGE \
 
 # Runs the verification pipeline.
 .PHONY: app/verify
-app/verify: .app/build \
+app/verify: app/build \
             .build/var/APP_DEPLOYER_IMAGE \
             .build/var/APP_PARAMETERS \
             .build/var/APP_PARAMETERS \
