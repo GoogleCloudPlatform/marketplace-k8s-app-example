@@ -4,6 +4,7 @@ FROM marketplace.gcr.io/google/debian10 AS build
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
 
+# Provide default value for tester image.
 ARG TESTER_IMAGE
 ADD apptest/deployer/schema.yaml /tmp/apptest/schema.yaml
 RUN cat /tmp/apptest/schema.yaml \
