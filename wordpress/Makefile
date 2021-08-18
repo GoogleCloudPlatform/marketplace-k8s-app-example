@@ -26,11 +26,11 @@ APP_PARAMETERS ?= { \
 TESTER_IMAGE ?= $(REGISTRY)/$(APP_ID)/tester:$(RELEASE)
 
 
-# app_v2.Makefile provides the main targets for installing the
+# app.Makefile provides the main targets for installing the
 # application.
 # It requires several APP_* variables defined above, and thus
 # must be included after.
-include ../app_v2.Makefile
+include ../app.Makefile
 
 
 # Extend the target as defined in app.Makefile to

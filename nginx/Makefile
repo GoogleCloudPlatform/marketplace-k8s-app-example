@@ -12,9 +12,7 @@ APP_PARAMETERS ?= { \
   "imageNginx.image": "$(REGISTRY)/example/nginx:$(TAG)" \
 }
 TESTER_IMAGE ?= $(REGISTRY)/example/nginx/tester:$(TAG)
-APP_TEST_PARAMETERS ?= { \
-  "tester.image": "$(TESTER_IMAGE)" \
-}
+
 
 # app.Makefile provides the main targets for installing the
 # application.
@@ -44,11 +42,13 @@ app/build:: .build/nginx/deployer \
                        .build/var/MARKETPLACE_TOOLS_TAG \
                        .build/var/REGISTRY \
                        .build/var/TAG \
+                       .build/var/TESTER_IMAGE \
                        | .build/nginx
 	$(call print_target, $@)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
 	    --build-arg TAG="$(TAG)" \
+	    --build-arg TESTER_IMAGE="$(TESTER_IMAGE)" \
 	    --tag "$(APP_DEPLOYER_IMAGE)" \
 	    -f deployer/Dockerfile \
 	    .
