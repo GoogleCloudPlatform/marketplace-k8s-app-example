@@ -10,7 +10,6 @@ include $(makefile_dir)/var.Makefile
 
 ##### Validations and Information #####
 
-
 ifndef APP_DEPLOYER_IMAGE
 $(error APP_DEPLOYER_IMAGE must be defined)
 endif
@@ -32,13 +31,6 @@ endef
 define namespace_parameter
 $(shell echo '$(APP_PARAMETERS)' \
     | docker run -i --entrypoint=/bin/print_config.py --rm $(APP_DEPLOYER_IMAGE) --values_mode stdin --xtype NAMESPACE)
-endef
-
-
-# Combines APP_PARAMETERS and APP_TEST_PARAMETERS.
-define combined_parameters
-$(shell echo '$(APP_PARAMETERS)' '$(APP_TEST_PARAMETERS)' \
-    | docker run -i --entrypoint=/usr/bin/jq --rm $(APP_DEPLOYER_IMAGE) -s '.[0] * .[1]')
 endef
 
 
@@ -69,32 +61,28 @@ endef
 .PHONY: app/build
 app/build:: ;
 
-
 # Installs the application into target namespace on the cluster.
 .PHONY: app/install
-app/install:: app/build \
-              .build/var/APP_DEPLOYER_IMAGE \
+app/install:: .build/var/APP_DEPLOYER_IMAGE \
               .build/var/APP_PARAMETERS \
               .build/var/MARKETPLACE_TOOLS_TAG \
               | .build/app/dev
 	$(call print_target)
 	.build/app/dev install \
-	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(APP_PARAMETERS)' \
-	    --entrypoint="/bin/deploy.sh"
+	    --parameters='$(APP_PARAMETERS)'
 
 
 # Installs the application into target namespace on the cluster.
 .PHONY: app/install-test
-app/install-test:: app/build \
-                   .build/var/APP_DEPLOYER_IMAGE \
+app/install-test:: .build/var/APP_DEPLOYER_IMAGE \
                    .build/var/APP_PARAMETERS \
+                   .build/var/TESTER_IMAGE \
                    .build/var/MARKETPLACE_TOOLS_TAG \
 	           | .build/app/dev
 	$(call print_target)
 	.build/app/dev install \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(call combined_parameters)' \
+	    --parameters='$(APP_PARAMETERS)' \
 	    --entrypoint="/bin/deploy_with_tests.sh"
 
 
@@ -113,12 +101,13 @@ app/uninstall: .build/var/APP_DEPLOYER_IMAGE \
 app/verify: app/build \
             .build/var/APP_DEPLOYER_IMAGE \
             .build/var/APP_PARAMETERS \
+            .build/var/TESTER_IMAGE \
             .build/var/MARKETPLACE_TOOLS_TAG \
             | .build/app/dev
 	$(call print_target)
 	.build/app/dev verify \
 	    --deployer='$(APP_DEPLOYER_IMAGE)' \
-	    --parameters='$(call combined_parameters)'
+	    --parameters='$(APP_PARAMETERS)'
 
 
 # Runs diagnostic tool to make sure your environment is properly setup.
