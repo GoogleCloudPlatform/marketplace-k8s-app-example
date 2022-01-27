@@ -25,20 +25,24 @@ x-google-marketplace:
 
   images:
     '':
+      digest: $WORDPRESS_DIGEST
       properties:
         imageWordpressRepo:
           type: REPO_WITH_REGISTRY
-        imageWordpressTag:
-          type: TAG
+        imageWordpressDigest:
+          type: DIGEST
     init:
+      digest: $INIT_DIGEST
       properties:
         imageInit:
           type: FULL
     mysql:
+      digest: $MYSQL_DIGEST
       properties:
         imageMysql:
           type: FULL
     ubbagent:
+      digest: $UBB_DIGEST
       properties:
         imageUbbagent:
           type: FULL

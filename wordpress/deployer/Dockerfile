@@ -12,14 +12,18 @@ RUN cat /tmp/apptest/schema.yaml \
     > /tmp/apptest/schema.yaml.new \
     && mv /tmp/apptest/schema.yaml.new /tmp/apptest/schema.yaml
 
-FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$MARKETPLACE_TOOLS_TAG
-
 ARG RELEASE
+ADD versions/$RELEASE/schema.yaml /tmp/schema.yaml
+ADD .env /tmp/.env
+RUN . /tmp/.env && cat /tmp/schema.yaml \
+    | envsubst > /tmp/schema.yaml.new \
+    && mv /tmp/schema.yaml.new /tmp/schema.yaml
 
-COPY versions/$RELEASE/schema.yaml /data/schema.yaml
-
+FROM gcr.io/cloud-marketplace-tools/k8s/deployer_envsubst:$MARKETPLACE_TOOLS_TAG
+ARG RELEASE
 COPY manifest /data/manifest
 COPY versions/$RELEASE/manifest /data/manifest
 
 COPY apptest/deployer /data-test/
 COPY --from=build /tmp/apptest/schema.yaml /data-test/
+COPY --from=build /tmp/schema.yaml /data

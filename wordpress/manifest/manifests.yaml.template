@@ -112,7 +112,7 @@ spec:
         - name: ubbagent-config
           mountPath: /etc/ubbagent
       containers:
-      - image: $imageWordpressRepo:$imageWordpressTag
+      - image: $imageWordpressRepo@$imageWordpressDigest
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST

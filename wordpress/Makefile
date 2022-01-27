@@ -46,12 +46,24 @@ app/build:: .build/wordpress/deployer \
 .build/wordpress: | .build
 	mkdir -p "$@"
 
+.build/wordpress/.env:  .build/wordpress/wordpress \
+        								     .build/wordpress/init \
+        								     .build/wordpress/mysql \
+        								     .build/wordpress/ubbagent
+	$(call print_target, $@)
+	@echo export INIT_DIGEST="$(call get_image_digest, "$(REGISTRY)/$(APP_ID)/init:$(TRACK)")" > .env
+	@echo export WORDPRESS_DIGEST="$(call get_image_digest, "$(REGISTRY)/$(APP_ID):$(TRACK)")" >> .env
+	@echo export MYSQL_DIGEST="$(call get_image_digest, "$(REGISTRY)/$(APP_ID)/mysql:$(TRACK)")" >> .env
+	@echo export UBB_DIGEST="$(call get_image_digest, "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)")" >> .env
+	@touch "$@"
+
 .build/wordpress/deployer: .build/var/APP_DEPLOYER_IMAGE \
                                      .build/var/MARKETPLACE_TOOLS_TAG \
                                      .build/var/REGISTRY \
                                      .build/var/TRACK \
                                      .build/var/RELEASE \
                                      .build/var/TESTER_IMAGE \
+								     .build/wordpress/.env \
                                      $(shell find apptest/deployer -type f) \
                                      $(shell find deployer -type f) \
                                      $(shell find manifest -type f) \

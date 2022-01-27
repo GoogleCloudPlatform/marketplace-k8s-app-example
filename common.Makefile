@@ -2,7 +2,12 @@ ifndef __COMMON_MAKEFILE__
 
 __COMMON_MAKEFILE__ := included
 
+define get_image_digest
+$(shell docker inspect --format='{{index .RepoDigests 0}}' $(1) \
+  | cut -d'@' -f 2)
+endef
 
+# docker inspect --format='{{index .RepoDigests 0}}' $(1)
 define print_target
   @$(call print_notice,Building $@...)
 endef
