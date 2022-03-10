@@ -125,8 +125,8 @@ app/build:: .build/wordpress/deployer \
                                      .build/var/RELEASE \
                                      | .build/wordpress
 	$(call print_target, $@)
-	docker pull "gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607"
-	docker tag "gcr.io/cloud-marketplace-tools/metering/ubbagent:sha_dfb8b727bd23a7e48b6b4904f4fa2aad43634607" "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)"
+	docker pull "gcr.io/cloud-marketplace-tools/metering/ubbagent:1.0.2
+	docker tag "gcr.io/cloud-marketplace-tools/metering/ubbagent:1.0.2" "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)"
 	docker tag "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)" "$(REGISTRY)/$(APP_ID)/ubbagent:$(RELEASE)"
 	docker push "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)"
 	docker push "$(REGISTRY)/$(APP_ID)/ubbagent:$(RELEASE)"
