@@ -4,7 +4,7 @@ APP_ID ?= example/wordpress
 TRACK ?= 1.1
 
 # Check directory versions/ for all available release values.
-RELEASE ?= 1.1.0
+RELEASE ?= 1.1.2
 ifneq ($(shell [ -d "versions/$(RELEASE)" ] && echo "OK"),OK)
   $(error "Release version $(RELEASE) doesn't exist. Check versions/ directory.")
 endif
@@ -125,8 +125,8 @@ app/build:: .build/wordpress/deployer \
                                      .build/var/RELEASE \
                                      | .build/wordpress
 	$(call print_target, $@)
-	docker pull "gcr.io/cloud-marketplace-tools/metering/ubbagent:1.0.2
-	docker tag "gcr.io/cloud-marketplace-tools/metering/ubbagent:1.0.2" "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)"
+	docker pull gcr.io/cloud-marketplace-tools/metering/ubbagent:0.0.2
+	docker tag gcr.io/cloud-marketplace-tools/metering/ubbagent:0.0.2 "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)"
 	docker tag "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)" "$(REGISTRY)/$(APP_ID)/ubbagent:$(RELEASE)"
 	docker push "$(REGISTRY)/$(APP_ID)/ubbagent:$(TRACK)"
 	docker push "$(REGISTRY)/$(APP_ID)/ubbagent:$(RELEASE)"
