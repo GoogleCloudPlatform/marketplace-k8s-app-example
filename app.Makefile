@@ -63,13 +63,15 @@ app/build:: ;
 
 # Installs the application into target namespace on the cluster.
 .PHONY: app/install
-app/install:: .build/var/APP_DEPLOYER_IMAGE \
+app/install:: app/build \
+	      .build/var/APP_DEPLOYER_IMAGE \
               .build/var/APP_PARAMETERS \
               .build/var/MARKETPLACE_TOOLS_TAG \
               | .build/app/dev
 	$(call print_target)
 	.build/app/dev install \
-	    --parameters='$(APP_PARAMETERS)'
+	--deployer='$(APP_DEPLOYER_IMAGE)' \
+	--parameters='$(APP_PARAMETERS)'
 
 
 # Installs the application into target namespace on the cluster.
